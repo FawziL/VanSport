@@ -21,3 +21,5 @@ router.register(r'reseñas', ReseñaViewSet)
 router.register(r'notificaciones', NotificacionViewSet)
 router.register(r'transacciones', TransaccionViewSet)
 router.register(r'envios', EnvioViewSet)
+
+urlpatterns = router.urls

@@ -142,7 +142,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Django REST framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'authentication.auth.UsuarioJWTAuthentication',
+        'ecommerce.auth.UsuarioJWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
@@ -161,5 +161,4 @@ SIMPLE_JWT = {
 # Disable migrations for local apps to work against existing DB schema without applying migrations
 MIGRATION_MODULES = {
     'ecommerce': None,
-    'users': None,
 }
