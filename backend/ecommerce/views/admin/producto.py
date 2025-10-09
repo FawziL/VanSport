@@ -1,46 +1,16 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
-from django.db import models
 from django.conf import settings
 import os
-from ..models import Producto
-from ..serializers import ProductoSerializer
+from ecommerce.models import Producto
+from ecommerce.serializers import ProductoSerializer
 
-class ProductoViewSet(viewsets.ModelViewSet):
+class ProductoViewSetAdmin(viewsets.ModelViewSet):
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
+    permission_classes = [permissions.IsAdminUser]
     parser_classes = [MultiPartParser, FormParser]
-
-    def get_permissions(self):
-        # Solo admin puede crear, actualizar o borrar productos
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [permissions.IsAdminUser()]
-        return [permissions.AllowAny()]
-
-    def get_queryset(self):
-        qs = Producto.objects.all()
-        activo = self.request.query_params.get('activo')
-        categoria_id = self.request.query_params.get('categoria_id')
-        min_price = self.request.query_params.get('min_price')
-        max_price = self.request.query_params.get('max_price')
-        q = self.request.query_params.get('q')
-
-        if activo is not None:
-            qs = qs.filter(activo=activo.lower() in ('1', 'true', 't', 'yes', 'y'))
-        if categoria_id:
-            qs = qs.filter(categoria_id=categoria_id)
-        if min_price:
-            qs = qs.filter(precio__gte=min_price)
-        if max_price:
-            qs = qs.filter(precio__lte=max_price)
-        if q:
-            qs = qs.filter(models.Q(nombre__icontains=q) | models.Q(descripcion__icontains=q))
-        return qs
-
-    def list(self, request, *args, **kwargs):
-        """Listar productos (con filtros opcionales)"""
-        return super().list(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         """Crear producto (solo admin), guardando imagen manualmente"""
@@ -53,10 +23,6 @@ class ProductoViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def retrieve(self, request, *args, **kwargs):
-        """Obtener producto por ID"""
-        return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         """Actualizar producto (solo admin), guardando imagen manualmente"""

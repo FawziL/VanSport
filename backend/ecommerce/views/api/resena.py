@@ -1,8 +1,8 @@
 from rest_framework import viewsets, permissions
-from ..models import Reseña
-from ..serializers import ReseñaSerializer
+from ecommerce.models import Reseña
+from ecommerce.serializers import ReseñaSerializer
 
-class ReseñaViewSet(viewsets.ModelViewSet):
+class ReseñaViewSetApi(viewsets.ModelViewSet):
     queryset = Reseña.objects.all()
     serializer_class = ReseñaSerializer
 

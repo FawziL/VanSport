@@ -1,8 +1,8 @@
 from rest_framework import viewsets, permissions
-from ..models import Envio
-from ..serializers import EnvioSerializer
+from ecommerce.models import Envio
+from ecommerce.serializers import EnvioSerializer
 
-class EnvioViewSet(viewsets.ModelViewSet):
+class EnvioViewSetApi(viewsets.ModelViewSet):
     queryset = Envio.objects.all()
     serializer_class = EnvioSerializer
 
@@ -11,6 +11,4 @@ class EnvioViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_staff:
-            return Envio.objects.all()
         return Envio.objects.filter(pedido__usuario_id=getattr(user, 'usuario_id', None))

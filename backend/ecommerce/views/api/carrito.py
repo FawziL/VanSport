@@ -2,11 +2,10 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
-from django.db.models import F
-from ..models import Carrito, Producto
-from ..serializers import CarritoSerializer
+from ecommerce.models import Carrito, Producto
+from ecommerce.serializers import CarritoSerializer
 
-class CarritoViewSet(viewsets.ModelViewSet):
+class CarritoViewSetApi(viewsets.ModelViewSet):
     queryset = Carrito.objects.all()
     serializer_class = CarritoSerializer
     permission_classes = [permissions.IsAuthenticated]

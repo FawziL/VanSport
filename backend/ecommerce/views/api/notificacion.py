@@ -1,8 +1,8 @@
 from rest_framework import viewsets, permissions
-from ..models import Notificacion
-from ..serializers import NotificacionSerializer
+from ecommerce.models import Notificacion
+from ecommerce.serializers import NotificacionSerializer
 
-class NotificacionViewSet(viewsets.ModelViewSet):
+class NotificacionViewSetApi(viewsets.ModelViewSet):
     queryset = Notificacion.objects.all()
     serializer_class = NotificacionSerializer
 

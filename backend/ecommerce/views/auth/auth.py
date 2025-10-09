@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from ecommerce.serializers_auth import RegisterSerializer, UserSerializer, LoginSerializer
-from ..models import Usuario
+from ecommerce.models import Usuario
 
 class RegisterView(generics.CreateAPIView):
     queryset = Usuario.objects.all()

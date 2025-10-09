@@ -1,8 +1,8 @@
 from rest_framework import viewsets, permissions
-from ..models import DetallePedido
-from ..serializers import DetallePedidoSerializer
+from ecommerce.models import DetallePedido
+from ecommerce.serializers import DetallePedidoSerializer
 
-class DetallePedidoViewSet(viewsets.ModelViewSet):
+class DetallePedidoViewSetAdmin(viewsets.ModelViewSet):
     queryset = DetallePedido.objects.all()
     serializer_class = DetallePedidoSerializer
 

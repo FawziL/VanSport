@@ -1,9 +1,9 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
-from ..models import Categoria
-from ..serializers import CategoriaSerializer
+from ecommerce.models import Categoria
+from ecommerce.serializers import CategoriaSerializer
 
-class CategoriaViewSet(viewsets.ModelViewSet):
+class CategoriaViewSetAdmin(viewsets.ModelViewSet):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
 

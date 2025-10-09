@@ -1,8 +1,8 @@
 from rest_framework import viewsets, permissions
-from ..models import Transaccion
-from ..serializers import TransaccionSerializer
+from ecommerce.models import Transaccion
+from ecommerce.serializers import TransaccionSerializer
 
-class TransaccionViewSet(viewsets.ModelViewSet):
+class TransaccionViewSetAdmin(viewsets.ModelViewSet):
     queryset = Transaccion.objects.all()
     serializer_class = TransaccionSerializer
 

@@ -1,5 +1,5 @@
 from django.urls import path
-from ecommerce.views.auth import RegisterView, LoginView, MeView, PasswordResetView
+from ecommerce.views.auth.auth import RegisterView, LoginView, MeView, PasswordResetView
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
