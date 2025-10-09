@@ -1,10 +1,6 @@
-from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-
-
-from ecommerce.models import Usuario
-
+from .models import Usuario
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
@@ -25,14 +21,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         # perform_create in view will hash the password
         return Usuario.objects.create(**validated_data)
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
         fields = ('usuario_id', 'email', 'nombre', 'apellido', 'telefono')
 
-
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, trim_whitespace=False)
-

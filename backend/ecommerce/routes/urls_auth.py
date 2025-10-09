@@ -1,8 +1,5 @@
 from django.urls import path
-from rest_framework_simplejwt.views import TokenRefreshView
-from django.views.generic import TemplateView
-from .views import RegisterView, MeView, PasswordResetView, LoginView
-
+from ecommerce.views.auth import RegisterView, LoginView, MeView, PasswordResetView
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),

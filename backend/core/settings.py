@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     # Third-party
     'rest_framework',
     # Local apps
-    'authentication',
     'ecommerce',
 ]
 
@@ -162,6 +161,5 @@ SIMPLE_JWT = {
 # Disable migrations for local apps to work against existing DB schema without applying migrations
 MIGRATION_MODULES = {
     'ecommerce': None,
-    'authentication': None,
     'users': None,
 }

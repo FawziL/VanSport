@@ -20,6 +20,7 @@ class Usuario(models.Model):
 	telefono = models.CharField(max_length=20, blank=True)
 	fecha_registro = models.DateTimeField(auto_now_add=True)
 	is_active = models.BooleanField(default=True, db_column='activo')
+	is_admin = models.BooleanField(default=False, db_column='is_admin')
 
 	class Meta:
 		db_table = 'usuarios'
