@@ -28,7 +28,7 @@ async function request(method, path, { body, headers = {}, signal } = {}) {
   const data = isJson ? await res.json() : await res.text();
 
   if (!res.ok) {
-    const message = isJson ? (data?.error || data?.detail || 'Error en la petición') : data;
+    const message = isJson ? data?.error || data?.detail || 'Error en la petición' : data;
     throw new Error(message);
   }
 
