@@ -2,6 +2,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import check_password, make_password
+from django.db import IntegrityError  # <-- capturar errores de unicidad DB
 from rest_framework_simplejwt.tokens import RefreshToken
 from ecommerce.serializers_auth import RegisterSerializer, UserSerializer, LoginSerializer
 from ecommerce.models import Usuario
@@ -11,10 +12,30 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
 
-    def perform_create(self, serializer):
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        # Validación manual para devolver el cuerpo de errores exactamente
+        if not serializer.is_valid():
+            # Devuelve errores por campo, ej: {"email": ["Este email ya está registrado."]}
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # Normaliza email por redundancia (ya sucede en validate_email)
+        email = serializer.validated_data.get('email', '')
+        serializer.validated_data['email'] = email.strip().lower()
+
+        # Hash de contraseña
         password = serializer.validated_data.get('password')
         serializer.validated_data['password'] = make_password(password)
-        serializer.save()
+
+        try:
+            user = serializer.save()
+        except IntegrityError:
+            # Si tu modelo aún no tiene unique=True en email, este bloque da un error claro
+            return Response({'email': ['Este email ya está registrado.']}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Devuelve el usuario serializado en 201
+        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
 class MeView(APIView):
     permission_classes = [permissions.IsAuthenticated]

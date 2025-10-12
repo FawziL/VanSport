@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { authService } from '@/services/auth';
+import { useNavigate } from 'react-router-dom'; // <-- añadido
 
 function Login() {
   const { login } = useAuth();
+  const navigate = useNavigate(); // <-- añadido
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -17,8 +19,21 @@ function Login() {
       const data = await authService.login(email, password);
       login(data.user, data.access);
       setSuccess(true);
+      navigate('/'); // <-- redirección a home
     } catch (err) {
-      setError(err.message || 'Error de autenticación');
+      // Mantén el mensaje genérico o muestra detalles si tu cliente expone err.response.data
+      const data = err?.response?.data;
+      if (data) {
+        const msg =
+          typeof data === 'object'
+            ? Object.entries(data)
+                .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+                .join(' | ')
+            : String(data);
+        setError(msg);
+      } else {
+        setError(err.message || 'Error de autenticación');
+      }
     }
   };
 

@@ -9,7 +9,6 @@ export default function NavBar() {
   const userMenuRef = useRef(null);
   const navigate = useNavigate();
 
-  // Cerrar menú usuario al hacer click fuera
   useEffect(() => {
     function handleClickOutside(e) {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
@@ -20,7 +19,6 @@ export default function NavBar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [userMenuOpen]);
 
-  // Cerrar menú móvil al navegar
   const handleNav = (to) => {
     setMobileOpen(false);
     navigate(to);
@@ -65,6 +63,7 @@ export default function NavBar() {
               fontWeight: 800,
               fontSize: 22,
               letterSpacing: 0.3,
+              marginRight: 42,
             }}
             onClick={() => {
               setMobileOpen(false);
@@ -74,120 +73,149 @@ export default function NavBar() {
             VanSport
           </Link>
 
-          {/* Desktop links */}
-          <div className="nav-links">
-            <NavLink to="/productos" style={linkStyle}>
-              Productos
-            </NavLink>
-            <NavLink to="/carrito" style={linkStyle}>
-              Carrito
-            </NavLink>
+          {/* Desktop: left group (normal links) and right group (auth/user) */}
+          <div className="nav-desktop">
+            <div className="nav-left">
+              <NavLink to="/productos" style={linkStyle}>
+                Productos
+              </NavLink>
+              <NavLink to="/ofertas" style={linkStyle}>
+                Ofertas
+              </NavLink>
+            </div>
 
-            {!user ? (
-              <>
-                <NavLink to="/register" style={linkStyle}>
-                  Crear cuenta
-                </NavLink>
-                <NavLink to="/login" style={linkStyle}>
-                  Iniciar sesión
-                </NavLink>
-              </>
-            ) : (
-              <div style={{ position: 'relative' }} ref={userMenuRef}>
-                <button
-                  type="button"
-                  onClick={() => setUserMenuOpen((p) => !p)}
-                  aria-haspopup="menu"
-                  aria-expanded={userMenuOpen}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    background: 'transparent',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    padding: '0.4rem 0.8rem',
-                    borderRadius: 10,
-                  }}
-                >
-                  <div
-                    aria-hidden
+            <div className="nav-right">
+              <NavLink to="/carrito" style={linkStyle}>
+                Carrito
+              </NavLink>
+              {!user ? (
+                <>
+                  <NavLink to="/register" style={linkStyle}>
+                    Crear cuenta
+                  </NavLink>
+                  <NavLink to="/login" style={linkStyle}>
+                    Iniciar sesión
+                  </NavLink>
+                </>
+              ) : (
+                <div style={{ position: 'relative' }} ref={userMenuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setUserMenuOpen((p) => !p)}
+                    aria-haspopup="menu"
+                    aria-expanded={userMenuOpen}
                     style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: '50%',
-                      background: '#2b2b2b',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 700,
-                    }}
-                  >
-                    {(user.nombre || 'U')[0].toUpperCase()}
-                  </div>
-                  <span style={{ fontWeight: 600 }}>
-                    {user.nombre} {user.apellido}
-                  </span>
-                </button>
-
-                {userMenuOpen && (
-                  <div
-                    role="menu"
-                    style={{
-                      position: 'absolute',
-                      right: 0,
-                      marginTop: 8,
-                      background: '#1b1b1b',
+                      gap: 8,
+                      background: 'transparent',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      padding: '0.4rem 0.8rem',
                       borderRadius: 10,
-                      minWidth: 200,
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-                      overflow: 'hidden',
-                      border: 'none',
                     }}
                   >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        handleNav('/perfil');
-                      }}
+                    <div
+                      aria-hidden
                       style={{
-                        width: '100%',
-                        textAlign: 'left',
-                        padding: '0.6rem 0.8rem',
-                        background: 'transparent',
-                        color: '#fff',
-                        border: 'none',
-                        cursor: 'pointer',
+                        width: 28,
+                        height: 28,
+                        borderRadius: '50%',
+                        background: '#2b2b2b',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 700,
                       }}
                     >
-                      Perfil
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        logout();
-                      }}
+                      {(user.nombre || 'U')[0].toUpperCase()}
+                    </div>
+                    <span style={{ fontWeight: 600 }}>
+                      {user.nombre} {user.apellido}
+                    </span>
+                  </button>
+
+                  {userMenuOpen && (
+                    <div
+                      role="menu"
                       style={{
-                        width: '100%',
-                        textAlign: 'left',
-                        padding: '0.6rem 0.8rem',
-                        background: 'transparent',
-                        color: '#ffb4b4',
+                        position: 'absolute',
+                        right: 0,
+                        marginTop: 8,
+                        background: '#1b1b1b',
+                        borderRadius: 10,
+                        minWidth: 200,
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+                        overflow: 'hidden',
                         border: 'none',
-                        cursor: 'pointer',
                       }}
                     >
-                      Cerrar sesión
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          handleNav('/perfil');
+                        }}
+                        style={{
+                          width: '100%',
+                          textAlign: 'left',
+                          padding: '0.6rem 0.8rem',
+                          background: 'transparent',
+                          color: '#fff',
+                          border: 'none',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Perfil
+                      </button>
+
+                      {user?.is_staff && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            handleNav('/admin/dashboard');
+                          }}
+                          style={{
+                            width: '100%',
+                            textAlign: 'left',
+                            padding: '0.6rem 0.8rem',
+                            background: 'transparent',
+                            color: '#b2d8ff',
+                            border: 'none',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Dashboard Admin
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          logout();
+                        }}
+                        style={{
+                          width: '100%',
+                          textAlign: 'left',
+                          padding: '0.6rem 0.8rem',
+                          background: 'transparent',
+                          color: '#ffb4b4',
+                          border: 'none',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Cerrar sesión
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Mobile toggle (only visible on small screens) */}
+          {/* Mobile toggle */}
           <button
             type="button"
             onClick={() => setMobileOpen((p) => !p)}
@@ -279,6 +307,13 @@ export default function NavBar() {
                 <NavLink to="/perfil" style={linkStyle} onClick={() => setMobileOpen(false)}>
                   Perfil
                 </NavLink>
+
+                {user?.is_staff && (
+                  <NavLink to="/admin" style={linkStyle} onClick={() => setMobileOpen(false)}>
+                    Dashboard Admin
+                  </NavLink>
+                )}
+
                 <button
                   type="button"
                   onClick={() => {
@@ -305,12 +340,24 @@ export default function NavBar() {
         {/* Responsive rules */}
         <style>
           {`
-            .nav-links { display: flex; gap: 8px; align-items: center; }
+            .nav-desktop {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              flex: 1;
+              justify-content: space-between; /* separa left y right */
+            }
+            .nav-left, .nav-right {
+              display: flex;
+              gap: 8px;
+              align-items: center;
+            }
+
             .nav-toggle { display: none; }
             .nav-mobile { display: none !important; }
 
             @media (max-width: 767px) {
-              .nav-links { display: none !important; }
+              .nav-desktop { display: none !important; }
               .nav-toggle { display: inline-flex; }
               .nav-mobile { display: grid !important; }
             }

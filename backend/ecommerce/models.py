@@ -22,6 +22,16 @@ class Usuario(models.Model):
 	is_active = models.BooleanField(default=True, db_column='activo')
 	is_staff = models.BooleanField(default=False, db_column='is_staff')
 
+	# Agrega estas propiedades para que DRF te reconozca como usuario válido autenticado
+	@property
+	def is_authenticated(self):
+		# Esta propiedad debe devolver True para instancias de usuarios reales
+		return True
+
+	@property
+	def is_anonymous(self):
+		return False
+
 	class Meta:
 		db_table = 'usuarios'
 		managed = False

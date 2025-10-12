@@ -28,8 +28,12 @@ async function request(method, path, { body, headers = {}, signal } = {}) {
   const data = isJson ? await res.json() : await res.text();
 
   if (!res.ok) {
-    const message = isJson ? data?.error || data?.detail || 'Error en la petición' : data;
-    throw new Error(message);
+    // Lanza un error que incluye el objeto de respuesta completo
+    const error = new Error(
+      (isJson && (data?.error || data?.detail)) || 'Error en la petición'
+    );
+    error.response = { data };
+    throw error;
   }
 
   return data;
