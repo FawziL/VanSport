@@ -4,9 +4,10 @@ from .models import Categoria, Producto, Usuario, Pedido, DetallePedido, Carrito
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Categoria
-        fields = '__all__'
+        fields = ['categoria_id', 'nombre']
 
 class ProductoSerializer(serializers.ModelSerializer):
+    categoria = CategoriaSerializer(read_only=True)
     class Meta:
         model = Producto
         fields = '__all__'

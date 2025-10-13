@@ -29,9 +29,7 @@ async function request(method, path, { body, headers = {}, signal } = {}) {
 
   if (!res.ok) {
     // Lanza un error que incluye el objeto de respuesta completo
-    const error = new Error(
-      (isJson && (data?.error || data?.detail)) || 'Error en la petición'
-    );
+    const error = new Error((isJson && (data?.error || data?.detail)) || 'Error en la petición');
     error.response = { data };
     throw error;
   }

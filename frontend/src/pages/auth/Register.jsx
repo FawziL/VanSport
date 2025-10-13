@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { authService } from '@/services/auth';
-import { useNavigate } from 'react-router-dom'; // <-- Agrega este import
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
   const { login } = useAuth();
-  const navigate = useNavigate(); // <-- Hook para redirección
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

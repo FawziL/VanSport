@@ -4,7 +4,6 @@ import { authService } from '@/services/auth';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  // Inicializa desde localStorage para no perder sesión entre recargas
   const [user, setUser] = useState(() => {
     try {
       const raw = localStorage.getItem('user');
@@ -15,52 +14,44 @@ export function AuthProvider({ children }) {
   });
   const [token, setToken] = useState(() => localStorage.getItem('token'));
 
-  // Persistir cambios en localStorage
   useEffect(() => {
     try {
       if (token) localStorage.setItem('token', token);
       else localStorage.removeItem('token');
       if (user) localStorage.setItem('user', JSON.stringify(user));
       else localStorage.removeItem('user');
-    } catch {
-      // Si el navegador bloquea localStorage, ignora silenciosamente
-    }
+    } catch {}
   }, [token, user]);
 
-  // Rehidratar/validar usuario con el backend si hay token
+  // Rehidratar usuario si hay token pero no hay user cargado
   useEffect(() => {
     const hydrateUser = async () => {
       if (!token) return;
       try {
-        const me = await authService.me(); // GET /auth/me/
-        // Asegura que el objeto usuario esté actualizado
+        const me = await authService.me();
         setUser(me);
       } catch (err) {
-        // Si el token es inválido/expirado, cierra sesión
         logout();
       }
     };
-    // Solo llama si no tenemos user cargado aún o quieres forzar refresco
     if (token && !user) {
       hydrateUser();
     }
-  }, [token]); // intencionalmente no depende de user para evitar bucles
+  }, [token]); // no dependemos de user para evitar bucles
 
-  // Sincronización entre pestañas/ventanas
-  useEffect(() => {
-    const onStorage = (e) => {
-      if (e.key === 'token') setToken(e.newValue);
-      if (e.key === 'user') {
-        try {
-          setUser(e.newValue ? JSON.parse(e.newValue) : null);
-        } catch {
-          setUser(null);
-        }
-      }
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, []);
+  // Helper para forzar carga de /auth/me si hace falta
+  const ensureUserLoaded = async () => {
+    if (!token) return false;
+    if (user) return true;
+    try {
+      const me = await authService.me();
+      setUser(me);
+      return true;
+    } catch {
+      logout();
+      return false;
+    }
+  };
 
   const login = (userData, accessToken) => {
     setUser(userData);
@@ -80,7 +71,10 @@ export function AuthProvider({ children }) {
     } catch {}
   };
 
-  const value = { user, token, login, logout, setUser };
+  // Flag claro para saber si hay sesión
+  const isAuthenticated = Boolean(token);
+
+  const value = { user, token, isAuthenticated, login, logout, setUser, ensureUserLoaded };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

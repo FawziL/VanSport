@@ -64,13 +64,14 @@ export default function Perfil() {
     };
   }, []);
 
-  const initials = ((form.nombre || '') + ' ' + (form.apellido || ''))
-    .trim()
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase())
-    .join('') || 'U';
+  const initials =
+    ((form.nombre || '') + ' ' + (form.apellido || ''))
+      .trim()
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase())
+      .join('') || 'U';
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -117,11 +118,43 @@ export default function Perfil() {
     return (
       <div style={{ maxWidth: 900, margin: '2rem auto', padding: '0 1rem' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 24 }}>
-          <div style={{ background: '#eee', borderRadius: '50%', width: 120, height: 120, margin: '0 auto' }} />
+          <div
+            style={{
+              background: '#eee',
+              borderRadius: '50%',
+              width: 120,
+              height: 120,
+              margin: '0 auto',
+            }}
+          />
           <div>
-            <div style={{ width: '60%', height: 24, background: '#eee', borderRadius: 8, marginBottom: 12 }} />
-            <div style={{ width: '80%', height: 18, background: '#eee', borderRadius: 8, marginBottom: 8 }} />
-            <div style={{ width: '80%', height: 18, background: '#eee', borderRadius: 8, marginBottom: 8 }} />
+            <div
+              style={{
+                width: '60%',
+                height: 24,
+                background: '#eee',
+                borderRadius: 8,
+                marginBottom: 12,
+              }}
+            />
+            <div
+              style={{
+                width: '80%',
+                height: 18,
+                background: '#eee',
+                borderRadius: 8,
+                marginBottom: 8,
+              }}
+            />
+            <div
+              style={{
+                width: '80%',
+                height: 18,
+                background: '#eee',
+                borderRadius: 8,
+                marginBottom: 8,
+              }}
+            />
             <div style={{ width: '40%', height: 18, background: '#eee', borderRadius: 8 }} />
           </div>
         </div>
@@ -207,7 +240,9 @@ export default function Perfil() {
       <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 12 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div>
-            <label style={{ display: 'block', marginBottom: 6, color: '#555' }}>ID de usuario</label>
+            <label style={{ display: 'block', marginBottom: 6, color: '#555' }}>
+              ID de usuario
+            </label>
             <input
               type="text"
               value={form.usuario_id || '—'}

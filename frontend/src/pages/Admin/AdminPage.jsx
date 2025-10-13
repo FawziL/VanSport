@@ -19,10 +19,7 @@ export default function AdminPage({ children }) {
         display: 'flex', // flex para que el main se ajuste al ancho del sidebar
       }}
     >
-      <AdminSidebar
-        collapsed={collapsed}
-        onToggle={() => setCollapsed((c) => !c)}
-      />
+      <AdminSidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
       <main
         style={{
           padding: '1.25rem',

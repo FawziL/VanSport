@@ -36,7 +36,7 @@ export default function CardProduct({ producto }) {
           )}% OFF`}
         </span>
       )}
-      <Link to={`/productos/${producto.id}`}>
+      <Link to={`/productos/${producto.producto_id}`}>
         <img
           src={producto.imagen}
           alt={producto.nombre}
@@ -47,8 +47,8 @@ export default function CardProduct({ producto }) {
             display: 'block',
           }}
         />
-        <div style={{ padding: '1rem' }}>
-          <h3 style={{ fontWeight: 700, fontSize: 18, marginBottom: 6 }}>
+        <div style={{ padding: '0.5rem' }}>
+          <h3 style={{ fontWeight: 700, fontSize: 18, marginBottom: 6, marginTop: 6 }}>
             {producto.nombre}
           </h3>
           <div style={{ marginBottom: 8 }}>
@@ -75,7 +75,7 @@ export default function CardProduct({ producto }) {
             )}
           </div>
           <div style={{ fontSize: 14, color: '#666', marginBottom: 8 }}>
-            {producto.categoria}
+            {producto.categoria.nombre}
           </div>
           <div style={{ fontSize: 13, color: producto.stock > 0 ? '#43a047' : '#e53935' }}>
             {producto.stock > 0 ? 'Disponible' : 'Agotado'}
@@ -85,7 +85,7 @@ export default function CardProduct({ producto }) {
       <div style={{ flexGrow: 1 }} />
       <div style={{ padding: '0 1rem 1rem' }}>
         <Link
-          to={`/productos/${producto.id}`}
+          to={`/productos/${producto.producto_id}`}
           style={{
             display: 'block',
             width: '100%',

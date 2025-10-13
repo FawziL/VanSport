@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { http } from '@/config/api';
+import { appService } from '@/services/auth';
+import { useAuth } from '@/context/AuthContext';
 
 function formatPrice(n) {
   const num = Number(n);
@@ -16,37 +17,46 @@ export default function VerProducto() {
   const [selectedImage, setSelectedImage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { isAuthenticated } = useAuth ? useAuth() : { isAuthenticated: true }; // Si tienes AuthContext
 
-  // Asunción de endpoint: ajusta según tu API real
-  // Por ejemplo: /ecommerce/productos/:id/ o /productos/:id/
-  const endpoint = useMemo(() => `/productos/${id}/`, [id]);
+  const [addMsg, setAddMsg] = useState('');
+  const [addLoading, setAddLoading] = useState(false);
+  const [inCart, setInCart] = useState(false); // NUEVO: estado para saber si está en el carrito
 
+  // Usar appService para obtener el detalle
   useEffect(() => {
     let alive = true;
     async function load() {
       setLoading(true);
       setErrMsg('');
       try {
-        // Esperamos una respuesta con fields:
-        // id, nombre, descripcion, precio, precio_oferta, categoria, stock,
-        // imagen (string principal), imagenes (array de strings o {image_path})
-        const data = await http.get(endpoint);
-        // Normaliza imágenes: admite array de strings o array de objetos {image_path}
-        const images =
-          Array.isArray(data.imagenes)
-            ? data.imagenes.map((img) => (typeof img === 'string' ? img : img.image_path))
-            : [];
+        const data = await appService.productos.retrieve(id);
 
+        // Normaliza según tu modelo: producto_id, imagen_url, etc.
         const normalized = {
-          id: data.id,
-          nombre: data.nombre,
-          descripcion: data.descripcion,
-          precio: data.precio,
-          precio_oferta: data.precio_oferta,
-          categoria: data.categoria,
-          stock: data.stock,
-          imagen: data.imagen,
-          imagenes: images,
+          id: data.producto_id ?? data.id ?? id,
+          nombre: data.nombre ?? '',
+          descripcion: data.descripcion ?? '',
+          precio: data.precio ?? null,
+          // Si no tienes precio_oferta en el backend, lo dejamos como null
+          precio_oferta: data.precio_oferta ?? null,
+          // categoria puede venir como objeto, id o nombre; mostramos algo legible
+          categoria:
+            typeof data.categoria === 'string'
+              ? data.categoria
+              : typeof data.categoria === 'object' && data.categoria !== null
+                ? (data.categoria.nombre ?? data.categoria.id ?? '')
+                : (data.categoria ?? ''),
+          stock: data.stock ?? 0,
+          imagen: data.imagen_url ?? data.imagen ?? '',
+          // Si no hay galería, dejamos vacío
+          imagenes: Array.isArray(data.imagenes)
+            ? data.imagenes
+                .map((img) => (typeof img === 'string' ? img : img.image_path))
+                .filter(Boolean)
+            : [],
+          // Atributos opcionales
+          atributos: data.atributos ?? null,
         };
 
         if (!alive) return;
@@ -70,11 +80,11 @@ export default function VerProducto() {
     return () => {
       alive = false;
     };
-  }, [id, endpoint]);
+  }, [id]);
 
   const allImages = useMemo(() => {
     if (!producto) return [];
-    const list = [producto.imagen, ...producto.imagenes].filter(Boolean);
+    const list = [producto.imagen, ...(producto.imagenes || [])].filter(Boolean);
     return list;
   }, [producto]);
 
@@ -93,22 +103,81 @@ export default function VerProducto() {
 
   const shareLink = typeof window !== 'undefined' ? window.location.href : '';
 
+  // Detectar si el producto ya está en el carrito
+  useEffect(() => {
+    let alive = true;
+    async function checkInCart() {
+      if (!producto || !isAuthenticated) {
+        if (alive) setInCart(false);
+        return;
+      }
+      try {
+        const data = await appService.carrito.list();
+        const items = Array.isArray(data) ? data : data.results || [];
+        const found = items.some((i) => {
+          const pid =
+            typeof i.producto === 'number'
+              ? i.producto
+              : (i.producto?.producto_id ?? i.producto_id);
+          return Number(pid) === Number(producto.id);
+        });
+        if (alive) setInCart(found);
+      } catch {
+        // Si falla, no bloqueamos la UI; asumimos que no está
+        if (alive) setInCart(false);
+      }
+    }
+    checkInCart();
+    return () => {
+      alive = false;
+    };
+  }, [producto, isAuthenticated]);
+
   if (loading) {
     return (
       <div style={{ maxWidth: 1200, margin: '2rem auto', padding: '0 1rem' }}>
-        <div style={{ width: 120, height: 16, background: '#eee', borderRadius: 6, marginBottom: 16 }} />
+        <div
+          style={{ width: 120, height: 16, background: '#eee', borderRadius: 6, marginBottom: 16 }}
+        />
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
           <div>
-            <div style={{ width: '100%', height: 360, background: '#eee', borderRadius: 12, marginBottom: 12 }} />
+            <div
+              style={{
+                width: '100%',
+                height: 360,
+                background: '#eee',
+                borderRadius: 12,
+                marginBottom: 12,
+              }}
+            />
             <div style={{ display: 'flex', gap: 8 }}>
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} style={{ width: 80, height: 60, background: '#eee', borderRadius: 8 }} />
+                <div
+                  key={i}
+                  style={{ width: 80, height: 60, background: '#eee', borderRadius: 8 }}
+                />
               ))}
             </div>
           </div>
           <div>
-            <div style={{ width: '80%', height: 24, background: '#eee', borderRadius: 8, marginBottom: 12 }} />
-            <div style={{ width: '60%', height: 20, background: '#eee', borderRadius: 8, marginBottom: 12 }} />
+            <div
+              style={{
+                width: '80%',
+                height: 24,
+                background: '#eee',
+                borderRadius: 8,
+                marginBottom: 12,
+              }}
+            />
+            <div
+              style={{
+                width: '60%',
+                height: 20,
+                background: '#eee',
+                borderRadius: 8,
+                marginBottom: 12,
+              }}
+            />
             <div style={{ width: '100%', height: 160, background: '#eee', borderRadius: 12 }} />
           </div>
         </div>
@@ -119,11 +188,22 @@ export default function VerProducto() {
   if (errMsg) {
     return (
       <div style={{ maxWidth: 900, margin: '2rem auto', padding: '0 1rem' }}>
-        <div style={{ background: '#ffecec', border: '1px solid #ffb4b4', color: '#c62828', borderRadius: 12, padding: '1rem' }}>
+        <div
+          style={{
+            background: '#ffecec',
+            border: '1px solid #ffb4b4',
+            color: '#c62828',
+            borderRadius: 12,
+            padding: '1rem',
+          }}
+        >
           {errMsg}
         </div>
         <div style={{ marginTop: 12 }}>
-          <Link to="/productos" style={{ textDecoration: 'none', color: '#1e88e5', fontWeight: 700 }}>
+          <Link
+            to="/productos"
+            style={{ textDecoration: 'none', color: '#1e88e5', fontWeight: 700 }}
+          >
             Volver a productos
           </Link>
         </div>
@@ -136,7 +216,10 @@ export default function VerProducto() {
       <div style={{ maxWidth: 900, margin: '2rem auto', padding: '0 1rem', textAlign: 'center' }}>
         No se encontró el producto.
         <div style={{ marginTop: 12 }}>
-          <Link to="/productos" style={{ textDecoration: 'none', color: '#1e88e5', fontWeight: 700 }}>
+          <Link
+            to="/productos"
+            style={{ textDecoration: 'none', color: '#1e88e5', fontWeight: 700 }}
+          >
             Volver a productos
           </Link>
         </div>
@@ -153,9 +236,13 @@ export default function VerProducto() {
     <div style={{ maxWidth: 1200, margin: '2rem auto', padding: '0 1rem' }}>
       {/* Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-        <Link to="/" style={{ color: '#1e88e5', textDecoration: 'none', fontWeight: 600 }}>Inicio</Link>
+        <Link to="/" style={{ color: '#1e88e5', textDecoration: 'none', fontWeight: 600 }}>
+          Inicio
+        </Link>
         <span style={{ color: '#888' }}>/</span>
-        <Link to="/productos" style={{ color: '#1e88e5', textDecoration: 'none', fontWeight: 600 }}>Productos</Link>
+        <Link to="/productos" style={{ color: '#1e88e5', textDecoration: 'none', fontWeight: 600 }}>
+          Productos
+        </Link>
         <span style={{ color: '#888' }}>/</span>
         <span style={{ color: '#333', fontWeight: 600 }}>{producto.nombre}</span>
       </div>
@@ -208,7 +295,9 @@ export default function VerProducto() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 8, marginTop: 12, overflowX: 'auto', paddingBottom: 6 }}>
+          <div
+            style={{ display: 'flex', gap: 8, marginTop: 12, overflowX: 'auto', paddingBottom: 6 }}
+          >
             {allImages.map((img, index) => (
               <button
                 key={index}
@@ -226,7 +315,11 @@ export default function VerProducto() {
                 }}
                 aria-label={`Imagen ${index + 1}`}
               >
-                <img src={img} alt={`Miniatura ${index + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img
+                  src={img}
+                  alt={`Miniatura ${index + 1}`}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
               </button>
             ))}
           </div>
@@ -234,7 +327,9 @@ export default function VerProducto() {
           {/* Descripción y atributos */}
           <div style={{ marginTop: 24 }}>
             <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>Descripción</h2>
-            <p style={{ color: '#444', lineHeight: 1.6 }}>{producto.descripcion || 'Sin descripción.'}</p>
+            <p style={{ color: '#444', lineHeight: 1.6 }}>
+              {producto.descripcion || 'Sin descripción.'}
+            </p>
 
             {producto.atributos && Object.keys(producto.atributos).length > 0 && (
               <div style={{ marginTop: 16 }}>
@@ -278,7 +373,9 @@ export default function VerProducto() {
             {producto.precio_oferta ? (
               <div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                  <span style={{ textDecoration: 'line-through', color: '#888' }}>{formatPrice(producto.precio)}</span>
+                  <span style={{ textDecoration: 'line-through', color: '#888' }}>
+                    {formatPrice(producto.precio)}
+                  </span>
                   <span style={{ color: '#e53935', fontWeight: 800, fontSize: 22 }}>
                     {formatPrice(producto.precio_oferta)}
                   </span>
@@ -290,7 +387,9 @@ export default function VerProducto() {
                 )}
               </div>
             ) : (
-              <div style={{ color: '#1e88e5', fontWeight: 800, fontSize: 22 }}>{formatPrice(producto.precio)}</div>
+              <div style={{ color: '#1e88e5', fontWeight: 800, fontSize: 22 }}>
+                {formatPrice(producto.precio)}
+              </div>
             )}
 
             <div
@@ -311,19 +410,65 @@ export default function VerProducto() {
                 padding: '0.7rem 1rem',
                 borderRadius: 10,
                 border: 'none',
-                background: producto.stock > 0 ? '#1e88e5' : '#aaa',
+                background: producto.stock > 0 ? (inCart ? '#e53935' : '#1e88e5') : '#aaa',
                 color: '#fff',
                 fontWeight: 800,
                 cursor: producto.stock > 0 ? 'pointer' : 'not-allowed',
+                transition: 'background 0.2s',
               }}
-              disabled={producto.stock <= 0}
-              onClick={() => {
-                // TODO: integrar con carrito
-                alert('Añadido al carrito (demo)');
+              disabled={producto.stock <= 0 || addLoading}
+              onClick={async () => {
+                if (!isAuthenticated) {
+                  window.location.href = '/login';
+                  return;
+                }
+                setAddMsg('');
+                setAddLoading(true);
+                try {
+                  if (inCart) {
+                    // Quitar del carrito
+                    await appService.carrito.remove({ producto_id: producto.id });
+                    setInCart(false);
+                    setAddMsg('Producto quitado del carrito.');
+                  } else {
+                    // Añadir al carrito
+                    await appService.carrito.add({ producto_id: producto.id, cantidad: 1 });
+                    setInCart(true);
+                    setAddMsg('¡Producto añadido al carrito!');
+                  }
+                } catch (err) {
+                  const backendMsg = err?.response?.data;
+                  const msg =
+                    typeof backendMsg === 'object'
+                      ? Object.entries(backendMsg)
+                          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+                          .join(' | ')
+                      : backendMsg || err.message || 'Error al procesar el carrito';
+                  setAddMsg(msg);
+                } finally {
+                  setAddLoading(false);
+                }
               }}
             >
-              Añadir al carrito
+              {addLoading
+                ? inCart
+                  ? 'Quitando...'
+                  : 'Añadiendo...'
+                : inCart
+                  ? 'Quitar del carrito'
+                  : 'Añadir al carrito'}
             </button>
+            {addMsg && (
+              <div
+                style={{
+                  marginTop: 8,
+                  color: addMsg.startsWith('¡') ? '#43a047' : '#e53935',
+                  fontWeight: 700,
+                }}
+              >
+                {addMsg}
+              </div>
+            )}
           </div>
 
           {/* Compartir */}
@@ -408,7 +553,7 @@ export default function VerProducto() {
       </div>
 
       {/* Modal de imagen ampliada */}
-      {isModalOpen && (
+      {isModalOpen && allImages.length > 0 && (
         <div
           onClick={() => setIsModalOpen(false)}
           style={{

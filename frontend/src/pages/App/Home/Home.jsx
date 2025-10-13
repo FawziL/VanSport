@@ -39,9 +39,7 @@ export default function Home() {
           textAlign: 'center',
         }}
       >
-        <h1 style={{ fontSize: 38, fontWeight: 800, marginBottom: 12 }}>
-          ¡Equípate para ganar!
-        </h1>
+        <h1 style={{ fontSize: 38, fontWeight: 800, marginBottom: 12 }}>¡Equípate para ganar!</h1>
         <p style={{ fontSize: 20, color: '#e0e0e0', marginBottom: 28 }}>
           Todo lo que necesitas para tu deporte favorito, en un solo lugar.
         </p>

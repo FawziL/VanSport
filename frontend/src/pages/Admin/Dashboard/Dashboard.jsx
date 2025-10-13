@@ -51,7 +51,9 @@ export default function Dashboard() {
           <div style={{ color: '#666' }}>Gestiona tu tienda desde el panel de administración.</div>
         </div>
         <div>
-          <span style={{ color: '#888', fontSize: 13 }}>{new Date().toLocaleDateString('es-ES')}</span>
+          <span style={{ color: '#888', fontSize: 13 }}>
+            {new Date().toLocaleDateString('es-ES')}
+          </span>
         </div>
       </div>
 
