@@ -7,10 +7,14 @@ import NotFound from '@/pages/App/NotFound';
 import Home from '@/pages/App/Home/Home';
 import Productos from '@/pages/App/Productos/Productos';
 import VerProducto from '@/pages/App/Productos/VerProducto';
-import Dashboard from '@/pages/Admin/Dashboard/Dashboard';
 import AdminPage from '@/pages/Admin/AdminPage';
 import Perfil from '@/pages/App/Perfil/Perfil';
 import Carrito from '@/pages/App/Carrito/Carrito';
+
+import Dashboard from '@/pages/Admin/Dashboard/Dashboard';
+import AdminCategorias from '@/pages/Admin/Categorias/ListCategory';
+import CrearCategorias from '@/pages/Admin/Categorias/CreateCategory';
+import EditarCategorias from '@/pages/Admin/Categorias/EditCategory';
 
 function AppShell() {
   const location = useLocation();
@@ -39,14 +43,30 @@ function AppShell() {
               </AdminPage>
             }
           />
-          {/* <Route
-            path="/admin/productos"
+          <Route
+            path="/admin/categorias"
             element={
               <AdminPage>
-                <AdminProductos />
+                <AdminCategorias />
               </AdminPage>
             }
-          /> */}
+          />
+          <Route
+            path="/admin/categorias/crear"
+            element={
+              <AdminPage>
+                <CrearCategorias />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/categorias/editar/:id"
+            element={
+              <AdminPage>
+                <EditarCategorias />
+              </AdminPage>
+            }
+          />
 
           <Route path="*" element={<NotFound />} />
         </Routes>
