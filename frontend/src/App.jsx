@@ -15,6 +15,9 @@ import Dashboard from '@/pages/Admin/Dashboard/Dashboard';
 import AdminCategorias from '@/pages/Admin/Categorias/ListCategory';
 import CrearCategorias from '@/pages/Admin/Categorias/CreateCategory';
 import EditarCategorias from '@/pages/Admin/Categorias/EditCategory';
+import ListProduct from '@/pages/Admin/Productos/ListProduct';
+import CreateProduct from '@/pages/Admin/Productos/CreateProduct';
+import EditProduct from '@/pages/Admin/Productos/EditProduct';
 
 function AppShell() {
   const location = useLocation();
@@ -64,6 +67,32 @@ function AppShell() {
             element={
               <AdminPage>
                 <EditarCategorias />
+              </AdminPage>
+            }
+          />
+
+          {/* Productos Admin */}
+          <Route
+            path="/admin/productos"
+            element={
+              <AdminPage>
+                <ListProduct />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/productos/crear"
+            element={
+              <AdminPage>
+                <CreateProduct />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/productos/editar/:id"
+            element={
+              <AdminPage>
+                <EditProduct />
               </AdminPage>
             }
           />

@@ -15,7 +15,8 @@ class ProductoViewSetAdmin(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         """Crear producto (solo admin), guardando imagen manualmente"""
         imagen = request.FILES.get('imagen')
-        data = request.data.copy()
+        # Evitar deepcopy de archivos: construir dict plano y excluir 'imagen'
+        data = {k: v for k, v in request.data.items() if k != 'imagen'}
         if imagen:
             ruta = self.handle_uploaded_file(imagen)
             data['imagen_url'] = ruta
@@ -29,7 +30,8 @@ class ProductoViewSetAdmin(viewsets.ModelViewSet):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         imagen = request.FILES.get('imagen')
-        data = request.data.copy()
+        # Evitar deepcopy de archivos: construir dict plano y excluir 'imagen'
+        data = {k: v for k, v in request.data.items() if k != 'imagen'}
         if imagen:
             ruta = self.handle_uploaded_file(imagen)
             data['imagen_url'] = ruta
@@ -47,8 +49,8 @@ class ProductoViewSetAdmin(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
     def handle_uploaded_file(self, f):
-        # Guarda el archivo en MEDIA_ROOT/productos/ y retorna la ruta relativa
-        folder = os.path.join(settings.MEDIA_ROOT, 'productos')
+        # Guarda el archivo en MEDIA_ROOT/public/productos/ y retorna la ruta relativa
+        folder = os.path.join(settings.MEDIA_ROOT, 'public/productos')
         os.makedirs(folder, exist_ok=True)
         filename = f.name
         path = os.path.join(folder, filename)

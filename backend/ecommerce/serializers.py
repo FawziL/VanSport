@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils import timezone
 from .models import Categoria, Producto, Usuario, Pedido, DetallePedido, Carrito, Reseña, Notificacion, Transaccion, Envio
 
 class CategoriaSerializer(serializers.ModelSerializer):
@@ -7,10 +8,21 @@ class CategoriaSerializer(serializers.ModelSerializer):
         fields = ['categoria_id', 'nombre', 'descripcion']
 
 class ProductoSerializer(serializers.ModelSerializer):
+    # Leer: objeto anidado de la categoría
     categoria = CategoriaSerializer(read_only=True)
+    # Escribir: ID de la categoría
+    categoria_id = serializers.PrimaryKeyRelatedField(
+        source='categoria', queryset=Categoria.objects.all(), write_only=True, required=True
+    )
+    # No viene del cliente: usar por defecto ahora si falta
+    fecha_creacion = serializers.DateTimeField(required=False, default=timezone.now)
+
     class Meta:
         model = Producto
         fields = '__all__'
+
+    def create(self, validated_data):
+        return super().create(validated_data)
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
