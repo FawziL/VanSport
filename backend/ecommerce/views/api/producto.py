@@ -19,6 +19,7 @@ class ProductoViewSetApi(viewsets.ModelViewSet):
         min_price = self.request.query_params.get('min_price')
         max_price = self.request.query_params.get('max_price')
         oferta = self.request.query_params.get('oferta')  # true/1 para solo con precio_oferta
+        destacado = self.request.query_params.get('destacado')  # true/1 para solo destacados
         q = self.request.query_params.get('q')
 
         if activo is not None:
@@ -35,6 +36,11 @@ class ProductoViewSetApi(viewsets.ModelViewSet):
                 qs = qs.filter(precio_oferta__isnull=False)
             else:
                 qs = qs.filter(precio_oferta__isnull=True)
+        if destacado is not None and destacado != '':
+            if str(destacado).lower() in ('1','true','t','yes','y'):
+                qs = qs.filter(destacado=True)
+            else:
+                qs = qs.filter(destacado=False)
         if q:
             qs = qs.filter(models.Q(nombre__icontains=q) | models.Q(descripcion__icontains=q))
         return qs

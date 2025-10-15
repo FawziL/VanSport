@@ -15,6 +15,7 @@ export default function ListProduct() {
 	const [error, setError] = useState('');
 	const [deleteId, setDeleteId] = useState(null);
 	const [modalOpen, setModalOpen] = useState(false);
+	const [togglingId, setTogglingId] = useState(null);
 	const navigate = useNavigate();
 
 	// Fetch productos
@@ -57,6 +58,18 @@ export default function ListProduct() {
 	const start = (page - 1) * pageSize;
 	const end = start + pageSize;
 	const productosPage = productos.slice(start, end);
+
+	const toggleDestacado = async (p) => {
+		try {
+			setTogglingId(p.producto_id);
+			await adminService.productos.partialUpdate(p.producto_id, { destacado: !p.destacado });
+			setProductos((prev) => prev.map((it) => it.producto_id === p.producto_id ? { ...it, destacado: !p.destacado } : it));
+		} catch (e) {
+			setError('No se pudo actualizar destacado');
+		} finally {
+			setTogglingId(null);
+		}
+	};
 
 	// Render helpers
 	const fmtPrecio = (v) => {
@@ -102,7 +115,7 @@ export default function ListProduct() {
 			)}
 
 			<div style={{ overflowX: 'auto', background: '#fff', borderRadius: 10, boxShadow: '0 2px 12px #0001' }}>
-						<table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
+						<table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 950 }}>
 					<thead>
 						<tr style={{ background: '#f3f4f6', color: '#000000ff' }}>
 							<th style={{ padding: '12px 8px', textAlign: 'left' }}>ID</th>
@@ -111,6 +124,7 @@ export default function ListProduct() {
                             <th style={{ padding: '12px 8px', textAlign: 'left' }}>Imagen</th>
 							<th style={{ padding: '12px 8px', textAlign: 'left' }}>Precio</th>
 							<th style={{ padding: '12px 8px', textAlign: 'left' }}>Stock</th>
+							<th style={{ padding: '12px 8px', textAlign: 'center' }}>Destacar</th>
 							<th style={{ padding: '12px 8px', textAlign: 'left' }}>Estado</th>
 							<th style={{ padding: '12px 8px', textAlign: 'center' }}>Acciones</th>
 						</tr>
@@ -128,7 +142,7 @@ export default function ListProduct() {
 							</tr>
 						) : (
 											productosPage.map((p) => (
-								<tr key={p.producto_id} style={{ color: '#444' }}>
+									<tr key={p.producto_id} style={{ color: '#444' }}>
 									<td style={{ padding: '10px 8px' }}>{p.producto_id}</td>
 									<td style={{ padding: '10px 8px' }}>{p.nombre}</td>
 									<td style={{ padding: '10px 8px' }}>{p.categoria?.nombre ?? '-'}</td>
@@ -146,6 +160,35 @@ export default function ListProduct() {
 													</td>
 									<td style={{ padding: '10px 8px' }}>{fmtPrecio(p.precio)}</td>
 									<td style={{ padding: '10px 8px' }}>{p.stock}</td>
+										<td style={{ padding: '10px 8px', textAlign: 'center' }}>
+											<button
+												onClick={() => toggleDestacado(p)}
+												aria-label={p.destacado ? 'Quitar destacado' : 'Marcar como destacado'}
+												style={{
+													background: 'transparent',
+													border: 'none',
+													cursor: 'pointer',
+													fontSize: 20,
+													color: p.destacado ? '#e53935' : '#bbb',
+													opacity: togglingId === p.producto_id ? 0.6 : 1,
+												}}
+												disabled={togglingId === p.producto_id}
+											>
+												<svg
+													width="24"
+													height="24"
+													viewBox="0 0 24 24"
+													fill={p.destacado ? '#e53935' : 'none'}
+													stroke={p.destacado ? '#e53935' : '#bbb'}
+													strokeWidth="2"
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													aria-hidden
+												>
+													<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+												</svg>
+											</button>
+										</td>
 									<td style={{ padding: '10px 8px' }}>{p.activo ? 'Activo' : 'Inactivo'}</td>
 									<td style={{ padding: '10px 8px', textAlign: 'center' }}>
 										<button

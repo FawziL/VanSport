@@ -14,6 +14,8 @@ export default function CreateCategory() {
   const [form, setForm] = useState({
     nombre: '',
     descripcion: '',
+    imagen: null,
+    imagenPreview: '',
   });
   const [errors, setErrors] = useState({});
   const [globalError, setGlobalError] = useState('');
@@ -29,8 +31,13 @@ export default function CreateCategory() {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, files } = e.target;
+    if (name === 'imagen') {
+      const file = files && files[0] ? files[0] : null;
+      setForm((prev) => ({ ...prev, imagen: file, imagenPreview: file ? URL.createObjectURL(file) : '' }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
     setErrors((prev) => ({ ...prev, [name]: undefined }));
     setGlobalError('');
   };
@@ -46,11 +53,11 @@ export default function CreateCategory() {
 
     setLoading(true);
     try {
-      const payload = {
-        nombre: form.nombre.trim(),
-        descripcion: form.descripcion?.trim() || '',
-      };
-      await adminService.categorias.create(payload);
+      const fd = new FormData();
+      fd.append('nombre', form.nombre.trim());
+      fd.append('descripcion', form.descripcion?.trim() || '');
+      if (form.imagen) fd.append('imagen', form.imagen);
+      await adminService.categorias.create(fd);
       navigate(`/admin/categorias`);
 
     } catch (err) {
@@ -149,6 +156,24 @@ export default function CreateCategory() {
             }}
           />
           <FieldError error={errors.descripcion} />
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <label htmlFor="imagen" style={{ display: 'block', fontWeight: 700, marginBottom: 6 }}>
+            Imagen (opcional)
+          </label>
+          <input
+            id="imagen"
+            name="imagen"
+            type="file"
+            accept="image/*"
+            onChange={handleChange}
+            style={{ display: 'block' }}
+          />
+          {form.imagenPreview && (
+            <img src={form.imagenPreview} alt="Vista previa" style={{ marginTop: 10, maxWidth: 240, borderRadius: 10 }} />
+          )}
+          <FieldError error={errors.imagen} />
         </div>
 
         <div style={{ display: 'flex', gap: 10 }}>

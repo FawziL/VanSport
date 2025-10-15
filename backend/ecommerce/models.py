@@ -5,6 +5,8 @@ class Categoria(models.Model):
 	categoria_id = models.AutoField(primary_key=True, db_column='categoria_id')
 	nombre = models.CharField(max_length=100)
 	descripcion = models.TextField(blank=True)
+	imagen_url = models.CharField(max_length=255, blank=True)
+	destacado = models.BooleanField(default=False, db_column='destacado')
 
 	class Meta:
 		db_table = 'categorias'
@@ -47,6 +49,7 @@ class Producto(models.Model):
 	imagen_url = models.CharField(max_length=255, blank=True)
 	fecha_creacion = models.DateTimeField(db_column='fecha_creacion', auto_now_add=False)
 	activo = models.BooleanField(default=True)
+	destacado = models.BooleanField(default=False, db_column='destacado')
 
 	class Meta:
 		db_table = 'productos'

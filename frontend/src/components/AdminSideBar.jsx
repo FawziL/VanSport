@@ -53,6 +53,7 @@ export default function AdminSidebar({ collapsed, onToggle }) {
   const navigate = useNavigate();
   const [openSettings, setOpenSettings] = useState(false);
   const settingsRef = useRef(null);
+  const [toggleHover, setToggleHover] = useState(false);
 
   useEffect(() => {
     const onDocClick = (e) => {
@@ -92,33 +93,43 @@ export default function AdminSidebar({ collapsed, onToggle }) {
         position: 'relative',
         // Permitimos overflow visible para que el menú no se recorte
         overflow: 'visible',
+        display: 'flex',
+        flexDirection: 'column',
         flex: '0 0 auto',
       }}
     >
       {/* Botón de colapsar/expandir */}
       <button
         onClick={onToggle}
+        onMouseEnter={() => setToggleHover(true)}
+        onMouseLeave={() => setToggleHover(false)}
         style={{
           position: 'absolute',
           top: 18,
-          right: collapsed ? -18 : -22,
+          right: collapsed ? -16 : -20,
           zIndex: 2,
-          background: '#222',
-          border: '1px solid #444',
-          borderRadius: '50%',
-          width: 36,
-          height: 36,
+          background: toggleHover ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.06)',
+          border: `1px solid ${toggleHover ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.14)'}`,
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          borderRadius: 999,
+          width: 34,
+          height: 34,
+          color: '#f5f5f5',
+          cursor: 'pointer',
+          boxShadow: toggleHover ? '0 6px 18px rgba(0,0,0,0.28)' : '0 2px 8px rgba(0,0,0,0.14)',
+          transition: 'right .5s, background .2s, border-color .2s, box-shadow .2s, transform .15s',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#fff',
-          cursor: 'pointer',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-          transition: 'right .5s',
+          transform: `translateX(${toggleHover ? (collapsed ? 2 : -2) : 0}px)`,
         }}
         aria-label={collapsed ? 'Expandir menú' : 'Colapsar menú'}
+        title={collapsed ? 'Expandir menú' : 'Colapsar menú'}
       >
-        {collapsed ? <FaChevronRight /> : <FaChevronLeft />}
+        <span style={{ fontSize: 14, lineHeight: 0 }}>
+          {collapsed ? <FaChevronRight /> : <FaChevronLeft />}
+        </span>
       </button>
 
       <div
@@ -180,8 +191,8 @@ export default function AdminSidebar({ collapsed, onToggle }) {
         </div>
       </div>
 
-      {/* Configuración (engranaje) pegado abajo */}
-      <div style={{ position: 'absolute', left: 8, right: 8, bottom: 12 }} ref={settingsRef}>
+      {/* Configuración (engranaje) al final sin superponer contenido */}
+      <div style={{ marginTop: 'auto', padding: '8px' }} ref={settingsRef}>
         <div style={{ position: 'relative', display: 'flex', justifyContent: collapsed ? 'center' : 'flex-start' }}>
           <button
             onClick={() => setOpenSettings((v) => !v)}
@@ -191,6 +202,7 @@ export default function AdminSidebar({ collapsed, onToggle }) {
               background: '#222',
               color: '#fff',
               boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+              marginLeft: collapsed ? 0 : -8,
             }}
           >
 
@@ -205,7 +217,7 @@ export default function AdminSidebar({ collapsed, onToggle }) {
                 position: collapsed ? 'fixed' : 'absolute',
                 bottom: collapsed ? 64 : 46,
                 left: collapsed ? sidebarWidth + 8 : 'auto',
-                right: collapsed ? 'auto' : 0,
+                right: collapsed ? 'auto' : -10,
                 background: '#1a1a1a',
                 color: '#fff',
                 border: '1px solid rgba(255,255,255,0.08)',

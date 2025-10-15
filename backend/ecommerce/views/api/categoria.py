@@ -13,9 +13,13 @@ class CategoriaViewSetApi(viewsets.ModelViewSet):
             return [permissions.IsAdminUser()]
         return [permissions.AllowAny()]
 
-    def list(self, request, *args, **kwargs):
-        """Listar todas las categorías"""
-        return super().list(request, *args, **kwargs)
+    def get_queryset(self):
+        qs = Categoria.objects.all()
+        destacado = self.request.query_params.get('destacado')
+        if destacado is not None and destacado != '':
+            truthy = str(destacado).lower() in ('1','true','t','yes','y')
+            qs = qs.filter(destacado=truthy)
+        return qs
 
     def retrieve(self, request, *args, **kwargs):
         """Obtener una categoría por ID"""

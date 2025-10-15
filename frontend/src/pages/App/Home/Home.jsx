@@ -1,33 +1,75 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { appService } from '@/services/auth';
+import { API_URL } from '@/config/api';
 
-const categories = [
-  { name: 'Ropa Deportiva', img: '/img/cat-ropa.jpg', to: '/productos?cat=ropa' },
-  { name: 'Calzado', img: '/img/cat-calzado.jpg', to: '/productos?cat=calzado' },
-  { name: 'Accesorios', img: '/img/cat-accesorios.jpg', to: '/productos?cat=accesorios' },
-];
+// Cargar categorías destacadas desde API
 
-const featured = [
-  {
-    name: 'Camiseta Running Pro',
-    img: '/img/prod-camiseta.jpg',
-    price: 29.99,
-    to: '/productos/1',
-  },
-  {
-    name: 'Zapatillas Urban Sport',
-    img: '/img/prod-zapatillas.jpg',
-    price: 69.99,
-    to: '/productos/2',
-  },
-  {
-    name: 'Gorra Transpirable',
-    img: '/img/prod-gorra.jpg',
-    price: 14.99,
-    to: '/productos/3',
-  },
-];
+function resolveImageUrl(path) {
+  if (!path) return '';
+  if (/^https?:/i.test(path)) return path;
+  const base = API_URL.replace(/\/+$/, '');
+  const rel = String(path).replace(/^\/+/, '');
+  return `${base}/${rel}`;
+}
 
 export default function Home() {
+  const [cats, setCats] = useState([]);
+  const [catsLoading, setCatsLoading] = useState(true);
+  const [catsError, setCatsError] = useState('');
+  const [featured, setFeatured] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let alive = true;
+    async function load() {
+      setLoading(true);
+      setError('');
+      try {
+        // Traer productos destacados (limit 3). Si no hay paginación server, cortamos en cliente.
+        const data = await appService.productos.list({ destacado: 1, activo: 1 });
+        const items = Array.isArray(data) ? data : data?.results || [];
+        const top3 = items.slice(0, 3).map((p) => ({
+          id: p.producto_id ?? p.id,
+          name: p.nombre,
+          price: p.precio,
+          img: resolveImageUrl(p.imagen_url || p.imagen),
+        }));
+        if (alive) setFeatured(top3);
+      } catch (e) {
+        if (alive) setError('No se pudieron cargar los destacados');
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }
+    load();
+    return () => { alive = false; };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    async function loadCats() {
+      setCatsLoading(true);
+      setCatsError('');
+      try {
+        const data = await appService.categorias.list({ destacado: 1 });
+        const items = Array.isArray(data) ? data : data?.results || [];
+        const mapped = items.slice(0, 6).map((c) => ({
+          id: c.categoria_id ?? c.id,
+          name: c.nombre,
+          img: c.imagen_url ? resolveImageUrl(c.imagen_url) : '/img/cat-placeholder.svg',
+        }));
+        if (alive) setCats(mapped);
+      } catch (e) {
+        if (alive) setCatsError('No se pudieron cargar las categorías destacadas');
+      } finally {
+        if (alive) setCatsLoading(false);
+      }
+    }
+    loadCats();
+    return () => { alive = false; };
+  }, []);
   return (
     <div>
       {/* Hero */}
@@ -61,11 +103,16 @@ export default function Home() {
         </Link>
       </section>
 
-      {/* Categorías */}
+      {/* Categorías destacadas */}
       <section style={{ maxWidth: 1200, margin: '2.5rem auto', padding: '0 1rem' }}>
         <h2 style={{ fontSize: 26, fontWeight: 700, marginBottom: 18, textAlign: 'center' }}>
           Categorías destacadas
         </h2>
+        {catsError && (
+          <div style={{ textAlign: 'center', color: '#c62828', marginBottom: 10, fontWeight: 700 }}>
+            {catsError}
+          </div>
+        )}
         <div
           style={{
             display: 'grid',
@@ -74,10 +121,10 @@ export default function Home() {
             marginBottom: 10,
           }}
         >
-          {categories.map((cat) => (
+          {(catsLoading ? Array.from({ length: 3 }) : cats).map((cat, idx) => (
             <Link
-              to={cat.to}
-              key={cat.name}
+              to={cat ? `/productos?categoria_id=${encodeURIComponent(cat.id)}` : '#'}
+              key={cat ? cat.id : idx}
               style={{
                 display: 'block',
                 background: '#fafafa',
@@ -90,18 +137,26 @@ export default function Home() {
                 cursor: 'pointer',
               }}
             >
-              <img
-                src={cat.img}
-                alt={cat.name}
-                style={{
-                  width: '100%',
-                  height: 140,
-                  objectFit: 'cover',
-                  display: 'block',
-                }}
-              />
+              {catsLoading ? (
+                <div style={{ width: '100%', height: 140, background: '#eee' }} />
+              ) : (
+                <img
+                  src={cat.img}
+                  alt={cat.name}
+                  style={{
+                    width: '100%',
+                    height: 140,
+                    objectFit: 'cover',
+                    display: 'block',
+                  }}
+                />
+              )}
               <div style={{ padding: '1rem', textAlign: 'center', fontWeight: 600 }}>
-                {cat.name}
+                {catsLoading ? (
+                  <div style={{ height: 20, background: '#eee', borderRadius: 8 }} />
+                ) : (
+                  cat.name
+                )}
               </div>
             </Link>
           ))}
@@ -113,6 +168,11 @@ export default function Home() {
         <h2 style={{ fontSize: 26, fontWeight: 700, marginBottom: 18, textAlign: 'center' }}>
           Más populares
         </h2>
+        {error && (
+          <div style={{ textAlign: 'center', color: '#c62828', marginBottom: 10, fontWeight: 700 }}>
+            {error}
+          </div>
+        )}
         <div
           style={{
             display: 'grid',
@@ -120,10 +180,10 @@ export default function Home() {
             gap: 24,
           }}
         >
-          {featured.map((prod) => (
+          {(loading ? Array.from({ length: 3 }) : featured).map((prod, idx) => (
             <Link
-              to={prod.to}
-              key={prod.name}
+              to={prod ? `/productos/${prod.id}` : '#'}
+              key={prod ? prod.id : idx}
               style={{
                 display: 'block',
                 background: '#fff',
@@ -136,21 +196,31 @@ export default function Home() {
                 cursor: 'pointer',
               }}
             >
-              <img
-                src={prod.img}
-                alt={prod.name}
-                style={{
-                  width: '100%',
-                  height: 160,
-                  objectFit: 'cover',
-                  display: 'block',
-                }}
-              />
+              {loading ? (
+                <div style={{ width: '100%', height: 160, background: '#eee' }} />
+              ) : (
+                <img
+                  src={prod.img}
+                  alt={prod.name}
+                  style={{
+                    width: '100%',
+                    height: 160,
+                    objectFit: 'cover',
+                    display: 'block',
+                  }}
+                />
+              )}
               <div style={{ padding: '1rem' }}>
-                <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 6 }}>{prod.name}</div>
-                <div style={{ color: '#1e88e5', fontWeight: 700, fontSize: 17 }}>
-                  ${prod.price.toFixed(2)}
-                </div>
+                {loading ? (
+                  <div style={{ height: 20, background: '#eee', borderRadius: 8 }} />
+                ) : (
+                  <>
+                    <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 6 }}>{prod.name}</div>
+                    <div style={{ color: '#1e88e5', fontWeight: 700, fontSize: 17 }}>
+                      {Number(prod.price).toLocaleString('es-ES', { style: 'currency', currency: 'USD' })}
+                    </div>
+                  </>
+                )}
               </div>
             </Link>
           ))}

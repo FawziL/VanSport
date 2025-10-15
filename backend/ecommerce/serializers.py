@@ -5,7 +5,7 @@ from .models import Categoria, Producto, Usuario, Pedido, DetallePedido, Carrito
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Categoria
-        fields = ['categoria_id', 'nombre', 'descripcion']
+        fields = ['categoria_id', 'nombre', 'descripcion', 'imagen_url', 'destacado']
 
 class ProductoSerializer(serializers.ModelSerializer):
     # Leer: objeto anidado de la categoría

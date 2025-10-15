@@ -1,5 +1,5 @@
 from rest_framework import viewsets, permissions, status
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from django.conf import settings
 import os
@@ -10,7 +10,7 @@ class ProductoViewSetAdmin(viewsets.ModelViewSet):
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
     permission_classes = [permissions.IsAdminUser]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def create(self, request, *args, **kwargs):
         """Crear producto (solo admin), guardando imagen manualmente"""

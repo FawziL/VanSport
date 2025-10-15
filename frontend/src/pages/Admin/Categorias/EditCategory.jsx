@@ -13,7 +13,7 @@ export default function EditCategory() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ nombre: '', descripcion: '' });
+  const [form, setForm] = useState({ nombre: '', descripcion: '', imagen: null, imagenPreview: '', imagenActual: '' });
   const [errors, setErrors] = useState({});
   const [globalError, setGlobalError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -30,9 +30,10 @@ export default function EditCategory() {
       setErrors({});
       try {
         const data = await adminService.categorias.retrieve(id);
-        const nombre = data?.nombre ?? '';
-        const descripcion = data?.descripcion ?? '';
-        if (alive) setForm({ nombre, descripcion });
+  const nombre = data?.nombre ?? '';
+  const descripcion = data?.descripcion ?? '';
+  const imagenActual = data?.imagen_url || '';
+  if (alive) setForm({ nombre, descripcion, imagen: null, imagenPreview: '', imagenActual });
       } catch (err) {
         if (!alive) return;
         const msg = err?.response?.data?.detail || err?.message || 'No se pudo cargar la categoría.';
@@ -57,8 +58,13 @@ export default function EditCategory() {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, files } = e.target;
+    if (name === 'imagen') {
+      const file = files && files[0] ? files[0] : null;
+      setForm((prev) => ({ ...prev, imagen: file, imagenPreview: file ? URL.createObjectURL(file) : '' }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
     setErrors((prev) => ({ ...prev, [name]: undefined }));
     setGlobalError('');
   };
@@ -74,11 +80,11 @@ export default function EditCategory() {
 
     setSaving(true);
     try {
-      const payload = {
-        nombre: form.nombre.trim(),
-        descripcion: form.descripcion?.trim() || '',
-      };
-      await adminService.categorias.update(id, payload);
+      const fd = new FormData();
+      fd.append('nombre', form.nombre.trim());
+      fd.append('descripcion', form.descripcion?.trim() || '');
+      if (form.imagen) fd.append('imagen', form.imagen);
+      await adminService.categorias.update(id, fd);
       navigate('/admin/categorias');
     } catch (err) {
       const data = err?.response?.data;
@@ -214,6 +220,25 @@ export default function EditCategory() {
             }}
           />
           <FieldError error={errors.descripcion} />
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <label htmlFor="imagen" style={{ display: 'block', fontWeight: 700, marginBottom: 6 }}>
+            Imagen (opcional)
+          </label>
+          {form.imagenPreview ? (
+            <img src={form.imagenPreview} alt="Vista previa" style={{ display: 'block', maxWidth: 260, marginBottom: 8, borderRadius: 10 }} />
+          ) : form.imagenActual ? (
+            <img src={form.imagenActual} alt="Imagen actual" style={{ display: 'block', maxWidth: 260, marginBottom: 8, borderRadius: 10 }} />
+          ) : null}
+          <input
+            id="imagen"
+            name="imagen"
+            type="file"
+            accept="image/*"
+            onChange={handleChange}
+          />
+          <FieldError error={errors.imagen} />
         </div>
 
         <div style={{ display: 'flex', gap: 10 }}>

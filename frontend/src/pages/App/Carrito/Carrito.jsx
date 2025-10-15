@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { appService } from '@/services/auth';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { API_URL } from '@/config/api';
 
 function formatPrice(n) {
   const num = Number(n);
@@ -9,6 +10,13 @@ function formatPrice(n) {
   return num.toLocaleString('es-ES', { style: 'currency', currency: 'USD' });
 }
 
+      const resolveImageUrl = (path) => {
+        if (!path) return '';
+        if (/^https?:/i.test(path)) return path;
+        const base = API_URL.replace(/\/+$/, '');
+        const rel = String(path).replace(/^\/+/, '');
+        return `${base}/${rel}`;
+      };
 export default function Carrito() {
   const navigate = useNavigate();
   const { isAuthenticated, ensureUserLoaded } = useAuth();
@@ -317,7 +325,7 @@ export default function Carrito() {
                   }}
                 >
                   <img
-                    src={producto.imagen_url || producto.imagen || ''}
+                    src={resolveImageUrl(producto.imagen_url)}
                     alt={producto.nombre || `Producto ${producto.producto_id ?? ''}`}
                     style={{
                       width: 84,
