@@ -25,6 +25,13 @@ import ListOrders from '@/pages/Admin/Pedidos/ListOrders';
 import EditOrder from '@/pages/Admin/Pedidos/EditOrder';
 import ListReviews from '@/pages/Admin/Reseñas/ListReviews';
 import EditReview from '@/pages/Admin/Reseñas/EditReview';
+import ListSales from '@/pages/Admin/Ventas/ListSales';
+import EditSale from '@/pages/Admin/Ventas/EditSale';
+import ListNotifications from '@/pages/Admin/Notificaciones/ListNotifications';
+import EditNotification from '@/pages/Admin/Notificaciones/EditNotification';
+import CreateNotification from '@/pages/Admin/Notificaciones/CreateNotification';
+import ListShipments from '@/pages/Admin/Envíos/ListShipments';
+import EditShipment from '@/pages/Admin/Envíos/EditShipment';
 
 function AppShell() {
   const location = useLocation();
@@ -162,6 +169,68 @@ function AppShell() {
             element={
               <AdminPage>
                 <EditReview />
+              </AdminPage>
+            }
+          />
+
+          {/* Ventas (Transacciones) Admin */}
+          <Route
+            path="/admin/ventas"
+            element={
+              <AdminPage>
+                <ListSales />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/ventas/editar/:id"
+            element={
+              <AdminPage>
+                <EditSale />
+              </AdminPage>
+            }
+          />
+
+          {/* Notificaciones Admin */}
+          <Route
+            path="/admin/notificaciones"
+            element={
+              <AdminPage>
+                <ListNotifications />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/notificaciones/crear"
+            element={
+              <AdminPage>
+                <CreateNotification />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/notificaciones/editar/:id"
+            element={
+              <AdminPage>
+                <EditNotification />
+              </AdminPage>
+            }
+          />
+
+          {/* Envíos Admin */}
+          <Route
+            path="/admin/envios"
+            element={
+              <AdminPage>
+                <ListShipments />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/envios/editar/:id"
+            element={
+              <AdminPage>
+                <EditShipment />
               </AdminPage>
             }
           />

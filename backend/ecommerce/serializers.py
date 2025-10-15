@@ -57,16 +57,27 @@ class ReseñaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class NotificacionSerializer(serializers.ModelSerializer):
+    usuario_nombre = serializers.CharField(source='usuario.nombre', read_only=True)
+    usuario_apellido = serializers.CharField(source='usuario.apellido', read_only=True)
+    usuario_email = serializers.CharField(source='usuario.email', read_only=True)
     class Meta:
         model = Notificacion
         fields = '__all__'
 
 class TransaccionSerializer(serializers.ModelSerializer):
+    usuario_nombre = serializers.CharField(source='pedido.usuario.nombre', read_only=True)
+    usuario_apellido = serializers.CharField(source='pedido.usuario.apellido', read_only=True)
+    usuario_email = serializers.CharField(source='pedido.usuario.email', read_only=True)
+    usuario_id = serializers.IntegerField(source='pedido.usuario_id', read_only=True)
     class Meta:
         model = Transaccion
         fields = '__all__'
 
 class EnvioSerializer(serializers.ModelSerializer):
+    usuario_nombre = serializers.CharField(source='pedido.usuario.nombre', read_only=True)
+    usuario_apellido = serializers.CharField(source='pedido.usuario.apellido', read_only=True)
+    usuario_email = serializers.CharField(source='pedido.usuario.email', read_only=True)
+    usuario_id = serializers.IntegerField(source='pedido.usuario_id', read_only=True)
     class Meta:
         model = Envio
         fields = '__all__'
