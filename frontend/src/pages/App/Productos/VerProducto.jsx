@@ -23,6 +23,8 @@ export default function VerProducto() {
   const [addMsg, setAddMsg] = useState('');
   const [addLoading, setAddLoading] = useState(false);
   const [inCart, setInCart] = useState(false); // NUEVO: estado para saber si está en el carrito
+  const [qty, setQty] = useState(1); // Cantidad seleccionada
+  const [cartQty, setCartQty] = useState(0); // Cantidad actual en el carrito (si existe)
 
   const resolveImageUrl = (path) => {
     if (!path) return '';
@@ -106,6 +108,11 @@ export default function VerProducto() {
     });
   }, [allImages]);
 
+  // Reiniciar cantidad cuando cambia el producto
+  useEffect(() => {
+    setQty(1);
+  }, [producto?.id]);
+
   const handleOpenModal = () => {
     setIsModalOpen(true);
     setCurrentImageIndex(Math.max(0, allImages.indexOf(selectedImage)));
@@ -118,7 +125,10 @@ export default function VerProducto() {
     let alive = true;
     async function checkInCart() {
       if (!producto || !isAuthenticated) {
-        if (alive) setInCart(false);
+        if (alive) {
+          setInCart(false);
+          setCartQty(0);
+        }
         return;
       }
       try {
@@ -131,10 +141,27 @@ export default function VerProducto() {
               : (i.producto?.producto_id ?? i.producto_id);
           return Number(pid) === Number(producto.id);
         });
-        if (alive) setInCart(found);
+        if (alive) {
+          setInCart(found);
+          if (found) {
+            const item = items.find((i) => {
+              const pid = typeof i.producto === 'number' ? i.producto : (i.producto?.producto_id ?? i.producto_id);
+              return Number(pid) === Number(producto.id);
+            });
+            const c = Number(item?.cantidad) || 1;
+            const max = Number(producto.stock) || c;
+            setQty(Math.min(c, max));
+            setCartQty(Math.min(c, max));
+          } else {
+            setCartQty(0);
+          }
+        }
       } catch {
         // Si falla, no bloqueamos la UI; asumimos que no está
-        if (alive) setInCart(false);
+        if (alive) {
+          setInCart(false);
+          setCartQty(0);
+        }
       }
     }
     checkInCart();
@@ -241,6 +268,13 @@ export default function VerProducto() {
     producto.precio_oferta && producto.precio
       ? Math.round(((producto.precio - producto.precio_oferta) / producto.precio) * 100)
       : null;
+
+  // Estados de deshabilitado del botón principal (añadir/actualizar)
+  const stockNum = Number(producto?.stock) || 0;
+  const exceedsStock = Number(qty) > stockNum;
+  const invalidQty = Number(qty) < 1;
+  const noChangeDisabled = inCart && Number(qty) === Number(cartQty);
+  const isDisabled = stockNum <= 0 || addLoading || invalidQty || exceedsStock || noChangeDisabled;
 
   return (
     <div style={{ maxWidth: 1200, margin: '2rem auto', padding: '0 1rem' }}>
@@ -380,6 +414,7 @@ export default function VerProducto() {
               marginBottom: 16,
             }}
           >
+            {/* Precio */}
             {producto.precio_oferta ? (
               <div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
@@ -412,62 +447,190 @@ export default function VerProducto() {
               {producto.stock > 0 ? 'En stock' : 'Agotado'}
             </div>
 
-            <button
-              type="button"
-              style={{
-                marginTop: 12,
-                width: '100%',
-                padding: '0.7rem 1rem',
-                borderRadius: 10,
-                border: 'none',
-                background: producto.stock > 0 ? (inCart ? '#e53935' : '#1e88e5') : '#aaa',
-                color: '#fff',
-                fontWeight: 800,
-                cursor: producto.stock > 0 ? 'pointer' : 'not-allowed',
-                transition: 'background 0.2s',
-              }}
-              disabled={producto.stock <= 0 || addLoading}
-              onClick={async () => {
-                if (!isAuthenticated) {
-                  window.location.href = '/login';
-                  return;
-                }
-                setAddMsg('');
-                setAddLoading(true);
-                try {
-                  if (inCart) {
-                    // Quitar del carrito
-                    await appService.carrito.remove({ producto_id: producto.id });
-                    setInCart(false);
-                    setAddMsg('Producto quitado del carrito.');
-                  } else {
-                    // Añadir al carrito
-                    await appService.carrito.add({ producto_id: producto.id, cantidad: 1 });
-                    setInCart(true);
-                    setAddMsg('¡Producto añadido al carrito!');
+            {/* Selector de cantidad */}
+            {producto.stock > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <div style={{ fontWeight: 700, marginBottom: 6 }}>Cantidad</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <button
+                    type="button"
+                    onClick={() => setQty((q) => Math.max(1, Number(q) - 1))}
+                    aria-label="Disminuir"
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 8,
+                      border: '1px solid #ddd',
+                      background: '#fafafa',
+                      cursor: 'pointer',
+                      fontSize: 18,
+                      fontWeight: 800,
+                    }}
+                  >
+                    –
+                  </button>
+                  <input
+                    type="number"
+                    min={1}
+                    max={Number(producto.stock) || 1}
+                    value={qty}
+                    onChange={(e) => {
+                      const v = parseInt(e.target.value, 10);
+                      if (Number.isNaN(v)) {
+                        setQty(1);
+                        return;
+                      }
+                      const max = Number(producto.stock) || 1;
+                      setQty(Math.min(Math.max(1, v), max));
+                    }}
+                    style={{
+                      width: 70,
+                      height: 36,
+                      borderRadius: 8,
+                      border: '1px solid #ddd',
+                      textAlign: 'center',
+                      fontWeight: 700,
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setQty((q) => {
+                      const max = Number(producto.stock) || 1;
+                      return Math.min(max, Number(q) + 1);
+                    })}
+                    aria-label="Aumentar"
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 8,
+                      border: '1px solid #ddd',
+                      background: '#fafafa',
+                      cursor: 'pointer',
+                      fontSize: 18,
+                      fontWeight: 800,
+                    }}
+                  >
+                    +
+                  </button>
+                </div>
+                {qty > (Number(producto.stock) || 0) && (
+                  <div style={{ color: '#e53935', fontWeight: 700, marginTop: 6, fontSize: 13 }}>
+                    Máximo disponible: {Number(producto.stock)}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+              <button
+                type="button"
+                style={{
+                  flex: 1,
+                  padding: '0.7rem 1rem',
+                  borderRadius: 10,
+                  border: noChangeDisabled ? '2px dashed #90caf9' : 'none',
+                  background: producto.stock > 0 ? (noChangeDisabled ? '#e3f2fd' : '#1e88e5') : '#aaa',
+                  color: producto.stock > 0 ? (noChangeDisabled ? '#1e88e5' : '#fff') : '#fff',
+                  fontWeight: 800,
+                  cursor: producto.stock > 0 ? (isDisabled ? 'not-allowed' : 'pointer') : 'not-allowed',
+                  transition: 'background 0.2s',
+                }}
+                title={noChangeDisabled ? 'Sin cambios' : undefined}
+                disabled={isDisabled}
+                onClick={async () => {
+                  if (!isAuthenticated) {
+                    window.location.href = '/login';
+                    return;
                   }
-                } catch (err) {
-                  const backendMsg = err?.response?.data;
-                  const msg =
-                    typeof backendMsg === 'object'
-                      ? Object.entries(backendMsg)
-                          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
-                          .join(' | ')
-                      : backendMsg || err.message || 'Error al procesar el carrito';
-                  setAddMsg(msg);
-                } finally {
-                  setAddLoading(false);
-                }
-              }}
-            >
-              {addLoading
-                ? inCart
-                  ? 'Quitando...'
-                  : 'Añadiendo...'
-                : inCart
-                  ? 'Quitar del carrito'
-                  : 'Añadir al carrito'}
-            </button>
+                  setAddMsg('');
+                  setAddLoading(true);
+                  try {
+                    if (inCart) {
+                      // Actualizar cantidad del carrito
+                      await appService.carrito.updateQuantity({ producto_id: producto.id, cantidad: Number(qty) || 1 });
+                      setCartQty(Number(qty) || 1);
+                      setAddMsg('Cantidad actualizada.');
+                    } else {
+                      // Añadir al carrito
+                      await appService.carrito.add({ producto_id: producto.id, cantidad: Number(qty) || 1 });
+                      setInCart(true);
+                      setCartQty(Number(qty) || 1);
+                      setAddMsg('¡Producto añadido al carrito!');
+                    }
+                    // Actualizar contador global
+                    try {
+                      const data = await appService.carrito.list();
+                      const items = Array.isArray(data) ? data : data?.results || [];
+                      const totalQty = items.reduce((acc, it) => acc + (Number(it?.cantidad) || 1), 0);
+                      window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: totalQty } }));
+                    } catch {}
+                  } catch (err) {
+                    const backendMsg = err?.response?.data;
+                    const msg =
+                      typeof backendMsg === 'object'
+                        ? Object.entries(backendMsg)
+                            .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+                            .join(' | ')
+                        : backendMsg || err.message || 'Error al procesar el carrito';
+                    setAddMsg(msg);
+                  } finally {
+                    setAddLoading(false);
+                  }
+                }}
+              >
+                {addLoading ? (inCart ? 'Actualizando...' : 'Añadiendo...') : (inCart ? 'Actualizar cantidad' : 'Añadir al carrito')}
+              </button>
+
+              {inCart && (
+                <button
+                  type="button"
+                  style={{
+                    width: 44,
+                    borderRadius: 10,
+                    border: '1px solid #f2b8b8',
+                    background: '#fff5f5',
+                    color: '#c62828',
+                    fontWeight: 900,
+                    cursor: 'pointer',
+                  }}
+                  title="Quitar del carrito"
+                  onClick={async () => {
+                    if (!isAuthenticated) {
+                      window.location.href = '/login';
+                      return;
+                    }
+                    setAddMsg('');
+                    setAddLoading(true);
+                    try {
+                      await appService.carrito.remove({ producto_id: producto.id });
+                      setInCart(false);
+                      setCartQty(0);
+                      setQty(1);
+                      setAddMsg('Producto quitado del carrito.');
+                      try {
+                        const data = await appService.carrito.list();
+                        const items = Array.isArray(data) ? data : data?.results || [];
+                        const totalQty = items.reduce((acc, it) => acc + (Number(it?.cantidad) || 1), 0);
+                        window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: totalQty } }));
+                      } catch {}
+                    } catch (err) {
+                      const backendMsg = err?.response?.data;
+                      const msg =
+                        typeof backendMsg === 'object'
+                          ? Object.entries(backendMsg)
+                              .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+                              .join(' | ')
+                          : backendMsg || err.message || 'No se pudo quitar del carrito';
+                      setAddMsg(msg);
+                    } finally {
+                      setAddLoading(false);
+                    }
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
             {addMsg && (
               <div
                 style={{

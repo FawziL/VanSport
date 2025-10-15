@@ -98,6 +98,8 @@ export default function Carrito() {
         cantidad: nuevaCantidad,
       });
       // Éxito: ya está actualizado en memoria; no hacemos nada más
+      const newCount = items.reduce((acc, i) => acc + (i === item ? nuevaCantidad : i.cantidad), 0);
+      window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: newCount } }));
     } catch (err) {
       // Revertir si falla
       setItems((prev) =>
@@ -121,6 +123,8 @@ export default function Carrito() {
         producto_id: item.producto?.producto_id ?? item.producto_id,
       });
       await fetchCarrito();
+      const newCount = items.reduce((acc, i) => acc + (i === item ? 0 : i.cantidad), 0);
+      window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: newCount } }));
     } catch {
       setErrMsg('No se pudo eliminar el producto');
     } finally {
@@ -134,6 +138,7 @@ export default function Carrito() {
     try {
       await appService.carrito.clear();
       await fetchCarrito();
+      window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: 0 } }));
     } catch {
       setErrMsg('No se pudo vaciar el carrito');
     } finally {

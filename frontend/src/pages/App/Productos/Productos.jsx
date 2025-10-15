@@ -2,41 +2,51 @@ import { useEffect, useState } from 'react';
 import CardProduct from '@/components/CardProduct';
 import { appService } from '@/services/auth';
 import Pagination from '@/components/Pagination';
-import PageSizeSelector from '@/components/PageSizeSelector';
+import ProductFilters from '@/components/ProductFilters';
 
-const fetchProductos = async ({ page, search, pageSize }) => {
-  const data = await appService.productos.list({ page, search });
+const fetchProductos = async ({ page, filters }) => {
+  const params = {
+    page,
+    q: filters?.q || undefined,
+    categoria_id: filters?.categoria_id || undefined,
+    min_price: filters?.min_price || undefined,
+    max_price: filters?.max_price || undefined,
+    oferta: filters?.oferta || undefined,
+    page_size: filters?.pageSize || undefined,
+  };
+  const data = await appService.productos.list(params);
 
   // Acepta ambos formatos: array plano o objeto paginado { count, results, ... }
   const items = Array.isArray(data) ? data : (data?.results ?? []);
   const filtered = items.filter(
-    (p) => !search || (p?.nombre ?? '').toLowerCase().includes(search.toLowerCase())
+    (p) => !filters?.q || (p?.nombre ?? '').toLowerCase().includes(String(filters.q).toLowerCase())
   );
 
+  const pageSize = filters?.pageSize || 6;
   const total = filtered.length;
-  const pages = Math.max(1, Math.ceil(total / (pageSize || 6)));
+  const pages = Math.max(1, Math.ceil(total / pageSize));
   const safePage = Math.min(Math.max(page, 1), pages);
-  const start = (safePage - 1) * (pageSize || 6);
+  const start = (safePage - 1) * pageSize;
 
   return {
-    productos: filtered.slice(start, start + (pageSize || 6)),
+    productos: filtered.slice(start, start + pageSize),
     total,
     pages,
+    pageSize,
   };
 };
 
 export default function Productos() {
   const [productos, setProductos] = useState([]);
-  const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [error, setError] = useState(null);
-  const [pageSize, setPageSize] = useState(6); // nuevo estado
+  const [filters, setFilters] = useState({ q: '', categoria_id: '', min_price: '', max_price: '', oferta: '', pageSize: 6 });
 
   useEffect(() => {
     let mounted = true;
     setError(null);
-    fetchProductos({ page, search, pageSize })
+    fetchProductos({ page, filters })
       .then((res) => {
         if (!mounted) return;
         setProductos(res.productos);
@@ -53,7 +63,7 @@ export default function Productos() {
     return () => {
       mounted = false;
     };
-  }, [page, search, pageSize]);
+  }, [page, JSON.stringify(filters)]);
 
   return (
     <div style={{ maxWidth: 1200, margin: '2.5rem auto', padding: '0 1rem' }}>
@@ -61,42 +71,15 @@ export default function Productos() {
         Todos los productos
       </h1>
 
-      {/* Filtros */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginBottom: 24,
-          gap: 12,
-          flexWrap: 'wrap',
+      {/* Filtros avanzados */}
+      <ProductFilters
+        value={filters}
+        onChange={(val) => {
+          setFilters(val);
+          setPage(1);
         }}
-      >
-        <input
-          type="text"
-          placeholder="Buscar por nombre..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-          style={{
-            padding: '0.6rem 1rem',
-            borderRadius: 8,
-            border: '1px solid #ccc',
-            minWidth: 220,
-            fontSize: 16,
-          }}
-        />
-        <PageSizeSelector
-          value={pageSize}
-          onChange={(val) => {
-            setPageSize(val);
-            setPage(1); // reset a la primera página al cambiar el tamaño
-          }}
-          options={[6, 12, 24, 48]}
-          label="Por página"
-        />
-      </div>
+        pageSizeOptions={[6, 12, 24, 48]}
+      />
 
       {/* Mensaje de error */}
       {error && (
@@ -123,7 +106,7 @@ export default function Productos() {
       </div>
 
       {/* Paginación */}
-      <Pagination page={page} pages={pages} onChange={setPage} showNumbers />
+  <Pagination page={page} pages={pages} onChange={setPage} showNumbers />
     </div>
   );
 }

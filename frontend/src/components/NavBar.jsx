@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { appService } from '@/services/auth';
+import { FaShoppingCart } from 'react-icons/fa';
 
 export default function NavBar() {
   const { user, logout } = useAuth();
@@ -8,6 +10,7 @@ export default function NavBar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef(null);
   const navigate = useNavigate();
+  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -18,6 +21,41 @@ export default function NavBar() {
     if (userMenuOpen) document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [userMenuOpen]);
+
+  // Escuchar eventos globales de carrito para actualizar en tiempo real
+  useEffect(() => {
+    const handler = (e) => {
+      const n = Number(e?.detail?.count);
+      if (!Number.isNaN(n)) setCartCount(n);
+    };
+    window.addEventListener('cart:updated', handler);
+    return () => window.removeEventListener('cart:updated', handler);
+  }, []);
+  // Cargar cantidad del carrito (sumando cantidades) cuando hay usuario y al recuperar foco
+  useEffect(() => {
+    let alive = true;
+    const load = async () => {
+      if (!user) {
+        if (alive) setCartCount(0);
+        return;
+      }
+      try {
+        const data = await appService.carrito.list();
+        const items = Array.isArray(data) ? data : data?.results || [];
+        const totalQty = items.reduce((acc, it) => acc + (Number(it?.cantidad) || 1), 0);
+        if (alive) setCartCount(totalQty);
+      } catch {
+        if (alive) setCartCount(0);
+      }
+    };
+    load();
+    const onFocus = () => load();
+    window.addEventListener('focus', onFocus);
+    return () => {
+      alive = false;
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [user]);
 
   const handleNav = (to) => {
     setMobileOpen(false);
@@ -79,14 +117,32 @@ export default function NavBar() {
               <NavLink to="/productos" style={linkStyle}>
                 Productos
               </NavLink>
-              <NavLink to="/ofertas" style={linkStyle}>
-                Ofertas
-              </NavLink>
             </div>
 
             <div className="nav-right">
               <NavLink to="/carrito" style={linkStyle}>
-                Carrito
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <FaShoppingCart />
+                  {cartCount > 0 && (
+                    <span
+                      aria-label={`Productos en el carrito: ${cartCount}`}
+                      style={{
+                        background: '#e53835',
+                        color: '#fff',
+                        borderRadius: 999,
+                        padding: '0 6px',
+                        fontSize: 12,
+                        fontWeight: 800,
+                        lineHeight: '20px',
+                        height: 20,
+                        width: 6,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {cartCount}
+                    </span>
+                  )}
+                </span>
               </NavLink>
               {!user ? (
                 <>
@@ -195,6 +251,7 @@ export default function NavBar() {
                         onClick={() => {
                           setUserMenuOpen(false);
                           logout();
+                          setCartCount(0);
                         }}
                         style={{
                           width: '100%',
@@ -290,7 +347,29 @@ export default function NavBar() {
               Productos
             </NavLink>
             <NavLink to="/carrito" style={linkStyle} onClick={() => setMobileOpen(false)}>
-              Carrito
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <FaShoppingCart />
+                <span>Carrito</span>
+                {cartCount > 0 && (
+                  <span
+                    aria-label={`Productos en el carrito: ${cartCount}`}
+                    style={{
+                      background: '#e53935',
+                      color: '#fff',
+                      borderRadius: 999,
+                      padding: '0 8px',
+                      fontSize: 12,
+                      fontWeight: 800,
+                      lineHeight: '18px',
+                      height: 18,
+                      minWidth: 18,
+                      textAlign: 'center',
+                    }}
+                  >
+                    {cartCount}
+                  </span>
+                )}
+              </span>
             </NavLink>
 
             {!user ? (
@@ -319,6 +398,7 @@ export default function NavBar() {
                   onClick={() => {
                     setMobileOpen(false);
                     logout();
+                    setCartCount(0);
                   }}
                   style={{
                     textAlign: 'left',

@@ -41,6 +41,7 @@ class Producto(models.Model):
 	nombre = models.CharField(max_length=255)
 	descripcion = models.TextField(blank=True)
 	precio = models.DecimalField(max_digits=10, decimal_places=2)
+	precio_oferta = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, db_column='precio_oferta')
 	stock = models.IntegerField()
 	categoria = models.ForeignKey(Categoria, on_delete=models.DO_NOTHING, db_column='categoria_id')
 	imagen_url = models.CharField(max_length=255, blank=True)

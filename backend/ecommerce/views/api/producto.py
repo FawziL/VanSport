@@ -18,16 +18,23 @@ class ProductoViewSetApi(viewsets.ModelViewSet):
         categoria_id = self.request.query_params.get('categoria_id')
         min_price = self.request.query_params.get('min_price')
         max_price = self.request.query_params.get('max_price')
+        oferta = self.request.query_params.get('oferta')  # true/1 para solo con precio_oferta
         q = self.request.query_params.get('q')
 
         if activo is not None:
             qs = qs.filter(activo=activo.lower() in ('1','true','t','yes','y'))
         if categoria_id:
             qs = qs.filter(categoria_id=categoria_id)
-        if min_price:
+        if min_price and min_price.lower() != 'undefined':
             qs = qs.filter(precio__gte=min_price)
-        if max_price:
+        if max_price and max_price.lower() != 'undefined':
             qs = qs.filter(precio__lte=max_price)
+        if oferta is not None and oferta != '':
+            truthy = str(oferta).lower() in ('1','true','t','yes','y')
+            if truthy:
+                qs = qs.filter(precio_oferta__isnull=False)
+            else:
+                qs = qs.filter(precio_oferta__isnull=True)
         if q:
             qs = qs.filter(models.Q(nombre__icontains=q) | models.Q(descripcion__icontains=q))
         return qs
