@@ -2,13 +2,13 @@ import { Link } from 'react-router-dom';
 import { API_URL } from '@/config/api';
 
 export default function CardProduct({ producto }) {
-      const resolveImageUrl = (path) => {
-        if (!path) return '';
-        if (/^https?:/i.test(path)) return path;
-        const base = API_URL.replace(/\/+$/, '');
-        const rel = String(path).replace(/^\/+/, '');
-        return `${base}/${rel}`;
-      };
+  const resolveImageUrl = (path) => {
+    if (!path) return '';
+    if (/^https?:/i.test(path)) return path;
+    const base = API_URL.replace(/\/+$/, '');
+    const rel = String(path).replace(/^\/+/, '');
+    return `${base}/${rel}`;
+  };
   return (
     <div
       style={{

@@ -55,10 +55,24 @@ export default function EditSale() {
           <input name="metodo_pago" value={form.metodo_pago} onChange={onChange} />
         </label>
         <div style={{ display: 'flex', gap: 12 }}>
-          <button type="submit" style={{ padding: '0.6rem 1.2rem', borderRadius: 8, background: '#1e88e5', color: '#fff', fontWeight: 800, border: 'none' }}>
+          <button
+            type="submit"
+            style={{
+              padding: '0.6rem 1.2rem',
+              borderRadius: 8,
+              background: '#1e88e5',
+              color: '#fff',
+              fontWeight: 800,
+              border: 'none',
+            }}
+          >
             Guardar
           </button>
-          <button type="button" onClick={() => navigate('/admin/ventas')} style={{ padding: '0.6rem 1.2rem', borderRadius: 8 }}>
+          <button
+            type="button"
+            onClick={() => navigate('/admin/ventas')}
+            style={{ padding: '0.6rem 1.2rem', borderRadius: 8 }}
+          >
             Cancelar
           </button>
         </div>

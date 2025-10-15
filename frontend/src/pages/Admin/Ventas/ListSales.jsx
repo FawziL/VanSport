@@ -58,17 +58,36 @@ export default function ListSales() {
 
   return (
     <div style={{ maxWidth: 1200, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 18,
+        }}
+      >
         <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Ventas</h1>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-        <PageSizeSelector value={pageSize} onChange={setPageSize} options={[5, 10, 20, 50]} label="Por página" />
+        <PageSizeSelector
+          value={pageSize}
+          onChange={setPageSize}
+          options={[5, 10, 20, 50]}
+          label="Por página"
+        />
       </div>
 
       {error && <div style={{ color: '#d32f2f', marginBottom: 12, fontWeight: 700 }}>{error}</div>}
 
-      <div style={{ overflowX: 'auto', background: '#fff', borderRadius: 10, boxShadow: '0 2px 12px #0001' }}>
+      <div
+        style={{
+          overflowX: 'auto',
+          background: '#fff',
+          borderRadius: 10,
+          boxShadow: '0 2px 12px #0001',
+        }}
+      >
         <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#f3f4f6', color: '#000000ff' }}>
@@ -85,22 +104,34 @@ export default function ListSales() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={8} style={{ textAlign: 'center', padding: 24 }}>Cargando...</td>
+                <td colSpan={8} style={{ textAlign: 'center', padding: 24 }}>
+                  Cargando...
+                </td>
               </tr>
             ) : pageItems.length === 0 ? (
               <tr>
-                <td colSpan={8} style={{ textAlign: 'center', padding: 24, color: '#888' }}>No hay ventas.</td>
+                <td colSpan={8} style={{ textAlign: 'center', padding: 24, color: '#888' }}>
+                  No hay ventas.
+                </td>
               </tr>
             ) : (
               pageItems.map((t) => (
                 <tr key={t.transaccion_id} style={{ color: '#444' }}>
                   <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{t.transaccion_id}</td>
-                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{t.pedido_id ?? '-'}</td>
-                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{getUserLabel(t)}</td>
-                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{fmt.money(t.monto)}</td>
+                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>
+                    {t.pedido_id ?? '-'}
+                  </td>
+                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>
+                    {getUserLabel(t)}
+                  </td>
+                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>
+                    {fmt.money(t.monto)}
+                  </td>
                   <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{t.metodo_pago}</td>
                   <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{t.estado}</td>
-                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{fmt.date(t.fecha_transaccion)}</td>
+                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>
+                    {fmt.date(t.fecha_transaccion)}
+                  </td>
                   <td style={{ padding: '10px 8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
                     <button
                       onClick={() => navigate(`/admin/ventas/editar/${t.transaccion_id}`)}

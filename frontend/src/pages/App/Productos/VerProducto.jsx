@@ -145,7 +145,10 @@ export default function VerProducto() {
           setInCart(found);
           if (found) {
             const item = items.find((i) => {
-              const pid = typeof i.producto === 'number' ? i.producto : (i.producto?.producto_id ?? i.producto_id);
+              const pid =
+                typeof i.producto === 'number'
+                  ? i.producto
+                  : (i.producto?.producto_id ?? i.producto_id);
               return Number(pid) === Number(producto.id);
             });
             const c = Number(item?.cantidad) || 1;
@@ -494,10 +497,12 @@ export default function VerProducto() {
                   />
                   <button
                     type="button"
-                    onClick={() => setQty((q) => {
-                      const max = Number(producto.stock) || 1;
-                      return Math.min(max, Number(q) + 1);
-                    })}
+                    onClick={() =>
+                      setQty((q) => {
+                        const max = Number(producto.stock) || 1;
+                        return Math.min(max, Number(q) + 1);
+                      })
+                    }
                     aria-label="Aumentar"
                     style={{
                       width: 36,
@@ -529,10 +534,12 @@ export default function VerProducto() {
                   padding: '0.7rem 1rem',
                   borderRadius: 10,
                   border: noChangeDisabled ? '2px dashed #90caf9' : 'none',
-                  background: producto.stock > 0 ? (noChangeDisabled ? '#e3f2fd' : '#1e88e5') : '#aaa',
+                  background:
+                    producto.stock > 0 ? (noChangeDisabled ? '#e3f2fd' : '#1e88e5') : '#aaa',
                   color: producto.stock > 0 ? (noChangeDisabled ? '#1e88e5' : '#fff') : '#fff',
                   fontWeight: 800,
-                  cursor: producto.stock > 0 ? (isDisabled ? 'not-allowed' : 'pointer') : 'not-allowed',
+                  cursor:
+                    producto.stock > 0 ? (isDisabled ? 'not-allowed' : 'pointer') : 'not-allowed',
                   transition: 'background 0.2s',
                 }}
                 title={noChangeDisabled ? 'Sin cambios' : undefined}
@@ -547,12 +554,18 @@ export default function VerProducto() {
                   try {
                     if (inCart) {
                       // Actualizar cantidad del carrito
-                      await appService.carrito.updateQuantity({ producto_id: producto.id, cantidad: Number(qty) || 1 });
+                      await appService.carrito.updateQuantity({
+                        producto_id: producto.id,
+                        cantidad: Number(qty) || 1,
+                      });
                       setCartQty(Number(qty) || 1);
                       setAddMsg('Cantidad actualizada.');
                     } else {
                       // Añadir al carrito
-                      await appService.carrito.add({ producto_id: producto.id, cantidad: Number(qty) || 1 });
+                      await appService.carrito.add({
+                        producto_id: producto.id,
+                        cantidad: Number(qty) || 1,
+                      });
                       setInCart(true);
                       setCartQty(Number(qty) || 1);
                       setAddMsg('¡Producto añadido al carrito!');
@@ -561,8 +574,13 @@ export default function VerProducto() {
                     try {
                       const data = await appService.carrito.list();
                       const items = Array.isArray(data) ? data : data?.results || [];
-                      const totalQty = items.reduce((acc, it) => acc + (Number(it?.cantidad) || 1), 0);
-                      window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: totalQty } }));
+                      const totalQty = items.reduce(
+                        (acc, it) => acc + (Number(it?.cantidad) || 1),
+                        0
+                      );
+                      window.dispatchEvent(
+                        new CustomEvent('cart:updated', { detail: { count: totalQty } })
+                      );
                     } catch {}
                   } catch (err) {
                     const backendMsg = err?.response?.data;
@@ -578,7 +596,13 @@ export default function VerProducto() {
                   }
                 }}
               >
-                {addLoading ? (inCart ? 'Actualizando...' : 'Añadiendo...') : (inCart ? 'Actualizar cantidad' : 'Añadir al carrito')}
+                {addLoading
+                  ? inCart
+                    ? 'Actualizando...'
+                    : 'Añadiendo...'
+                  : inCart
+                    ? 'Actualizar cantidad'
+                    : 'Añadir al carrito'}
               </button>
 
               {inCart && (
@@ -610,8 +634,13 @@ export default function VerProducto() {
                       try {
                         const data = await appService.carrito.list();
                         const items = Array.isArray(data) ? data : data?.results || [];
-                        const totalQty = items.reduce((acc, it) => acc + (Number(it?.cantidad) || 1), 0);
-                        window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: totalQty } }));
+                        const totalQty = items.reduce(
+                          (acc, it) => acc + (Number(it?.cantidad) || 1),
+                          0
+                        );
+                        window.dispatchEvent(
+                          new CustomEvent('cart:updated', { detail: { count: totalQty } })
+                        );
                       } catch {}
                     } catch (err) {
                       const backendMsg = err?.response?.data;

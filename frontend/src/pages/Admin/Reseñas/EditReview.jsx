@@ -51,17 +51,40 @@ export default function EditReview() {
       <form onSubmit={onSubmit} style={{ display: 'grid', gap: 12 }}>
         <label style={{ display: 'grid', gap: 6 }}>
           <span>Calificación</span>
-          <input type="number" min={1} max={5} step={1} name="calificacion" value={form.calificacion} onChange={onChange} required />
+          <input
+            type="number"
+            min={1}
+            max={5}
+            step={1}
+            name="calificacion"
+            value={form.calificacion}
+            onChange={onChange}
+            required
+          />
         </label>
         <label style={{ display: 'grid', gap: 6 }}>
           <span>Comentario</span>
           <textarea name="comentario" value={form.comentario} onChange={onChange} rows={3} />
         </label>
         <div style={{ display: 'flex', gap: 12 }}>
-          <button type="submit" style={{ padding: '0.6rem 1.2rem', borderRadius: 8, background: '#1e88e5', color: '#fff', fontWeight: 800, border: 'none' }}>
+          <button
+            type="submit"
+            style={{
+              padding: '0.6rem 1.2rem',
+              borderRadius: 8,
+              background: '#1e88e5',
+              color: '#fff',
+              fontWeight: 800,
+              border: 'none',
+            }}
+          >
             Guardar
           </button>
-          <button type="button" onClick={() => navigate('/admin/resenas')} style={{ padding: '0.6rem 1.2rem', borderRadius: 8 }}>
+          <button
+            type="button"
+            onClick={() => navigate('/admin/resenas')}
+            style={{ padding: '0.6rem 1.2rem', borderRadius: 8 }}
+          >
             Cancelar
           </button>
         </div>

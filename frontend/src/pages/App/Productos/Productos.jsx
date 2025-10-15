@@ -154,7 +154,7 @@ export default function Productos() {
       </div>
 
       {/* Paginación */}
-  <Pagination page={page} pages={pages} onChange={setPage} showNumbers />
+      <Pagination page={page} pages={pages} onChange={setPage} showNumbers />
     </div>
   );
 }

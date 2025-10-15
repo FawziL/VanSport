@@ -193,7 +193,13 @@ export default function AdminSidebar({ collapsed, onToggle }) {
 
       {/* Configuración (engranaje) al final sin superponer contenido */}
       <div style={{ marginTop: 'auto', padding: '8px' }} ref={settingsRef}>
-        <div style={{ position: 'relative', display: 'flex', justifyContent: collapsed ? 'center' : 'flex-start' }}>
+        <div
+          style={{
+            position: 'relative',
+            display: 'flex',
+            justifyContent: collapsed ? 'center' : 'flex-start',
+          }}
+        >
           <button
             onClick={() => setOpenSettings((v) => !v)}
             aria-label="Configuración"
@@ -205,7 +211,6 @@ export default function AdminSidebar({ collapsed, onToggle }) {
               marginLeft: collapsed ? 0 : -8,
             }}
           >
-
             <FiSettings />
           </button>
 
@@ -229,10 +234,20 @@ export default function AdminSidebar({ collapsed, onToggle }) {
               }}
             >
               {/* Header con usuario */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', background: '#141414' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '12px 14px',
+                  background: '#141414',
+                }}
+              >
                 <FaUserCircle size={26} />
                 <div style={{ display: 'grid', gap: 2, textAlign: 'left' }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.1 }}>{displayName}</div>
+                  <div style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.1 }}>
+                    {displayName}
+                  </div>
                   {displayEmail && (
                     <div style={{ fontSize: 12, color: '#bdbdbd' }}>{displayEmail}</div>
                   )}

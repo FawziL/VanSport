@@ -57,7 +57,13 @@ export default function CreateUser() {
         </label>
         <label style={{ display: 'grid', gap: 6 }}>
           <span>Contraseña</span>
-          <input type="password" name="password" value={form.password} onChange={onChange} required />
+          <input
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={onChange}
+            required
+          />
         </label>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <label style={{ display: 'grid', gap: 6 }}>
@@ -83,11 +89,22 @@ export default function CreateUser() {
           <button
             type="submit"
             disabled={loading}
-            style={{ padding: '0.6rem 1.2rem', borderRadius: 8, background: '#1e88e5', color: '#fff', fontWeight: 800, border: 'none' }}
+            style={{
+              padding: '0.6rem 1.2rem',
+              borderRadius: 8,
+              background: '#1e88e5',
+              color: '#fff',
+              fontWeight: 800,
+              border: 'none',
+            }}
           >
             {loading ? 'Guardando...' : 'Guardar'}
           </button>
-          <button type="button" onClick={() => navigate('/admin/usuarios')} style={{ padding: '0.6rem 1.2rem', borderRadius: 8 }}>
+          <button
+            type="button"
+            onClick={() => navigate('/admin/usuarios')}
+            style={{ padding: '0.6rem 1.2rem', borderRadius: 8 }}
+          >
             Cancelar
           </button>
         </div>

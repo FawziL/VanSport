@@ -143,7 +143,9 @@ export const adminService = {
 
 function qs(params) {
   if (!params) return '';
-  const entries = Object.entries(params).filter(([_, v]) => v !== undefined && v !== null && v !== '');
+  const entries = Object.entries(params).filter(
+    ([_, v]) => v !== undefined && v !== null && v !== ''
+  );
   if (entries.length === 0) return '';
   const usp = new URLSearchParams();
   for (const [k, v] of entries) usp.append(k, String(v));

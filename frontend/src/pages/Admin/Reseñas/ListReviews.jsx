@@ -57,24 +57,43 @@ export default function ListReviews() {
     const apellido = r.usuario_apellido || '';
     const email = r.usuario_email || '';
     const base = `${nombre} ${apellido}`.trim();
-    const id = r.usuario != null ? r.usuario : (r.usuario_id != null ? r.usuario_id : null);
+    const id = r.usuario != null ? r.usuario : r.usuario_id != null ? r.usuario_id : null;
     const emailPart = email ? ` - ${email}` : '';
     return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
   };
 
   return (
     <div style={{ maxWidth: 1200, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 18,
+        }}
+      >
         <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Reseñas</h1>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-        <PageSizeSelector value={pageSize} onChange={setPageSize} options={[5, 10, 20, 50]} label="Por página" />
+        <PageSizeSelector
+          value={pageSize}
+          onChange={setPageSize}
+          options={[5, 10, 20, 50]}
+          label="Por página"
+        />
       </div>
 
       {error && <div style={{ color: '#d32f2f', marginBottom: 12, fontWeight: 700 }}>{error}</div>}
 
-      <div style={{ overflowX: 'auto', background: '#fff', borderRadius: 10, boxShadow: '0 2px 12px #0001' }}>
+      <div
+        style={{
+          overflowX: 'auto',
+          background: '#fff',
+          borderRadius: 10,
+          boxShadow: '0 2px 12px #0001',
+        }}
+      >
         <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#f3f4f6', color: '#000000ff' }}>
@@ -90,21 +109,36 @@ export default function ListReviews() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} style={{ textAlign: 'center', padding: 24 }}>Cargando...</td>
+                <td colSpan={7} style={{ textAlign: 'center', padding: 24 }}>
+                  Cargando...
+                </td>
               </tr>
             ) : pageItems.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ textAlign: 'center', padding: 24, color: '#888' }}>No hay reseñas.</td>
+                <td colSpan={7} style={{ textAlign: 'center', padding: 24, color: '#888' }}>
+                  No hay reseñas.
+                </td>
               </tr>
             ) : (
               pageItems.map((r) => (
                 <tr key={r.resena_id} style={{ color: '#444' }}>
                   <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{r.resena_id}</td>
-                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{r.producto ?? '-'}</td>
-                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{getUserLabel(r)}</td>
-                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }} title={r.comentario || ''}>{truncateWords(r.comentario, 12)}</td>
+                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>
+                    {r.producto ?? '-'}
+                  </td>
+                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>
+                    {getUserLabel(r)}
+                  </td>
+                  <td
+                    style={{ padding: '10px 8px', wordBreak: 'break-word' }}
+                    title={r.comentario || ''}
+                  >
+                    {truncateWords(r.comentario, 12)}
+                  </td>
                   <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{r.calificacion}</td>
-                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{fmt.date(r.fecha_creacion)}</td>
+                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>
+                    {fmt.date(r.fecha_creacion)}
+                  </td>
                   <td style={{ padding: '10px 8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
                     <button
                       onClick={() => navigate(`/admin/resenas/editar/${r.resena_id}`)}

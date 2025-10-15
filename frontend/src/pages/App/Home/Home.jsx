@@ -44,7 +44,9 @@ export default function Home() {
       }
     }
     load();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -68,7 +70,9 @@ export default function Home() {
       }
     }
     loadCats();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
   return (
     <div>
@@ -215,9 +219,14 @@ export default function Home() {
                   <div style={{ height: 20, background: '#eee', borderRadius: 8 }} />
                 ) : (
                   <>
-                    <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 6 }}>{prod.name}</div>
+                    <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 6 }}>
+                      {prod.name}
+                    </div>
                     <div style={{ color: '#1e88e5', fontWeight: 700, fontSize: 17 }}>
-                      {Number(prod.price).toLocaleString('es-ES', { style: 'currency', currency: 'USD' })}
+                      {Number(prod.price).toLocaleString('es-ES', {
+                        style: 'currency',
+                        currency: 'USD',
+                      })}
                     </div>
                   </>
                 )}

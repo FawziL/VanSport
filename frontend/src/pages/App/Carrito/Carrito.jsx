@@ -10,13 +10,13 @@ function formatPrice(n) {
   return num.toLocaleString('es-ES', { style: 'currency', currency: 'USD' });
 }
 
-      const resolveImageUrl = (path) => {
-        if (!path) return '';
-        if (/^https?:/i.test(path)) return path;
-        const base = API_URL.replace(/\/+$/, '');
-        const rel = String(path).replace(/^\/+/, '');
-        return `${base}/${rel}`;
-      };
+const resolveImageUrl = (path) => {
+  if (!path) return '';
+  if (/^https?:/i.test(path)) return path;
+  const base = API_URL.replace(/\/+$/, '');
+  const rel = String(path).replace(/^\/+/, '');
+  return `${base}/${rel}`;
+};
 export default function Carrito() {
   const navigate = useNavigate();
   const { isAuthenticated, ensureUserLoaded } = useAuth();

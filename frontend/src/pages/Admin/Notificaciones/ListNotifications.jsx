@@ -60,23 +60,49 @@ export default function ListNotifications() {
 
   return (
     <div style={{ maxWidth: 1200, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 18,
+        }}
+      >
         <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Notificaciones</h1>
         <button
           onClick={() => navigate('/admin/notificaciones/crear')}
-          style={{ padding: '0.6rem 1.2rem', borderRadius: 8, background: '#1e88e5', color: '#fff', fontWeight: 800, border: 'none' }}
+          style={{
+            padding: '0.6rem 1.2rem',
+            borderRadius: 8,
+            background: '#1e88e5',
+            color: '#fff',
+            fontWeight: 800,
+            border: 'none',
+          }}
         >
           + Crear notificación
         </button>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-        <PageSizeSelector value={pageSize} onChange={setPageSize} options={[5, 10, 20, 50]} label="Por página" />
+        <PageSizeSelector
+          value={pageSize}
+          onChange={setPageSize}
+          options={[5, 10, 20, 50]}
+          label="Por página"
+        />
       </div>
 
       {error && <div style={{ color: '#d32f2f', marginBottom: 12, fontWeight: 700 }}>{error}</div>}
 
-      <div style={{ overflowX: 'auto', background: '#fff', borderRadius: 10, boxShadow: '0 2px 12px #0001' }}>
+      <div
+        style={{
+          overflowX: 'auto',
+          background: '#fff',
+          borderRadius: 10,
+          boxShadow: '0 2px 12px #0001',
+        }}
+      >
         <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#f3f4f6', color: '#000000ff' }}>
@@ -91,20 +117,28 @@ export default function ListNotifications() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: 24 }}>Cargando...</td>
+                <td colSpan={6} style={{ textAlign: 'center', padding: 24 }}>
+                  Cargando...
+                </td>
               </tr>
             ) : pageItems.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: 24, color: '#888' }}>No hay notificaciones.</td>
+                <td colSpan={6} style={{ textAlign: 'center', padding: 24, color: '#888' }}>
+                  No hay notificaciones.
+                </td>
               </tr>
             ) : (
               pageItems.map((n) => (
                 <tr key={n.notificacion_id} style={{ color: '#444' }}>
                   <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{n.notificacion_id}</td>
-                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{getUserLabel(n)}</td>
+                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>
+                    {getUserLabel(n)}
+                  </td>
                   <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{n.titulo}</td>
                   <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{n.tipo}</td>
-                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{fmt.date(n.fecha_creacion)}</td>
+                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>
+                    {fmt.date(n.fecha_creacion)}
+                  </td>
                   <td style={{ padding: '10px 8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
                     <button
                       onClick={() => navigate(`/admin/notificaciones/editar/${n.notificacion_id}`)}
@@ -121,7 +155,10 @@ export default function ListNotifications() {
                       Editar
                     </button>
                     <button
-                      onClick={() => { setDeleteId(n.notificacion_id); setModalOpen(true); }}
+                      onClick={() => {
+                        setDeleteId(n.notificacion_id);
+                        setModalOpen(true);
+                      }}
                       style={{
                         marginLeft: 8,
                         padding: '0.4rem 0.8rem',

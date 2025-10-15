@@ -19,7 +19,14 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
     onChange?.(normalize(local));
   };
   const reset = () => {
-    const cleared = { q: '', categoria_id: '', min_price: '', max_price: '', oferta: '', pageSize: pageSizeOptions[0] };
+    const cleared = {
+      q: '',
+      categoria_id: '',
+      min_price: '',
+      max_price: '',
+      oferta: '',
+      pageSize: pageSizeOptions[0],
+    };
     setLocal(cleared);
     onChange?.(normalize(cleared));
   };
@@ -34,7 +41,15 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
   });
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24, gap: 12, flexWrap: 'wrap' }}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        marginBottom: 24,
+        gap: 12,
+        flexWrap: 'wrap',
+      }}
+    >
       <div style={{ minWidth: 200 }}>
         <ListCategories
           value={local.categoria_id}
@@ -48,7 +63,13 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
         placeholder="Precio mínimo"
         value={local.min_price}
         onChange={(e) => setLocal((p) => ({ ...p, min_price: e.target.value }))}
-        style={{ padding: '0.6rem 1rem', borderRadius: 8, border: '1px solid #ccc', width: 160, fontSize: 16 }}
+        style={{
+          padding: '0.6rem 1rem',
+          borderRadius: 8,
+          border: '1px solid #ccc',
+          width: 160,
+          fontSize: 16,
+        }}
         min="0"
         step="0.01"
       />
@@ -57,7 +78,13 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
         placeholder="Precio máximo"
         value={local.max_price}
         onChange={(e) => setLocal((p) => ({ ...p, max_price: e.target.value }))}
-        style={{ padding: '0.6rem 1rem', borderRadius: 8, border: '1px solid #ccc', width: 160, fontSize: 16 }}
+        style={{
+          padding: '0.6rem 1rem',
+          borderRadius: 8,
+          border: '1px solid #ccc',
+          width: 160,
+          fontSize: 16,
+        }}
         min="0"
         step="0.01"
       />
@@ -65,15 +92,47 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
       <select
         value={local.oferta}
         onChange={(e) => setLocal((p) => ({ ...p, oferta: e.target.value }))}
-        style={{ padding: '0.6rem 1rem', borderRadius: 8, border: '1px solid #ccc', width: 180, fontSize: 16 }}
+        style={{
+          padding: '0.6rem 1rem',
+          borderRadius: 8,
+          border: '1px solid #ccc',
+          width: 180,
+          fontSize: 16,
+        }}
       >
         <option value="">Todos</option>
         <option value="1">Solo en oferta</option>
       </select>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-        <button onClick={apply} style={{ padding: '0.6rem 1rem', borderRadius: 8, border: 'none', background: '#1e88e5', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>Aplicar</button>
-        <button onClick={reset} style={{ padding: '0.6rem 1rem', borderRadius: 8, border: '1px solid #ccc', background: '#fff', color: '#333', fontWeight: 700, cursor: 'pointer' }}>Limpiar</button>
+        <button
+          onClick={apply}
+          style={{
+            padding: '0.6rem 1rem',
+            borderRadius: 8,
+            border: 'none',
+            background: '#1e88e5',
+            color: '#fff',
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          Aplicar
+        </button>
+        <button
+          onClick={reset}
+          style={{
+            padding: '0.6rem 1rem',
+            borderRadius: 8,
+            border: '1px solid #ccc',
+            background: '#fff',
+            color: '#333',
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          Limpiar
+        </button>
         <select
           value={local.pageSize}
           onChange={(e) => {
@@ -81,11 +140,18 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
             setLocal((p) => ({ ...p, pageSize: val }));
             onChange?.(normalize({ ...local, pageSize: val }));
           }}
-          style={{ padding: '0.6rem 1rem', borderRadius: 8, border: '1px solid #ccc', fontSize: 16 }}
+          style={{
+            padding: '0.6rem 1rem',
+            borderRadius: 8,
+            border: '1px solid #ccc',
+            fontSize: 16,
+          }}
           aria-label="Por página"
         >
           {pageSizeOptions.map((n) => (
-            <option key={n} value={n}>{n} por página</option>
+            <option key={n} value={n}>
+              {n} por página
+            </option>
           ))}
         </select>
       </div>

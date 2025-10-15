@@ -31,7 +31,9 @@ export default function ConfirmModal({
           textAlign: 'center',
         }}
       >
-        <div style={{ fontWeight: 800, fontSize: 20, marginBottom: 18, color: '#222', }}>{title}</div>
+        <div style={{ fontWeight: 800, fontSize: 20, marginBottom: 18, color: '#222' }}>
+          {title}
+        </div>
         {message && (
           <div style={{ color: danger ? '#e53935' : '#222', marginBottom: 18 }}>{message}</div>
         )}

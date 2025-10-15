@@ -51,24 +51,43 @@ export default function ListOrders() {
     const apellido = p.usuario_apellido || '';
     const email = p.usuario_email || '';
     const base = `${nombre} ${apellido}`.trim();
-    const id = p.usuario != null ? p.usuario : (p.usuario_id != null ? p.usuario_id : null);
+    const id = p.usuario != null ? p.usuario : p.usuario_id != null ? p.usuario_id : null;
     const emailPart = email ? ` - ${email}` : '';
     return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
   };
 
   return (
     <div style={{ maxWidth: 1200, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 18,
+        }}
+      >
         <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Pedidos</h1>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-        <PageSizeSelector value={pageSize} onChange={setPageSize} options={[5, 10, 20, 50]} label="Por página" />
+        <PageSizeSelector
+          value={pageSize}
+          onChange={setPageSize}
+          options={[5, 10, 20, 50]}
+          label="Por página"
+        />
       </div>
 
       {error && <div style={{ color: '#d32f2f', marginBottom: 12, fontWeight: 700 }}>{error}</div>}
 
-      <div style={{ overflowX: 'auto', background: '#fff', borderRadius: 10, boxShadow: '0 2px 12px #0001' }}>
+      <div
+        style={{
+          overflowX: 'auto',
+          background: '#fff',
+          borderRadius: 10,
+          boxShadow: '0 2px 12px #0001',
+        }}
+      >
         <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#f3f4f6', color: '#000000ff' }}>
@@ -83,20 +102,30 @@ export default function ListOrders() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: 24 }}>Cargando...</td>
+                <td colSpan={6} style={{ textAlign: 'center', padding: 24 }}>
+                  Cargando...
+                </td>
               </tr>
             ) : pageItems.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: 24, color: '#888' }}>No hay pedidos.</td>
+                <td colSpan={6} style={{ textAlign: 'center', padding: 24, color: '#888' }}>
+                  No hay pedidos.
+                </td>
               </tr>
             ) : (
               pageItems.map((p) => (
                 <tr key={p.pedido_id} style={{ color: '#444' }}>
                   <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{p.pedido_id}</td>
-                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{getUserLabel(p)}</td>
-                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{fmt.date(p.fecha_pedido)}</td>
+                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>
+                    {getUserLabel(p)}
+                  </td>
+                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>
+                    {fmt.date(p.fecha_pedido)}
+                  </td>
                   <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{p.estado}</td>
-                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{fmt.money(p.total)}</td>
+                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>
+                    {fmt.money(p.total)}
+                  </td>
                   <td style={{ padding: '10px 8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
                     <button
                       onClick={() => navigate(`/admin/pedidos/editar/${p.pedido_id}`)}

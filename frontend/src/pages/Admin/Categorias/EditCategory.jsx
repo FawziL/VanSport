@@ -13,7 +13,13 @@ export default function EditCategory() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ nombre: '', descripcion: '', imagen: null, imagenPreview: '', imagenActual: '' });
+  const [form, setForm] = useState({
+    nombre: '',
+    descripcion: '',
+    imagen: null,
+    imagenPreview: '',
+    imagenActual: '',
+  });
   const [errors, setErrors] = useState({});
   const [globalError, setGlobalError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -30,13 +36,14 @@ export default function EditCategory() {
       setErrors({});
       try {
         const data = await adminService.categorias.retrieve(id);
-  const nombre = data?.nombre ?? '';
-  const descripcion = data?.descripcion ?? '';
-  const imagenActual = data?.imagen_url || '';
-  if (alive) setForm({ nombre, descripcion, imagen: null, imagenPreview: '', imagenActual });
+        const nombre = data?.nombre ?? '';
+        const descripcion = data?.descripcion ?? '';
+        const imagenActual = data?.imagen_url || '';
+        if (alive) setForm({ nombre, descripcion, imagen: null, imagenPreview: '', imagenActual });
       } catch (err) {
         if (!alive) return;
-        const msg = err?.response?.data?.detail || err?.message || 'No se pudo cargar la categoría.';
+        const msg =
+          err?.response?.data?.detail || err?.message || 'No se pudo cargar la categoría.';
         setGlobalError(msg);
       } finally {
         if (alive) setLoading(false);
@@ -61,7 +68,11 @@ export default function EditCategory() {
     const { name, value, files } = e.target;
     if (name === 'imagen') {
       const file = files && files[0] ? files[0] : null;
-      setForm((prev) => ({ ...prev, imagen: file, imagenPreview: file ? URL.createObjectURL(file) : '' }));
+      setForm((prev) => ({
+        ...prev,
+        imagen: file,
+        imagenPreview: file ? URL.createObjectURL(file) : '',
+      }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
@@ -90,18 +101,8 @@ export default function EditCategory() {
       const data = err?.response?.data;
       if (data && typeof data === 'object') {
         setErrors(data);
-        const global =
-          data.detail ||
-          data.non_field_errors ||
-          data.error ||
-          null;
-        setGlobalError(
-          global
-            ? Array.isArray(global)
-              ? global.join(', ')
-              : String(global)
-            : ''
-        );
+        const global = data.detail || data.non_field_errors || data.error || null;
+        setGlobalError(global ? (Array.isArray(global) ? global.join(', ') : String(global)) : '');
       } else {
         setGlobalError(err?.message || 'No se pudo actualizar la categoría.');
       }
@@ -115,7 +116,8 @@ export default function EditCategory() {
       await adminService.categorias.remove(id);
       navigate('/admin/categorias');
     } catch (err) {
-      const msg = err?.response?.data?.detail || err?.message || 'No se pudo eliminar la categoría.';
+      const msg =
+        err?.response?.data?.detail || err?.message || 'No se pudo eliminar la categoría.';
       setGlobalError(msg);
     } finally {
       setModalOpen(false);
@@ -125,9 +127,32 @@ export default function EditCategory() {
   if (loading) {
     return (
       <div style={{ maxWidth: 800, margin: '2rem auto', padding: '0 1rem' }}>
-        <div style={{ width: '60%', height: 20, background: '#eee', borderRadius: 8, marginBottom: 12 }} />
-        <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: 12, padding: '1rem' }}>
-          <div style={{ width: '50%', height: 18, background: '#eee', borderRadius: 8, marginBottom: 12 }} />
+        <div
+          style={{
+            width: '60%',
+            height: 20,
+            background: '#eee',
+            borderRadius: 8,
+            marginBottom: 12,
+          }}
+        />
+        <div
+          style={{
+            background: '#fff',
+            border: '1px solid #eee',
+            borderRadius: 12,
+            padding: '1rem',
+          }}
+        >
+          <div
+            style={{
+              width: '50%',
+              height: 18,
+              background: '#eee',
+              borderRadius: 8,
+              marginBottom: 12,
+            }}
+          />
           <div style={{ width: '100%', height: 44, background: '#eee', borderRadius: 10 }} />
         </div>
       </div>
@@ -139,7 +164,10 @@ export default function EditCategory() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 12 }}>Editar categoría</h1>
         <div style={{ display: 'flex', gap: 10 }}>
-          <Link to="/admin/categorias" style={{ color: '#1e88e5', fontWeight: 700, textDecoration: 'none' }}>
+          <Link
+            to="/admin/categorias"
+            style={{ color: '#1e88e5', fontWeight: 700, textDecoration: 'none' }}
+          >
             ← Volver
           </Link>
           <button
@@ -176,7 +204,10 @@ export default function EditCategory() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} style={{ background: '#fff', border: '1px solid #eee', borderRadius: 12, padding: '1rem' }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ background: '#fff', border: '1px solid #eee', borderRadius: 12, padding: '1rem' }}
+      >
         <div style={{ marginBottom: 14 }}>
           <label htmlFor="nombre" style={{ display: 'block', fontWeight: 700, marginBottom: 6 }}>
             Nombre
@@ -200,7 +231,10 @@ export default function EditCategory() {
         </div>
 
         <div style={{ marginBottom: 14 }}>
-          <label htmlFor="descripcion" style={{ display: 'block', fontWeight: 700, marginBottom: 6 }}>
+          <label
+            htmlFor="descripcion"
+            style={{ display: 'block', fontWeight: 700, marginBottom: 6 }}
+          >
             Descripción (opcional)
           </label>
           <textarea
@@ -227,17 +261,19 @@ export default function EditCategory() {
             Imagen (opcional)
           </label>
           {form.imagenPreview ? (
-            <img src={form.imagenPreview} alt="Vista previa" style={{ display: 'block', maxWidth: 260, marginBottom: 8, borderRadius: 10 }} />
+            <img
+              src={form.imagenPreview}
+              alt="Vista previa"
+              style={{ display: 'block', maxWidth: 260, marginBottom: 8, borderRadius: 10 }}
+            />
           ) : form.imagenActual ? (
-            <img src={form.imagenActual} alt="Imagen actual" style={{ display: 'block', maxWidth: 260, marginBottom: 8, borderRadius: 10 }} />
+            <img
+              src={form.imagenActual}
+              alt="Imagen actual"
+              style={{ display: 'block', maxWidth: 260, marginBottom: 8, borderRadius: 10 }}
+            />
           ) : null}
-          <input
-            id="imagen"
-            name="imagen"
-            type="file"
-            accept="image/*"
-            onChange={handleChange}
-          />
+          <input id="imagen" name="imagen" type="file" accept="image/*" onChange={handleChange} />
           <FieldError error={errors.imagen} />
         </div>
 

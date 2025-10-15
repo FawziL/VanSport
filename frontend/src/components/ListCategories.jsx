@@ -42,11 +42,7 @@ export default function ListCategories({
       setError(null);
       try {
         const res = await appService.categorias.list(params);
-        const items = Array.isArray(res)
-          ? res
-          : Array.isArray(res?.results)
-          ? res.results
-          : [];
+        const items = Array.isArray(res) ? res : Array.isArray(res?.results) ? res.results : [];
         if (!ignore) setData(items);
       } catch (err) {
         if (!ignore) setError(err);
@@ -68,9 +64,7 @@ export default function ListCategories({
     [getOptionLabel]
   );
   const valueGetter = useMemo(
-    () =>
-      getOptionValue ||
-      ((item) => String(item?.categoria_id ?? item?.id ?? item?.pk ?? '')),
+    () => getOptionValue || ((item) => String(item?.categoria_id ?? item?.id ?? item?.pk ?? '')),
     [getOptionValue]
   );
 
@@ -102,7 +96,9 @@ export default function ListCategories({
     ? Array.isArray(value)
       ? value.map((v) => (v == null ? '' : String(v)))
       : []
-    : value == null ? '' : String(value);
+    : value == null
+      ? ''
+      : String(value);
 
   return (
     <div className="flex flex-col gap-1">
@@ -118,10 +114,7 @@ export default function ListCategories({
         onChange={handleChange}
       >
         {!multiple && (
-          <option
-            value=""
-            disabled={required && selectValue !== ''}
-          >
+          <option value="" disabled={required && selectValue !== ''}>
             {loading ? 'Cargando categorías…' : error ? 'Error al cargar' : placeholder}
           </option>
         )}
@@ -131,9 +124,7 @@ export default function ListCategories({
           </option>
         ))}
       </select>
-      {error && (
-        <span className="text-sm text-red-600">No se pudo cargar categorías.</span>
-      )}
+      {error && <span className="text-sm text-red-600">No se pudo cargar categorías.</span>}
     </div>
   );
 }

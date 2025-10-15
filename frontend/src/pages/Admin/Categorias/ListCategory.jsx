@@ -35,7 +35,7 @@ export default function ListCategory() {
       .then((data) => {
         const items = Array.isArray(data) ? data : data.results || [];
         setCategorias(items);
-        console.log(items)
+        console.log(items);
         setPages(Math.max(1, Math.ceil(items.length / pageSize)));
         setPage((prev) => Math.min(prev, Math.max(1, Math.ceil(items.length / pageSize))));
       })
@@ -72,7 +72,11 @@ export default function ListCategory() {
     try {
       setTogglingId(cat.categoria_id);
       await adminService.categorias.partialUpdate(cat.categoria_id, { destacado: !cat.destacado });
-      setCategorias((prev) => prev.map((c) => c.categoria_id === cat.categoria_id ? { ...c, destacado: !cat.destacado } : c));
+      setCategorias((prev) =>
+        prev.map((c) =>
+          c.categoria_id === cat.categoria_id ? { ...c, destacado: !cat.destacado } : c
+        )
+      );
     } catch (e) {
       setError('No se pudo actualizar destacado');
     } finally {
@@ -82,7 +86,14 @@ export default function ListCategory() {
 
   return (
     <div style={{ maxWidth: 900, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 18,
+        }}
+      >
         <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Categorías</h1>
         <Link
           to="/admin/categorias/crear"
@@ -100,17 +111,27 @@ export default function ListCategory() {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-        <PageSizeSelector value={pageSize} onChange={setPageSize} options={[5, 10, 20, 50]} label="Por página" />
+        <PageSizeSelector
+          value={pageSize}
+          onChange={setPageSize}
+          options={[5, 10, 20, 50]}
+          label="Por página"
+        />
       </div>
 
-      {error && (
-        <div style={{ color: '#d32f2f', marginBottom: 12, fontWeight: 700 }}>{error}</div>
-      )}
+      {error && <div style={{ color: '#d32f2f', marginBottom: 12, fontWeight: 700 }}>{error}</div>}
 
-      <div style={{ overflowX: 'auto', background: '#fff', borderRadius: 10, boxShadow: '0 2px 12px #0001' }}>
+      <div
+        style={{
+          overflowX: 'auto',
+          background: '#fff',
+          borderRadius: 10,
+          boxShadow: '0 2px 12px #0001',
+        }}
+      >
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
           <thead>
-            <tr style={{ background: '#f3f4f6', color: '#000000ff', }}>
+            <tr style={{ background: '#f3f4f6', color: '#000000ff' }}>
               <th style={{ padding: '12px 8px', textAlign: 'left' }}>ID</th>
               <th style={{ padding: '12px 8px', textAlign: 'left' }}>Imagen</th>
               <th style={{ padding: '12px 8px', textAlign: 'left' }}>Nombre</th>
@@ -122,7 +143,9 @@ export default function ListCategory() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: 24 }}>Cargando...</td>
+                <td colSpan={6} style={{ textAlign: 'center', padding: 24 }}>
+                  Cargando...
+                </td>
               </tr>
             ) : categoriasPage.length === 0 ? (
               <tr>
@@ -139,10 +162,24 @@ export default function ListCategory() {
                       <img
                         src={resolveImageUrl(cat.imagen_url)}
                         alt={cat.nombre}
-                        style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 8, boxShadow: '0 1px 4px #0001' }}
+                        style={{
+                          width: 48,
+                          height: 48,
+                          objectFit: 'cover',
+                          borderRadius: 8,
+                          boxShadow: '0 1px 4px #0001',
+                        }}
                       />
                     ) : (
-                      <div style={{ width: 48, height: 48, borderRadius: 8, background: '#eee', display: 'inline-block' }} />
+                      <div
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 8,
+                          background: '#eee',
+                          display: 'inline-block',
+                        }}
+                      />
                     )}
                   </td>
                   <td style={{ padding: '10px 8px' }}>{cat.nombre}</td>
