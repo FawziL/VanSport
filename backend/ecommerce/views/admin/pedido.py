@@ -3,7 +3,7 @@ from ecommerce.models import Pedido
 from ecommerce.serializers import PedidoSerializer
 
 class PedidoViewSetAdmin(viewsets.ModelViewSet):
-    queryset = Pedido.objects.all()
+    queryset = Pedido.objects.select_related('usuario')
     serializer_class = PedidoSerializer
 
     def get_permissions(self):
@@ -14,6 +14,7 @@ class PedidoViewSetAdmin(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        base = Pedido.objects.select_related('usuario')
         if user.is_staff:
-            return Pedido.objects.all()
-        return Pedido.objects.filter(usuario_id=getattr(user, 'usuario_id', None))
+            return base
+        return base.filter(usuario_id=getattr(user, 'usuario_id', None))

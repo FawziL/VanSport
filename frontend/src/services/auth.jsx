@@ -37,8 +37,8 @@ export const appService = {
     clear: () => http.post('/api/carrito/clear/'),
   },
   reseñas: {
-    list: (params) => http.get(`/api/reseñas/${qs(params)}`),
-    retrieve: (id) => http.get(`/api/reseñas/${encodeURIComponent(id)}/`),
+    list: (params) => http.get(`/api/resenas/${qs(params)}`),
+    retrieve: (id) => http.get(`/api/resenas/${encodeURIComponent(id)}/`),
   },
   notificaciones: {
     list: (params) => http.get(`/api/notificaciones/${qs(params)}`),
@@ -106,12 +106,12 @@ export const adminService = {
     remove: (id) => http.delete(`/admin/carrito/${encodeURIComponent(id)}/`),
   },
   reseñas: {
-    list: (params) => http.get(`/admin/reseñas/${qs(params)}`),
-    retrieve: (id) => http.get(`/admin/reseñas/${encodeURIComponent(id)}/`),
-    create: (data) => http.post('/admin/reseñas/', data),
-    update: (id, data) => http.put(`/admin/reseñas/${encodeURIComponent(id)}/`, data),
-    partialUpdate: (id, data) => http.patch(`/admin/reseñas/${encodeURIComponent(id)}/`, data),
-    remove: (id) => http.delete(`/admin/reseñas/${encodeURIComponent(id)}/`),
+    list: (params) => http.get(`/admin/resenas/${qs(params)}`),
+    retrieve: (id) => http.get(`/admin/resenas/${encodeURIComponent(id)}/`),
+    create: (data) => http.post('/admin/resenas/', data),
+    update: (id, data) => http.put(`/admin/resenas/${encodeURIComponent(id)}/`, data),
+    partialUpdate: (id, data) => http.patch(`/admin/resenas/${encodeURIComponent(id)}/`, data),
+    remove: (id) => http.delete(`/admin/resenas/${encodeURIComponent(id)}/`),
   },
   notificaciones: {
     list: (params) => http.get(`/admin/notificaciones/${qs(params)}`),

@@ -87,8 +87,9 @@ class Carrito(models.Model):
 		db_table = 'carrito'
 		managed = False
 
+
 class Reseña(models.Model):
-	resena_id = models.AutoField(primary_key=True, db_column='resena_id')
+	resena_id = models.AutoField(primary_key=True, db_column='reseña_id')
 	producto = models.ForeignKey(Producto, on_delete=models.DO_NOTHING, db_column='producto_id')
 	usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, db_column='usuario_id')
 	calificacion = models.IntegerField()
@@ -96,7 +97,7 @@ class Reseña(models.Model):
 	fecha_creacion = models.DateTimeField(db_column='fecha_creacion')
 
 	class Meta:
-		db_table = 'resenas'
+		db_table = 'reseñas'
 		managed = False
 
 class Notificacion(models.Model):

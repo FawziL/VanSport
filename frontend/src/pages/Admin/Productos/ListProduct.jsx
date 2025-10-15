@@ -25,7 +25,6 @@ export default function ListProduct() {
 			.list()
 			.then((data) => {
 				const items = Array.isArray(data) ? data : data.results || [];
-                console.log(items);
 				setProductos(items);
 				setPages(Math.max(1, Math.ceil(items.length / pageSize)));
 				setPage((prev) => Math.min(prev, Math.max(1, Math.ceil(items.length / pageSize))));
@@ -72,7 +71,6 @@ export default function ListProduct() {
 			if (/^https?:/i.test(path)) return path;
 			const base = API_URL.replace(/\/+$/, '');
 			const rel = String(path).replace(/^\/+/, '');
-            console.log(`${base}/${rel}`);
 			return `${base}/${rel}`;
 		};
 
@@ -120,11 +118,11 @@ export default function ListProduct() {
 					<tbody>
 						{loading ? (
 							<tr>
-								<td colSpan={7} style={{ textAlign: 'center', padding: 24 }}>Cargando...</td>
+								<td colSpan={8} style={{ textAlign: 'center', padding: 24 }}>Cargando...</td>
 							</tr>
 						) : productosPage.length === 0 ? (
 							<tr>
-								<td colSpan={7} style={{ textAlign: 'center', padding: 24, color: '#888' }}>
+								<td colSpan={8} style={{ textAlign: 'center', padding: 24, color: '#888' }}>
 									No hay productos.
 								</td>
 							</tr>

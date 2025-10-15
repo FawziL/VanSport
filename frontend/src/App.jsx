@@ -18,6 +18,13 @@ import EditarCategorias from '@/pages/Admin/Categorias/EditCategory';
 import ListProduct from '@/pages/Admin/Productos/ListProduct';
 import CreateProduct from '@/pages/Admin/Productos/CreateProduct';
 import EditProduct from '@/pages/Admin/Productos/EditProduct';
+import ListUsers from '@/pages/Admin/Usuarios/ListUsers';
+import CreateUser from '@/pages/Admin/Usuarios/CreateUser';
+import EditUser from '@/pages/Admin/Usuarios/EditUser';
+import ListOrders from '@/pages/Admin/Pedidos/ListOrders';
+import EditOrder from '@/pages/Admin/Pedidos/EditOrder';
+import ListReviews from '@/pages/Admin/Reseñas/ListReviews';
+import EditReview from '@/pages/Admin/Reseñas/EditReview';
 
 function AppShell() {
   const location = useLocation();
@@ -80,6 +87,32 @@ function AppShell() {
               </AdminPage>
             }
           />
+
+          {/* Usuarios Admin */}
+          <Route
+            path="/admin/usuarios"
+            element={
+              <AdminPage>
+                <ListUsers />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/usuarios/crear"
+            element={
+              <AdminPage>
+                <CreateUser />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/usuarios/editar/:id"
+            element={
+              <AdminPage>
+                <EditUser />
+              </AdminPage>
+            }
+          />
           <Route
             path="/admin/productos/crear"
             element={
@@ -93,6 +126,42 @@ function AppShell() {
             element={
               <AdminPage>
                 <EditProduct />
+              </AdminPage>
+            }
+          />
+
+          {/* Pedidos Admin */}
+          <Route
+            path="/admin/pedidos"
+            element={
+              <AdminPage>
+                <ListOrders />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/pedidos/editar/:id"
+            element={
+              <AdminPage>
+                <EditOrder />
+              </AdminPage>
+            }
+          />
+
+          {/* Reseñas Admin */}
+          <Route
+            path="/admin/resenas"
+            element={
+              <AdminPage>
+                <ListReviews />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/resenas/editar/:id"
+            element={
+              <AdminPage>
+                <EditReview />
               </AdminPage>
             }
           />

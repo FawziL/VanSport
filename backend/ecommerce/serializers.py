@@ -30,6 +30,9 @@ class UsuarioSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class PedidoSerializer(serializers.ModelSerializer):
+    usuario_nombre = serializers.CharField(source='usuario.nombre', read_only=True)
+    usuario_apellido = serializers.CharField(source='usuario.apellido', read_only=True)
+    usuario_email = serializers.CharField(source='usuario.email', read_only=True)
     class Meta:
         model = Pedido
         fields = '__all__'
@@ -45,6 +48,10 @@ class CarritoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ReseñaSerializer(serializers.ModelSerializer):
+    usuario_nombre = serializers.CharField(source='usuario.nombre', read_only=True)
+    usuario_apellido = serializers.CharField(source='usuario.apellido', read_only=True)
+    usuario_email = serializers.CharField(source='usuario.email', read_only=True)
+    producto_nombre = serializers.CharField(source='producto.nombre', read_only=True)
     class Meta:
         model = Reseña
         fields = '__all__'

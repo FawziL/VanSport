@@ -3,7 +3,7 @@ from ecommerce.models import Reseña
 from ecommerce.serializers import ReseñaSerializer
 
 class ReseñaViewSetAdmin(viewsets.ModelViewSet):
-    queryset = Reseña.objects.all()
+    queryset = Reseña.objects.select_related('usuario', 'producto')
     serializer_class = ReseñaSerializer
 
     def get_permissions(self):
@@ -12,7 +12,7 @@ class ReseñaViewSetAdmin(viewsets.ModelViewSet):
         return [permissions.AllowAny()]
 
     def get_queryset(self):
-        qs = Reseña.objects.all()
+        qs = Reseña.objects.select_related('usuario', 'producto')
         producto_id = self.request.query_params.get('producto_id')
         if producto_id:
             qs = qs.filter(producto_id=producto_id)
