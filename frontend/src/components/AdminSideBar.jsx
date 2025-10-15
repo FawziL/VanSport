@@ -1,4 +1,6 @@
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import {
   FaThLarge,
   FaTags,
@@ -12,7 +14,11 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaStore,
+  FaUserCircle,
+  FaUserCog,
+  FaSignOutAlt,
 } from 'react-icons/fa';
+import { FiSettings } from 'react-icons/fi';
 
 const sections = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: <FaThLarge /> },
@@ -42,7 +48,37 @@ const linkStyle = (isActive, collapsed) => ({
 });
 
 export default function AdminSidebar({ collapsed, onToggle }) {
-  const sidebarWidth = collapsed ? 70 : 220;
+  const sidebarWidth = collapsed ? 70 : 240;
+  const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [openSettings, setOpenSettings] = useState(false);
+  const settingsRef = useRef(null);
+
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (!settingsRef.current) return;
+      if (!settingsRef.current.contains(e.target)) setOpenSettings(false);
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, []);
+
+  const displayName = (() => {
+    if (!user) return 'Usuario';
+    const nombre = user.nombre || user.first_name || user.name || '';
+    const apellido = user.apellido || user.last_name || '';
+    const combined = `${nombre} ${apellido}`.trim();
+    return combined || user.username || 'Usuario';
+  })();
+
+  const displayEmail = user?.email || user?.correo || '';
+
+  const handleLogout = () => {
+    setOpenSettings(false);
+    logout();
+    // Llevar al catálogo público como destino seguro
+    navigate('/productos');
+  };
 
   return (
     <aside
@@ -54,7 +90,8 @@ export default function AdminSidebar({ collapsed, onToggle }) {
         width: sidebarWidth,
         transition: 'width .5s',
         position: 'relative',
-        overflow: 'hidden',
+        // Permitimos overflow visible para que el menú no se recorte
+        overflow: 'visible',
         flex: '0 0 auto',
       }}
     >
@@ -140,6 +177,96 @@ export default function AdminSidebar({ collapsed, onToggle }) {
             <FaStore />
             {!collapsed && <span>Ver tienda</span>}
           </Link>
+        </div>
+      </div>
+
+      {/* Configuración (engranaje) pegado abajo */}
+      <div style={{ position: 'absolute', left: 8, right: 8, bottom: 12 }} ref={settingsRef}>
+        <div style={{ position: 'relative', display: 'flex', justifyContent: collapsed ? 'center' : 'flex-start' }}>
+          <button
+            onClick={() => setOpenSettings((v) => !v)}
+            aria-label="Configuración"
+            title="Configuración"
+            style={{
+              background: '#222',
+              color: '#fff',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+            }}
+          >
+
+            <FiSettings />
+          </button>
+
+          {openSettings && (
+            <div
+              style={{
+                // Cuando está colapsado, usamos posición fija para que el menú
+                // se renderice por encima y no se recorte
+                position: collapsed ? 'fixed' : 'absolute',
+                bottom: collapsed ? 64 : 46,
+                left: collapsed ? sidebarWidth + 8 : 'auto',
+                right: collapsed ? 'auto' : 0,
+                background: '#1a1a1a',
+                color: '#fff',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: 10,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+                minWidth: 240,
+                zIndex: 1000,
+                overflow: 'hidden',
+              }}
+            >
+              {/* Header con usuario */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', background: '#141414' }}>
+                <FaUserCircle size={26} />
+                <div style={{ display: 'grid', gap: 2, textAlign: 'left' }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.1 }}>{displayName}</div>
+                  {displayEmail && (
+                    <div style={{ fontSize: 12, color: '#bdbdbd' }}>{displayEmail}</div>
+                  )}
+                </div>
+              </div>
+
+              {/* Opciones */}
+              <div style={{ padding: 6 }}>
+                <Link
+                  to="/perfil"
+                  onClick={() => setOpenSettings(false)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '10px 12px',
+                    color: '#e0e0e0',
+                    textDecoration: 'none',
+                    borderRadius: 8,
+                  }}
+                >
+                  <FaUserCog />
+                  <span>Perfil</span>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '10px 12px',
+                    color: '#e0e0e0',
+                    background: 'transparent',
+                    border: 'none',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    textAlign: 'right',
+                  }}
+                >
+                  <FaSignOutAlt />
+                  <span>Cerrar Sesión</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </aside>

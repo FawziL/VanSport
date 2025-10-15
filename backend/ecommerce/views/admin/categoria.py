@@ -6,12 +6,7 @@ from ecommerce.serializers import CategoriaSerializer
 class CategoriaViewSetAdmin(viewsets.ModelViewSet):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
-
-    def get_permissions(self):
-        # Solo lectura para todos, escritura solo para staff
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [permissions.IsAdminUser()]
-        return [permissions.AllowAny()]
+    permission_classes = [permissions.IsAdminUser]
 
     def list(self, request, *args, **kwargs):
         """Listar todas las categorías"""

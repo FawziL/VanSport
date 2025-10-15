@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { appService } from '@/services/auth';
+import { API_URL } from '@/config/api';
 import { useAuth } from '@/context/AuthContext';
 
 function formatPrice(n) {
@@ -22,6 +23,14 @@ export default function VerProducto() {
   const [addMsg, setAddMsg] = useState('');
   const [addLoading, setAddLoading] = useState(false);
   const [inCart, setInCart] = useState(false); // NUEVO: estado para saber si está en el carrito
+
+  const resolveImageUrl = (path) => {
+    if (!path) return '';
+    if (/^https?:/i.test(path)) return path;
+    const base = API_URL.replace(/\/+$/, '');
+    const rel = String(path).replace(/^\/+/, '');
+    return `${base}/${rel}`;
+  };
 
   // Usar appService para obtener el detalle
   useEffect(() => {
@@ -48,12 +57,13 @@ export default function VerProducto() {
                 ? (data.categoria.nombre ?? data.categoria.id ?? '')
                 : (data.categoria ?? ''),
           stock: data.stock ?? 0,
-          imagen: data.imagen_url ?? data.imagen ?? '',
+          imagen: resolveImageUrl(data.imagen_url ?? data.imagen ?? ''),
           // Si no hay galería, dejamos vacío
           imagenes: Array.isArray(data.imagenes)
             ? data.imagenes
                 .map((img) => (typeof img === 'string' ? img : img.image_path))
                 .filter(Boolean)
+                .map((p) => resolveImageUrl(p))
             : [],
           // Atributos opcionales
           atributos: data.atributos ?? null,

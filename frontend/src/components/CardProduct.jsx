@@ -1,6 +1,14 @@
 import { Link } from 'react-router-dom';
+import { API_URL } from '@/config/api';
 
 export default function CardProduct({ producto }) {
+      const resolveImageUrl = (path) => {
+        if (!path) return '';
+        if (/^https?:/i.test(path)) return path;
+        const base = API_URL.replace(/\/+$/, '');
+        const rel = String(path).replace(/^\/+/, '');
+        return `${base}/${rel}`;
+      };
   return (
     <div
       style={{
@@ -38,7 +46,7 @@ export default function CardProduct({ producto }) {
       )}
       <Link to={`/productos/${producto.producto_id}`}>
         <img
-          src={producto.imagen}
+          src={resolveImageUrl(producto.imagen_url)}
           alt={producto.nombre}
           style={{
             width: '100%',

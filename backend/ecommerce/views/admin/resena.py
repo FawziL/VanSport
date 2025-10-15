@@ -5,11 +5,7 @@ from ecommerce.serializers import ReseñaSerializer
 class ReseñaViewSetAdmin(viewsets.ModelViewSet):
     queryset = Reseña.objects.select_related('usuario', 'producto')
     serializer_class = ReseñaSerializer
-
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
+    permission_classes = [permissions.IsAdminUser]
 
     def get_queryset(self):
         qs = Reseña.objects.select_related('usuario', 'producto')

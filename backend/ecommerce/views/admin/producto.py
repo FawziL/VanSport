@@ -49,12 +49,20 @@ class ProductoViewSetAdmin(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
     def handle_uploaded_file(self, f):
-        # Guarda el archivo en MEDIA_ROOT/public/productos/ y retorna la ruta relativa
-        folder = os.path.join(settings.MEDIA_ROOT, 'public/productos')
+        # Guarda el archivo en MEDIA_ROOT/productos/ y retorna la URL relativa bajo MEDIA_URL
+        folder = os.path.join(settings.MEDIA_ROOT, 'productos')
         os.makedirs(folder, exist_ok=True)
+        # Evitar colisiones simples: si existe, agregar sufijo numérico
+        base, ext = os.path.splitext(f.name)
         filename = f.name
         path = os.path.join(folder, filename)
+        i = 1
+        while os.path.exists(path):
+            filename = f"{base}_{i}{ext}"
+            path = os.path.join(folder, filename)
+            i += 1
         with open(path, 'wb+') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
-        return f'productos/{filename}'
+        # Construye ruta accesible: /media/productos/<filename>
+        return os.path.join('media', 'productos', filename).replace('\\', '/')
