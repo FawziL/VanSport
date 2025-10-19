@@ -11,4 +11,9 @@ class DetallePedidoViewSetApi(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return DetallePedido.objects.filter(pedido__usuario_id=getattr(user, 'usuario_id', None))
+        usuario_id = getattr(user, 'usuario_id', None)
+        qs = DetallePedido.objects.filter(pedido__usuario_id=usuario_id)
+        pedido_id = self.request.query_params.get('pedido_id')
+        if pedido_id:
+            qs = qs.filter(pedido_id=pedido_id)
+        return qs

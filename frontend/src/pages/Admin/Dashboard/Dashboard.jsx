@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from 'react-router-dom';
+import { adminService } from '@/services/auth';
 
-function StatCard({ title, value }) {
-  return (
+function StatCard({ title, value, to, note }) {
+  const content = (
     <div
       style={{
         background: '#fff',
@@ -10,11 +12,23 @@ function StatCard({ title, value }) {
         borderRadius: 12,
         padding: '1rem',
         boxShadow: '0 2px 12px rgba(30,136,229,0.06)',
+        color: 'black',
+        height: '76px',
       }}
     >
       <div style={{ color: '#666', fontSize: 13 }}>{title}</div>
       <div style={{ fontSize: 22, fontWeight: 800 }}>{value}</div>
+      {note ? (
+        <div style={{ color: '#888', fontSize: 12, marginTop: 4 }}>{note}</div>
+      ) : null}
     </div>
+  );
+  return to ? (
+    <Link to={to} style={{ textDecoration: 'none', color: 'inherit' }}>
+      {content}
+    </Link>
+  ) : (
+    content
   );
 }
 
@@ -31,6 +45,90 @@ const sections = [
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const [pendingCount, setPendingCount] = useState(0);
+  const [stats, setStats] = useState({
+    productos: 0,
+    ventasMes: 0,
+    ventasDesde: '',
+    usuariosTotal: 0,
+    usuariosMes: 0,
+  });
+
+  // Pagos pendientes
+  useEffect(() => {
+    let alive = true;
+    adminService.transacciones
+      .list()
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : data.results || [];
+        const cnt = arr.filter((t) => String(t.estado || '').toLowerCase() === 'pendiente').length;
+        if (alive) setPendingCount(cnt);
+      })
+      .catch(() => {
+        if (alive) setPendingCount(0);
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // Stats: productos, ventas del mes, usuarios (total y del mes)
+  useEffect(() => {
+    let alive = true;
+    Promise.all([
+      adminService.productos.list(),
+      adminService.pedidos.list(),
+      adminService.usuarios.list(),
+    ])
+      .then(([prodData, pedData, usrData]) => {
+        if (!alive) return;
+
+        const prods = Array.isArray(prodData) ? prodData : prodData.results || [];
+        const pedidos = Array.isArray(pedData) ? pedData : pedData.results || [];
+        const usuarios = Array.isArray(usrData) ? usrData : usrData.results || [];
+
+        const prodIds = new Set(prods.map((p) => p.producto_id ?? p.id ?? JSON.stringify(p)));
+        const productos = prodIds.size;
+
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = now.getMonth(); // 0-11
+
+        const parseDate = (s) => {
+          if (!s) return null;
+          const d = new Date(s);
+          return isNaN(d) ? null : d;
+        };
+
+        const ventasMes = pedidos.filter((p) => {
+          const d = parseDate(p.fecha_pedido);
+          return d && d.getFullYear() === y && d.getMonth() === m;
+        }).length;
+
+        // earliest order date
+        const fechas = pedidos
+          .map((p) => parseDate(p.fecha_pedido))
+          .filter(Boolean)
+          .sort((a, b) => a - b);
+        const ventasDesde = fechas.length ? fechas[0].toLocaleDateString('es-ES') : '';
+
+        const usuariosTotal = usuarios.length;
+        const usuariosMes = usuarios.filter((u) => {
+          const d = parseDate(u.fecha_registro || u.created_at || u.fecha_creacion);
+          return d && d.getFullYear() === y && d.getMonth() === m;
+        }).length;
+
+        setStats({ productos, ventasMes, ventasDesde, usuariosTotal, usuariosMes });
+      })
+      .catch(() => {
+        if (alive) {
+          setStats((s) => ({ ...s }));
+        }
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   return (
     <>
@@ -57,7 +155,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Quick stats demo */}
+      {/* Quick stats */}
       <div
         style={{
           display: 'grid',
@@ -66,10 +164,22 @@ export default function Dashboard() {
           marginBottom: 16,
         }}
       >
-        <StatCard title="Productos" value="—" />
-        <StatCard title="Pedidos hoy" value="—" />
-        <StatCard title="Ventas del mes" value="—" />
-        <StatCard title="Usuarios" value="—" />
+        <StatCard
+          title="Pagos pendientes"
+          value={pendingCount}
+          to="/admin/ventas/pendientes"
+        />
+        <StatCard title="Productos" value={stats.productos} />
+        <StatCard
+          title="Ventas totales"
+          value={stats.ventasMes}
+          note={stats.ventasDesde ? `desde ${stats.ventasDesde}` : ''}
+        />
+        <StatCard
+          title="Usuarios Registrados"
+          value={stats.usuariosTotal}
+          note={stats.usuariosMes ? `${stats.usuariosMes} desde ${stats.ventasDesde}` : ''}
+        />
       </div>
 
       {/* Tarjetas de secciones */}

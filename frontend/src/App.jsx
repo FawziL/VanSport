@@ -10,6 +10,9 @@ import VerProducto from '@/pages/App/Productos/VerProducto';
 import AdminPage from '@/pages/Admin/AdminPage';
 import Perfil from '@/pages/App/Perfil/Perfil';
 import Carrito from '@/pages/App/Carrito/Carrito';
+import Checkout from '@/pages/App/Checkout/Checkout';
+import MisPedidos from '@/pages/App/Pedidos/MisPedidos';
+import VerPedido from '@/pages/App/Pedidos/VerPedido';
 
 import Dashboard from '@/pages/Admin/Dashboard/Dashboard';
 import AdminCategorias from '@/pages/Admin/Categorias/ListCategory';
@@ -27,6 +30,7 @@ import ListReviews from '@/pages/Admin/Reseñas/ListReviews';
 import EditReview from '@/pages/Admin/Reseñas/EditReview';
 import ListSales from '@/pages/Admin/Ventas/ListSales';
 import EditSale from '@/pages/Admin/Ventas/EditSale';
+import PendingPayments from '@/pages/Admin/Ventas/PendingPayments';
 import ListNotifications from '@/pages/Admin/Notificaciones/ListNotifications';
 import EditNotification from '@/pages/Admin/Notificaciones/EditNotification';
 import CreateNotification from '@/pages/Admin/Notificaciones/CreateNotification';
@@ -49,7 +53,10 @@ function AppShell() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/perfil" element={<Perfil />} />
+          <Route path="/pedidos" element={<MisPedidos />} />
+          <Route path="/pedidos/:id" element={<VerPedido />} />
           <Route path="/carrito" element={<Carrito />} />
+          <Route path="/checkout" element={<Checkout />} />
 
           {/* Admin */}
           <Route
@@ -179,6 +186,14 @@ function AppShell() {
             element={
               <AdminPage>
                 <ListSales />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/ventas/pendientes"
+            element={
+              <AdminPage>
+                <PendingPayments />
               </AdminPage>
             }
           />

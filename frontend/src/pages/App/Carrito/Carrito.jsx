@@ -25,6 +25,7 @@ export default function Carrito() {
   const [loading, setLoading] = useState(true);
   const [errMsg, setErrMsg] = useState('');
   const [updating, setUpdating] = useState(false);
+  const [placing, setPlacing] = useState(false);
 
   // Cargar carrito + enriquecer con datos de producto
   const fetchCarrito = async () => {
@@ -431,6 +432,7 @@ export default function Carrito() {
 
           {/* Resumen */}
           <Section style={{ padding: '1rem', position: 'sticky', top: 24, alignSelf: 'start' }}>
+            {/* Dirección y notas ahora se piden en Checkout */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
               <span style={{ color: '#6b7280' }}>Productos</span>
               <span style={{ fontWeight: 800, color: '#111827' }}>
@@ -458,12 +460,13 @@ export default function Carrito() {
                 color: '#fff',
                 fontWeight: 900,
                 fontSize: 16,
-                cursor: 'pointer',
+                cursor: placing ? 'not-allowed' : 'pointer',
+                opacity: placing ? 0.8 : 1,
               }}
-              disabled={updating}
-              onClick={() => alert('Función de checkout pendiente')}
+              disabled={updating || placing || items.length === 0}
+              onClick={() => navigate('/checkout')}
             >
-              Finalizar compra
+              Ir a checkout
             </button>
 
             <button

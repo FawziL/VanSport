@@ -225,6 +225,25 @@ export default function NavBar() {
                         Perfil
                       </button>
 
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          handleNav('/pedidos');
+                        }}
+                        style={{
+                          width: '100%',
+                          textAlign: 'left',
+                          padding: '0.6rem 0.8rem',
+                          background: 'transparent',
+                          color: '#20a750ff',
+                          border: 'none',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Mis pedidos
+                      </button>
+
                       {user?.is_staff && (
                         <button
                           type="button"
@@ -386,13 +405,14 @@ export default function NavBar() {
                 <NavLink to="/perfil" style={linkStyle} onClick={() => setMobileOpen(false)}>
                   Perfil
                 </NavLink>
-
+                <NavLink to="/pedidos" style={linkStyle} onClick={() => setMobileOpen(false)}>
+                  Mis pedidos
+                </NavLink>
                 {user?.is_staff && (
                   <NavLink to="/admin" style={linkStyle} onClick={() => setMobileOpen(false)}>
                     Dashboard Admin
                   </NavLink>
                 )}
-
                 <button
                   type="button"
                   onClick={() => {

@@ -23,6 +23,7 @@ export const appService = {
   pedidos: {
     list: (params) => http.get(`/api/pedidos/${qs(params)}`),
     retrieve: (id) => http.get(`/api/pedidos/${encodeURIComponent(id)}/`),
+    checkout: (data) => http.post('/api/pedidos/checkout/', data),
   },
   detallesPedido: {
     list: (params) => http.get(`/api/detalles-pedido/${qs(params)}`),
@@ -47,6 +48,7 @@ export const appService = {
   transacciones: {
     list: (params) => http.get(`/api/transacciones/${qs(params)}`),
     retrieve: (id) => http.get(`/api/transacciones/${encodeURIComponent(id)}/`),
+    pay: (data) => http.post('/api/transacciones/pay/', data),
   },
   envios: {
     list: (params) => http.get(`/api/envios/${qs(params)}`),
@@ -54,7 +56,7 @@ export const appService = {
   },
 };
 
-// ADMIN (/admin/...) — CRUD completo
+// ADMIN (/admin/...)
 export const adminService = {
   categorias: {
     list: (params) => http.get(`/admin/categorias/${qs(params)}`),

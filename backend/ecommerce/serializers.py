@@ -33,11 +33,53 @@ class PedidoSerializer(serializers.ModelSerializer):
     usuario_nombre = serializers.CharField(source='usuario.nombre', read_only=True)
     usuario_apellido = serializers.CharField(source='usuario.apellido', read_only=True)
     usuario_email = serializers.CharField(source='usuario.email', read_only=True)
+    transaccion_id = serializers.SerializerMethodField(read_only=True)
+    detalles = serializers.SerializerMethodField(read_only=True)
+    ultima_transaccion = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Pedido
         fields = '__all__'
 
+    def get_transaccion_id(self, obj):
+        try:
+            from .models import Transaccion
+            tid = (
+                Transaccion.objects
+                .filter(pedido_id=obj.pedido_id)
+                .order_by('-transaccion_id')
+                .values_list('transaccion_id', flat=True)
+                .first()
+            )
+            return tid
+        except Exception:
+            return None
+
+    def get_detalles(self, obj):
+        try:
+            dets = (
+                DetallePedido.objects
+                .filter(pedido_id=obj.pedido_id)
+                .order_by('detalle_id')
+            )
+            return DetallePedidoSerializer(dets, many=True).data
+        except Exception:
+            return []
+
+    def get_ultima_transaccion(self, obj):
+        try:
+            tx = (
+                Transaccion.objects
+                .filter(pedido_id=obj.pedido_id)
+                .order_by('-transaccion_id')
+                .values('transaccion_id', 'estado', 'metodo_pago', 'codigo_transaccion', 'fecha_transaccion', 'monto')
+                .first()
+            )
+            return tx
+        except Exception:
+            return None
+
 class DetallePedidoSerializer(serializers.ModelSerializer):
+    producto_nombre = serializers.CharField(source='producto.nombre', read_only=True)
     class Meta:
         model = DetallePedido
         fields = '__all__'
