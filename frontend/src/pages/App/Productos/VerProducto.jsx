@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { appService } from '@/services/auth';
-import { API_URL } from '@/config/api';
+import { resolveImageUrl } from '@/utils/resolveUrl';
 import { useAuth } from '@/context/AuthContext';
 
 function formatPrice(n) {
@@ -25,14 +25,6 @@ export default function VerProducto() {
   const [inCart, setInCart] = useState(false); // NUEVO: estado para saber si está en el carrito
   const [qty, setQty] = useState(1); // Cantidad seleccionada
   const [cartQty, setCartQty] = useState(0); // Cantidad actual en el carrito (si existe)
-
-  const resolveImageUrl = (path) => {
-    if (!path) return '';
-    if (/^https?:/i.test(path)) return path;
-    const base = API_URL.replace(/\/+$/, '');
-    const rel = String(path).replace(/^\/+/, '');
-    return `${base}/${rel}`;
-  };
 
   // Usar appService para obtener el detalle
   useEffect(() => {

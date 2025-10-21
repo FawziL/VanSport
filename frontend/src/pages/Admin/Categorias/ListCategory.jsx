@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { API_URL } from '@/config/api';
+import { resolveImageUrl } from '@/utils/resolveUrl';
 import { adminService } from '@/services/auth';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
@@ -17,14 +17,6 @@ export default function ListCategory() {
   const [modalOpen, setModalOpen] = useState(false);
   const [togglingId, setTogglingId] = useState(null);
   const navigate = useNavigate();
-
-  const resolveImageUrl = (path) => {
-    if (!path) return '';
-    if (/^https?:/i.test(path)) return path;
-    const base = API_URL.replace(/\/+$/, '');
-    const rel = String(path).replace(/^\/+/, '');
-    return `${base}/${rel}`;
-  };
 
   // Fetch categorías
   useEffect(() => {

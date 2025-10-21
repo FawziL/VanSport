@@ -41,6 +41,7 @@ const sections = [
   { to: '/admin/resenas', label: 'Reseñas', desc: 'Modera y responde reseñas' },
   { to: '/admin/envios', label: 'Envíos', desc: 'Configura y monitorea envíos' },
   { to: '/admin/notificaciones', label: 'Notificaciones', desc: 'Mensajería y avisos a clientes' },
+  { to: '/admin/reportes', label: 'Reportes', desc: 'Gestiona reportes de fallas' },
 ];
 
 export default function Dashboard() {

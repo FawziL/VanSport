@@ -244,6 +244,25 @@ export default function NavBar() {
                         Mis pedidos
                       </button>
 
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          handleNav('/reportes');
+                        }}
+                        style={{
+                          width: '100%',
+                          textAlign: 'left',
+                          padding: '0.6rem 0.8rem',
+                          background: 'transparent',
+                          color: '#af1414ff',
+                          border: 'none',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Reporte de fallas
+                      </button>
+
                       {user?.is_staff && (
                         <button
                           type="button"
@@ -407,6 +426,9 @@ export default function NavBar() {
                 </NavLink>
                 <NavLink to="/pedidos" style={linkStyle} onClick={() => setMobileOpen(false)}>
                   Mis pedidos
+                </NavLink>
+                <NavLink to="/reportes" style={linkStyle} onClick={() => setMobileOpen(false)}>
+                  Reporte de fallas
                 </NavLink>
                 {user?.is_staff && (
                   <NavLink to="/admin" style={linkStyle} onClick={() => setMobileOpen(false)}>

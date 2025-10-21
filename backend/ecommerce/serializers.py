@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-from .models import Categoria, Producto, Usuario, Pedido, DetallePedido, Carrito, Reseña, Notificacion, Transaccion, Envio
+from .models import Categoria, Producto, Usuario, Pedido, DetallePedido, Carrito, Reseña, Notificacion, Transaccion, Envio, ReporteFalla, ReporteFallaFollowUp
 
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -123,3 +123,20 @@ class EnvioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Envio
         fields = '__all__'
+
+class ReporteFallaFollowUpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReporteFallaFollowUp
+        fields = '__all__'
+        read_only_fields = ['followup_id', 'fecha_creacion', 'autor_tipo', 'reporte']
+
+class ReporteFallaSerializer(serializers.ModelSerializer):
+    usuario_nombre = serializers.CharField(source='usuario.nombre', read_only=True)
+    usuario_apellido = serializers.CharField(source='usuario.apellido', read_only=True)
+    usuario_email = serializers.CharField(source='usuario.email', read_only=True)
+    followups = ReporteFallaFollowUpSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ReporteFalla
+        fields = '__all__'
+        read_only_fields = ['id', 'fecha_creacion', 'fecha_actualizacion', 'usuario', 'imagen_url', 'video_url']

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminService } from '@/services/auth';
-import { API_URL } from '@/config/api';
+import { resolveImageUrl } from '@/utils/resolveUrl';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
 import ConfirmModal from '@/components/ConfirmModal';
@@ -81,14 +81,6 @@ export default function ListProduct() {
     const n = Number(v);
     if (Number.isNaN(n)) return String(v);
     return new Intl.NumberFormat('es-VE', { style: 'currency', currency: 'USD' }).format(n);
-  };
-
-  const resolveImageUrl = (path) => {
-    if (!path) return '';
-    if (/^https?:/i.test(path)) return path;
-    const base = API_URL.replace(/\/+$/, '');
-    const rel = String(path).replace(/^\/+/, '');
-    return `${base}/${rel}`;
   };
 
   return (

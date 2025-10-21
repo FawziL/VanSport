@@ -30,6 +30,7 @@ const sections = [
   { to: '/admin/resenas', label: 'Reseñas', icon: <FaStar /> },
   { to: '/admin/envios', label: 'Envíos', icon: <FaTruck /> },
   { to: '/admin/notificaciones', label: 'Notificaciones', icon: <FaBell /> },
+  { to: '/admin/reportes', label: 'Reportes', icon: <FaTruck /> },
 ];
 
 const linkStyle = (isActive, collapsed) => ({

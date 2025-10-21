@@ -36,6 +36,11 @@ import EditNotification from '@/pages/Admin/Notificaciones/EditNotification';
 import CreateNotification from '@/pages/Admin/Notificaciones/CreateNotification';
 import ListShipments from '@/pages/Admin/Envíos/ListShipments';
 import EditShipment from '@/pages/Admin/Envíos/EditShipment';
+import NuevoReporte from '@/pages/App/Reportes/NuevoReporte';
+import MisReportes from '@/pages/App/Reportes/MisReportes';
+import VerReporte from '@/pages/App/Reportes/VerReporte';
+import ListReportes from '@/pages/Admin/Reportes/ListReport';
+import EditReporte from '@/pages/Admin/Reportes/EditReport';
 
 function AppShell() {
   const location = useLocation();
@@ -57,6 +62,11 @@ function AppShell() {
           <Route path="/pedidos/:id" element={<VerPedido />} />
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/checkout" element={<Checkout />} />
+
+          {/* Reportes Usuario */}
+          <Route path="/reportes" element={<MisReportes />} />
+          <Route path="/reportes/nuevo" element={<NuevoReporte />} />
+          <Route path="/reportes/:id" element={<VerReporte />} />
 
           {/* Admin */}
           <Route
@@ -101,6 +111,22 @@ function AppShell() {
               </AdminPage>
             }
           />
+          <Route
+            path="/admin/productos/crear"
+            element={
+              <AdminPage>
+                <CreateProduct />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/productos/editar/:id"
+            element={
+              <AdminPage>
+                <EditProduct />
+              </AdminPage>
+            }
+          />
 
           {/* Usuarios Admin */}
           <Route
@@ -124,22 +150,6 @@ function AppShell() {
             element={
               <AdminPage>
                 <EditUser />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/productos/crear"
-            element={
-              <AdminPage>
-                <CreateProduct />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/productos/editar/:id"
-            element={
-              <AdminPage>
-                <EditProduct />
               </AdminPage>
             }
           />
@@ -249,6 +259,10 @@ function AppShell() {
               </AdminPage>
             }
           />
+
+          {/* Reportes Admin */}
+          <Route path="/admin/reportes" element={<AdminPage><ListReportes /></AdminPage>} />
+          <Route path="/admin/reportes/:id" element={<AdminPage><EditReporte /></AdminPage>} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>

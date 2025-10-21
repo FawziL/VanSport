@@ -54,6 +54,12 @@ export const appService = {
     list: (params) => http.get(`/api/envios/${qs(params)}`),
     retrieve: (id) => http.get(`/api/envios/${encodeURIComponent(id)}/`),
   },
+  reportes: {
+    list: () => http.get('/api/reportes-fallas/'),
+    create: (formData) => http.post('/api/reportes-fallas/', formData),
+    retrieve: (id) => http.get(`/api/reportes-fallas/${id}/`),
+    addFollowUp: (id, formData) => http.post(`/api/reportes-fallas/${id}/followups/`, formData),
+  },
 };
 
 // ADMIN (/admin/...)
@@ -140,6 +146,12 @@ export const adminService = {
     update: (id, data) => http.put(`/admin/envios/${encodeURIComponent(id)}/`, data),
     partialUpdate: (id, data) => http.patch(`/admin/envios/${encodeURIComponent(id)}/`, data),
     remove: (id) => http.delete(`/admin/envios/${encodeURIComponent(id)}/`),
+  },
+  reportes: {
+    list: (params) => http.get('/admin/reportes-fallas/', { params }),
+    retrieve: (id) => http.get(`/admin/reportes-fallas/${id}/`),
+    patch: (id, data) => http.patch(`/admin/reportes-fallas/${id}/`, data),
+    addFollowUp: (id, formData) => http.post(`/admin/reportes-fallas/${id}/followups/`, formData),
   },
 };
 

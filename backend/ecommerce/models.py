@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, PermissionsMixin, AbstractBaseUser
+from uuid import uuid4
 
 class Categoria(models.Model):
 	categoria_id = models.AutoField(primary_key=True, db_column='categoria_id')
@@ -146,3 +147,32 @@ class Envio(models.Model):
 	class Meta:
 		db_table = 'envios'
 		managed = False
+
+class ReporteFalla(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False, db_column='reporte_id')
+    usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, db_column='usuario_id')
+    categoria = models.CharField(max_length=50)
+    titulo = models.CharField(max_length=200)
+    descripcion = models.TextField(blank=True)
+    seccion = models.CharField(max_length=120)
+    imagen_url = models.CharField(max_length=255, blank=True)
+    video_url = models.CharField(max_length=255, blank=True)
+    estado = models.CharField(max_length=20, default='pendiente')  # pendiente | en_revision | finalizado
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'reportes_falla'
+        managed = True
+
+class ReporteFallaFollowUp(models.Model):
+    followup_id = models.AutoField(primary_key=True, db_column='followup_id')
+    reporte = models.ForeignKey(ReporteFalla, on_delete=models.CASCADE, db_column='reporte_id', related_name='followups')
+    autor_tipo = models.CharField(max_length=20)  # usuario | soporte
+    mensaje = models.TextField(blank=True)
+    imagen_url = models.CharField(max_length=255, blank=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'reportes_falla_followups'
+        managed = True

@@ -9,6 +9,7 @@ from ecommerce.views.api.resena import ReseñaViewSetApi
 from ecommerce.views.api.notificacion import NotificacionViewSetApi
 from ecommerce.views.api.transaccion import TransaccionViewSetApi
 from ecommerce.views.api.envio import EnvioViewSetApi
+from ecommerce.views.api.reporte_falla import ReporteFallaViewSetApi
 
 router = routers.DefaultRouter()
 router.register(r'categorias', CategoriaViewSetApi)
@@ -21,5 +22,6 @@ router.register(r'resenas', ReseñaViewSetApi)
 router.register(r'notificaciones', NotificacionViewSetApi)
 router.register(r'transacciones', TransaccionViewSetApi)
 router.register(r'envios', EnvioViewSetApi)
+router.register(r'reportes-fallas', ReporteFallaViewSetApi, basename='reportes-fallas')
 
 urlpatterns = router.urls

@@ -1,17 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { appService } from '@/services/auth';
-import { API_URL } from '@/config/api';
-
-// Cargar categorías destacadas desde API
-
-function resolveImageUrl(path) {
-  if (!path) return '';
-  if (/^https?:/i.test(path)) return path;
-  const base = API_URL.replace(/\/+$/, '');
-  const rel = String(path).replace(/^\/+/, '');
-  return `${base}/${rel}`;
-}
+import { resolveImageUrl } from '@/utils/resolveUrl';
 
 export default function Home() {
   const [cats, setCats] = useState([]);
