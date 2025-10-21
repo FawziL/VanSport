@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { adminService } from '@/services/auth';
 import ListCategories from '@/components/ListCategories';
+import { resolveImageUrl } from '@/utils/resolveUrl';
 
 export default function EditProduct() {
   const { id } = useParams();
@@ -11,6 +12,8 @@ export default function EditProduct() {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [imagen, setImagen] = useState(null);
+  const [extras, setExtras] = useState([]);
+  const [existingExtras, setExistingExtras] = useState([]);
 
   const [form, setForm] = useState({
     nombre: '',
@@ -40,6 +43,7 @@ export default function EditProduct() {
           activo: !!data?.activo,
           imagen_url: data?.imagen_url ?? '',
         });
+        setExistingExtras(Array.isArray(data?.imagenes_adicionales) ? data.imagenes_adicionales : []);
       } catch (err) {
         setError(err?.response?.data?.detail || err?.message || 'No se pudo cargar el producto');
       } finally {
@@ -76,9 +80,11 @@ export default function EditProduct() {
       if (imagen) {
         fd.append('imagen', imagen);
       } else if (form.imagen_url) {
-        // Mantener imagen actual cuando no se sube una nueva (PUT requiere datos completos)
         fd.append('imagen_url', form.imagen_url);
       }
+      extras.forEach((file) => {
+        if (file) fd.append('imagenes_adicionales', file);
+      });
 
       await adminService.productos.update(id, fd);
       navigate('/admin/productos');
@@ -189,17 +195,58 @@ export default function EditProduct() {
 
         <div>
           <label htmlFor="imagen" className="block text-sm font-medium mb-1">
-            Imagen (opcional)
+            Imagen principal (opcional)
           </label>
-          {form.imagen_url && (
-            <div className="mb-2 text-sm text-gray-600">Actual: {form.imagen_url}</div>
-          )}
+          {form.imagen_url && <div className="mb-2 text-sm text-gray-600">                
+            <div className="w-28 h-20 rounded overflow-hidden border">
+                  <img
+                    src={resolveImageUrl(form.imagen_url)}
+                    alt={form.imagen_url}
+                    className="w-full h-full object-cover"
+                  />
+                </div></div>}
+          
           <input
             id="imagen"
             name="imagen"
             type="file"
             accept="image/*"
             onChange={(e) => setImagen(e.target.files?.[0] || null)}
+            className="border rounded px-3 py-2 w-full"
+          />
+        </div>
+
+        {existingExtras?.length > 0 && (
+          <div>
+            <div className="text-sm font-medium mb-1">Imágenes adicionales actuales</div>
+            <div className="flex flex-wrap gap-8">
+              {existingExtras.map((p, idx) => (
+                <div key={idx} className="w-28 h-20 rounded overflow-hidden border">
+                  <img
+                    src={resolveImageUrl(p)}
+                    alt={`extra-${idx}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              (Por ahora solo agregamos; si necesitas eliminar, te lo habilito luego.)
+            </div>
+          </div>
+        )}
+
+        <div>
+          <label htmlFor="extras" className="block text-sm font-medium mb-1">
+            Agregar nuevas imágenes adicionales
+          </label>
+          <input
+            id="extras"
+            name="imagenes_adicionales"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => setExtras(Array.from(e.target.files || []))}
             className="border rounded px-3 py-2 w-full"
           />
         </div>

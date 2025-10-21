@@ -14,6 +14,7 @@ export default function CreateProduct() {
     activo: true,
   });
   const [imagen, setImagen] = useState(null);
+  const [extras, setExtras] = useState([]); // <-- nuevo
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -39,6 +40,10 @@ export default function CreateProduct() {
       fd.append('categoria_id', String(form.categoria_id));
       fd.append('activo', form.activo ? 'true' : 'false');
       if (imagen) fd.append('imagen', imagen);
+      // Imágenes adicionales (múltiples)
+      (extras || []).forEach((file) => {
+        if (file) fd.append('imagenes_adicionales', file);
+      });
 
       await adminService.productos.create(fd);
       navigate('/admin/productos');
@@ -140,7 +145,7 @@ export default function CreateProduct() {
 
         <div>
           <label htmlFor="imagen" className="block text-sm font-medium mb-1">
-            Imagen (opcional)
+            Imagen principal (opcional)
           </label>
           <input
             id="imagen"
@@ -150,6 +155,24 @@ export default function CreateProduct() {
             onChange={(e) => setImagen(e.target.files?.[0] || null)}
             className="border rounded px-3 py-2 w-full"
           />
+        </div>
+
+        <div>
+          <label htmlFor="extras" className="block text-sm font-medium mb-1">
+            Imágenes adicionales (opcional, puedes seleccionar varias)
+          </label>
+          <input
+            id="extras"
+            name="imagenes_adicionales"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => setExtras(Array.from(e.target.files || []))}
+            className="border rounded px-3 py-2 w-full"
+          />
+          <div className="text-xs text-gray-500 mt-1">
+            Se guardarán en /media/productos y se añadirán a imagenes_adicionales.
+          </div>
         </div>
 
         <div className="flex items-center gap-2">

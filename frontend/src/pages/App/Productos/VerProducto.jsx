@@ -35,31 +35,38 @@ export default function VerProducto() {
       try {
         const data = await appService.productos.retrieve(id);
 
-        // Normaliza según tu modelo: producto_id, imagen_url, etc.
+        // Normaliza imagenes_adicionales en array de strings
+        let extras = [];
+        const rawExtras = data.imagenes_adicionales ?? data.imagenes ?? null;
+        if (Array.isArray(rawExtras)) {
+          extras = rawExtras;
+        } else if (typeof rawExtras === 'string') {
+          const s = rawExtras.trim();
+          try {
+            const parsed = JSON.parse(s);
+            if (Array.isArray(parsed)) extras = parsed;
+          } catch {
+            // fallback CSV
+            extras = s ? s.split(',').map((p) => p.trim()).filter(Boolean) : [];
+          }
+        }
+
         const normalized = {
           id: data.producto_id ?? data.id ?? id,
           nombre: data.nombre ?? '',
           descripcion: data.descripcion ?? '',
           precio: data.precio ?? null,
-          // Si no tienes precio_oferta en el backend, lo dejamos como null
           precio_oferta: data.precio_oferta ?? null,
-          // categoria puede venir como objeto, id o nombre; mostramos algo legible
           categoria:
             typeof data.categoria === 'string'
               ? data.categoria
               : typeof data.categoria === 'object' && data.categoria !== null
                 ? (data.categoria.nombre ?? data.categoria.id ?? '')
                 : (data.categoria ?? ''),
+
           stock: data.stock ?? 0,
           imagen: resolveImageUrl(data.imagen_url ?? data.imagen ?? ''),
-          // Si no hay galería, dejamos vacío
-          imagenes: Array.isArray(data.imagenes)
-            ? data.imagenes
-                .map((img) => (typeof img === 'string' ? img : img.image_path))
-                .filter(Boolean)
-                .map((p) => resolveImageUrl(p))
-            : [],
-          // Atributos opcionales
+          imagenes: extras.map((p) => resolveImageUrl(p)), // <-- ahora fuente oficial
           atributos: data.atributos ?? null,
         };
 
@@ -81,9 +88,7 @@ export default function VerProducto() {
       }
     }
     if (id) load();
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, [id]);
 
   const allImages = useMemo(() => {

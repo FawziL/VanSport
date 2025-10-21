@@ -40,21 +40,22 @@ class Usuario(models.Model):
 		managed = False
 
 class Producto(models.Model):
-	producto_id = models.AutoField(primary_key=True, db_column='producto_id')
-	nombre = models.CharField(max_length=255)
-	descripcion = models.TextField(blank=True)
-	precio = models.DecimalField(max_digits=10, decimal_places=2)
-	precio_oferta = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, db_column='precio_oferta')
-	stock = models.IntegerField()
-	categoria = models.ForeignKey(Categoria, on_delete=models.DO_NOTHING, db_column='categoria_id')
-	imagen_url = models.CharField(max_length=255, blank=True)
-	fecha_creacion = models.DateTimeField(db_column='fecha_creacion', auto_now_add=False)
-	activo = models.BooleanField(default=True)
-	destacado = models.BooleanField(default=False, db_column='destacado')
+    producto_id = models.AutoField(primary_key=True, db_column='producto_id')
+    nombre = models.CharField(max_length=255)
+    descripcion = models.TextField(blank=True)
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_oferta = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, db_column='precio_oferta')
+    stock = models.IntegerField()
+    categoria = models.ForeignKey(Categoria, on_delete=models.DO_NOTHING, db_column='categoria_id')
+    imagen_url = models.CharField(max_length=255, blank=True)
+    fecha_creacion = models.DateTimeField(db_column='fecha_creacion', auto_now_add=False)
+    activo = models.BooleanField(default=True)
+    destacado = models.BooleanField(default=False, db_column='destacado')
+    imagenes_adicionales = models.JSONField(null=True, blank=True, db_column='imagenes_adicionales')  # <-- nuevo
 
-	class Meta:
-		db_table = 'productos'
-		managed = False
+    class Meta:
+        db_table = 'productos'
+        managed = False
 
 class Pedido(models.Model):
 	pedido_id = models.AutoField(primary_key=True, db_column='pedido_id')
