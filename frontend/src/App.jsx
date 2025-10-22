@@ -41,6 +41,7 @@ import MisReportes from '@/pages/App/Reportes/MisReportes';
 import VerReporte from '@/pages/App/Reportes/VerReporte';
 import ListReportes from '@/pages/Admin/Reportes/ListReport';
 import EditReporte from '@/pages/Admin/Reportes/EditReport';
+import Footer from '@/components/Footer'; // importa el componente
 
 function AppShell() {
   const location = useLocation();
@@ -267,6 +268,7 @@ function AppShell() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
+      <Footer />
     </>
   );
 }
