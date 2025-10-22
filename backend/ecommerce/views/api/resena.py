@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions
+from django.utils import timezone  # <-- nuevo
 from ecommerce.models import Reseña
 from ecommerce.serializers import ReseñaSerializer
 
@@ -19,4 +20,7 @@ class ReseñaViewSetApi(viewsets.ModelViewSet):
         return qs
 
     def perform_create(self, serializer):
-        serializer.save(usuario_id=self.request.user.usuario_id)
+        serializer.save(
+            usuario_id=self.request.user.usuario_id,
+            fecha_creacion=timezone.now(),  # <-- nuevo
+        )

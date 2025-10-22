@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { appService } from '@/services/auth';
 import { resolveImageUrl } from '@/utils/resolveUrl';
 import { useAuth } from '@/context/AuthContext';
+import ProductReviews from '@/components/ProductReviews';
+import {StarRow} from '@/utils/reviews';
 
 function formatPrice(n) {
   const num = Number(n);
@@ -25,6 +27,8 @@ export default function VerProducto() {
   const [inCart, setInCart] = useState(false); // NUEVO: estado para saber si está en el carrito
   const [qty, setQty] = useState(1); // Cantidad seleccionada
   const [cartQty, setCartQty] = useState(0); // Cantidad actual en el carrito (si existe)
+  const [avgRating, setAvgRating] = useState(0);      // <-- nuevo
+  const [reviewsCount, setReviewsCount] = useState(0); // <-- nuevo
 
   // Usar appService para obtener el detalle
   useEffect(() => {
@@ -169,6 +173,36 @@ export default function VerProducto() {
       alive = false;
     };
   }, [producto, isAuthenticated]);
+
+  // Cargar promedio y conteo de reseñas para este producto
+  useEffect(() => {
+    let alive = true;
+    async function loadAvg() {
+      if (!producto?.id) return;
+      try {
+        const data = await appService.reseñas.list({ producto_id: producto.id });
+        const arr = Array.isArray(data) ? data : data?.results || [];
+        if (!alive) return;
+        if (arr.length > 0) {
+          const sum = arr.reduce((acc, r) => acc + (Number(r.calificacion) || 0), 0);
+          setAvgRating(sum / arr.length);
+          setReviewsCount(arr.length);
+        } else {
+          setAvgRating(0);
+          setReviewsCount(0);
+        }
+      } catch {
+        if (alive) {
+          setAvgRating(0);
+          setReviewsCount(0);
+        }
+      }
+    }
+    loadAvg();
+    return () => {
+      alive = false;
+    };
+  }, [producto?.id]);
 
   if (loading) {
     return (
@@ -396,6 +430,11 @@ export default function VerProducto() {
                 </div>
               </div>
             )}
+
+            {/* --- Reseñas --- */}
+            <div style={{ marginTop: 28 }}>
+              <ProductReviews productoId={producto.id} nombre={producto.nombre} />
+            </div>
           </div>
         </div>
 
@@ -403,6 +442,15 @@ export default function VerProducto() {
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 6 }}>{producto.nombre}</h1>
           <div style={{ color: '#666', marginBottom: 8 }}>{producto.categoria || 'Categoría'}</div>
+
+          {/* Promedio de estrellas (solo si hay reseñas) */}
+          {reviewsCount > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <StarRow value={avgRating} size={16} />
+              <span style={{ color: '#333', fontWeight: 800 }}>{avgRating.toFixed(1)}</span>
+              <span style={{ color: '#777' }}>({reviewsCount})</span>
+            </div>
+          )}
 
           <div
             style={{

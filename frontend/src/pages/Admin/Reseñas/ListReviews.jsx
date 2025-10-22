@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { adminService } from '@/services/auth';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
+import ConfirmModal from '@/components/ConfirmModal'; // <-- nuevo
 
 export default function ListReviews() {
   const [items, setItems] = useState([]);
@@ -11,6 +12,8 @@ export default function ListReviews() {
   const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deleteId, setDeleteId] = useState(null);   // <-- nuevo
+  const [modalOpen, setModalOpen] = useState(false); // <-- nuevo
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -154,6 +157,24 @@ export default function ListReviews() {
                     >
                       Editar
                     </button>
+                    <button
+                      onClick={() => {
+                        setDeleteId(r.resena_id);
+                        setModalOpen(true);
+                      }}
+                      style={{
+                        marginLeft: 8,
+                        padding: '0.4rem 0.8rem',
+                        borderRadius: 6,
+                        border: 'none',
+                        background: '#e53935',
+                        color: '#fff',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Eliminar
+                    </button>
                   </td>
                 </tr>
               ))
@@ -163,6 +184,28 @@ export default function ListReviews() {
       </div>
 
       <Pagination page={page} pages={pages} onChange={setPage} showNumbers />
+
+      <ConfirmModal
+        open={modalOpen}
+        title="¿Eliminar reseña?"
+        message="Esta acción no se puede deshacer."
+        confirmText="Sí, eliminar"
+        cancelText="Cancelar"
+        danger
+        onCancel={() => setModalOpen(false)}
+        onConfirm={async () => {
+          if (!deleteId) return;
+          try {
+            await adminService.reseñas.remove(deleteId);
+            setItems((prev) => prev.filter((x) => x.resena_id !== deleteId));
+          } catch {
+            setError('No se pudo eliminar la reseña');
+          } finally {
+            setDeleteId(null);
+            setModalOpen(false);
+          }
+        }}
+      />
     </div>
   );
 }

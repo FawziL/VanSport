@@ -94,9 +94,15 @@ class ReseñaSerializer(serializers.ModelSerializer):
     usuario_apellido = serializers.CharField(source='usuario.apellido', read_only=True)
     usuario_email = serializers.CharField(source='usuario.email', read_only=True)
     producto_nombre = serializers.CharField(source='producto.nombre', read_only=True)
+    fecha_creacion = serializers.DateTimeField(required=False, default=timezone.now)  # <-- nuevo
+
     class Meta:
         model = Reseña
         fields = '__all__'
+        extra_kwargs = {
+            'usuario': {'required': False},     # <-- no lo exige el cliente
+            'usuario_id': {'required': False},  # <-- idem
+        }
 
 class NotificacionSerializer(serializers.ModelSerializer):
     usuario_nombre = serializers.CharField(source='usuario.nombre', read_only=True)

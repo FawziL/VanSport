@@ -40,6 +40,7 @@ export const appService = {
   reseñas: {
     list: (params) => http.get(`/api/resenas/${qs(params)}`),
     retrieve: (id) => http.get(`/api/resenas/${encodeURIComponent(id)}/`),
+    create: (data) => http.post('/api/resenas/', data),
   },
   notificaciones: {
     list: (params) => http.get(`/api/notificaciones/${qs(params)}`),
