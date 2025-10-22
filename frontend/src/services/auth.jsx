@@ -5,6 +5,7 @@ export const authService = {
   register: (payload) => http.post('/auth/register/', payload),
   me: () => http.get('/auth/me/'),
   passwordReset: (email) => http.post('/auth/password-reset/', { email }),
+  passwordResetConfirm: (token, password) => http.post('/auth/password-reset/confirm/', { token, password }), // <-- nuevo
 };
 
 export const appService = {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { authService } from '@/services/auth';
-import { useNavigate } from 'react-router-dom'; // <-- añadido
+import { useNavigate, Link } from 'react-router-dom'; // <-- añade Link
 
 function Login() {
   const { login } = useAuth();
@@ -63,6 +63,19 @@ function Login() {
         {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
         {success && <div style={{ color: 'green', marginTop: 10 }}>¡Login exitoso!</div>}
       </form>
+
+      {/* Enlaces rápidos */}
+      <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between' }}>
+        <Link to="/register" style={{ color: '#1e88e5', textDecoration: 'none', fontWeight: 700 }}>
+          Crear cuenta
+        </Link>
+        <Link
+          to="/password-reset"
+          style={{ color: '#1e88e5', textDecoration: 'none', fontWeight: 700 }}
+        >
+          ¿Olvidaste tu contraseña?
+        </Link>
+      </div>
     </div>
   );
 }
