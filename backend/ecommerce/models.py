@@ -108,7 +108,7 @@ class Reseña(models.Model):
 
 class Notificacion(models.Model):
 	notificacion_id = models.AutoField(primary_key=True, db_column='notificacion_id')
-	usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, db_column='usuario_id')
+	usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, db_column='usuario_id', null=True, blank=True)
 	titulo = models.CharField(max_length=255)
 	mensaje = models.TextField()
 	tipo = models.CharField(max_length=50)
@@ -116,6 +116,7 @@ class Notificacion(models.Model):
 	leida = models.BooleanField(default=False)
 	relacion_id = models.IntegerField(blank=True, null=True)
 	relacion_tipo = models.CharField(max_length=50, blank=True)
+	expira = models.DateTimeField(db_column='expira', null=True, blank=True)  # <-- nuevo nombre
 
 	class Meta:
 		db_table = 'notificaciones'

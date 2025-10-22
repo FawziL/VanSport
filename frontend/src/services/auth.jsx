@@ -44,6 +44,7 @@ export const appService = {
   notificaciones: {
     list: (params) => http.get(`/api/notificaciones/${qs(params)}`),
     retrieve: (id) => http.get(`/api/notificaciones/${encodeURIComponent(id)}/`),
+    latestBanner: () => http.get('/api/notificaciones/latest-banner/'),
   },
   transacciones: {
     list: (params) => http.get(`/api/transacciones/${qs(params)}`),

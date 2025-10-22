@@ -102,9 +102,21 @@ class NotificacionSerializer(serializers.ModelSerializer):
     usuario_nombre = serializers.CharField(source='usuario.nombre', read_only=True)
     usuario_apellido = serializers.CharField(source='usuario.apellido', read_only=True)
     usuario_email = serializers.CharField(source='usuario.email', read_only=True)
+    fecha_creacion = serializers.DateTimeField(required=False, default=timezone.now)  # <-- importante
+
     class Meta:
         model = Notificacion
         fields = '__all__'
+        extra_kwargs = {
+            'usuario': {'required': False, 'allow_null': True},    # globales
+            'usuario_id': {'required': False, 'allow_null': True}, # globales
+            'leida': {'required': False},
+            'relacion_id': {'required': False, 'allow_null': True},
+            'relacion_tipo': {'required': False, 'allow_blank': True},
+            'tipo': {'required': True},       # mantenlo requerido (p.ej. "banner")
+            'titulo': {'required': True},
+            'mensaje': {'required': True},
+        }
 
 class TransaccionSerializer(serializers.ModelSerializer):
     usuario_nombre = serializers.CharField(source='pedido.usuario.nombre', read_only=True)
