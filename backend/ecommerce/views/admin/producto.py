@@ -59,15 +59,21 @@ class ProductoViewSetAdmin(viewsets.ModelViewSet):
         # Construir dict plano sin archivos
         data = {k: v for k, v in request.data.items() if k != 'imagen'}
 
+        # Lista explícita opcional (reemplazo/orden final inicial)
+        explicit_list_raw = request.data.get('imagenes_adicionales_list', None)
+        explicit_list = self._parse_urls_list(explicit_list_raw) if explicit_list_raw is not None else []
+
         # Extra desde texto opcional (JSON/CSV), ya sea en imagenes_adicionales o imagenes_adicionales_urls
         extra_from_text = self._coerce_imagenes_extra_text(data)
         extra_from_text_urls = self._parse_urls_list(request.data.get('imagenes_adicionales_urls'))
         # Extra desde archivos subidos
         extra_from_uploads = self._save_extra_images(extra_files)
 
-        extras = [*extra_from_text, *extra_from_text_urls, *extra_from_uploads]
-        if extras:
-            # Quita duplicados manteniendo orden
+        # Construir orden: explícita (si viene) + textos/urls + uploads
+        base = explicit_list
+        extras = [*base, *extra_from_text, *extra_from_text_urls, *extra_from_uploads]
+        if extras or explicit_list_raw is not None:
+            # Quita duplicados manteniendo orden (permite lista vacía explícita)
             data['imagenes_adicionales'] = list(dict.fromkeys(x for x in extras if x))
 
         if imagen:
@@ -80,19 +86,28 @@ class ProductoViewSetAdmin(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
-        """Actualizar producto (solo admin), fusionando imágenes adicionales"""
+        """Actualizar producto (solo admin), permitiendo reemplazo/orden explícito y agregados"""
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         imagen = request.FILES.get('imagen')
         extra_files = request.FILES.getlist('imagenes_adicionales')
         data = {k: v for k, v in request.data.items() if k != 'imagen'}
 
-        existing = instance.imagenes_adicionales or []
+        # Lista explícita opcional (si viene, reemplaza y define orden base)
+        explicit_list_raw = request.data.get('imagenes_adicionales_list', None)
+        if explicit_list_raw is not None:
+            base_list = self._parse_urls_list(explicit_list_raw)
+        else:
+            base_list = (instance.imagenes_adicionales or [])
+
+        # Permitir compatibilidad: también aceptar texto/urls adicionales
         extra_from_text = self._coerce_imagenes_extra_text(data)
         extra_from_text_urls = self._parse_urls_list(request.data.get('imagenes_adicionales_urls'))
         extra_from_uploads = self._save_extra_images(extra_files)
-        combined = [*existing, *extra_from_text, *extra_from_text_urls, *extra_from_uploads]
-        if combined:
+
+        combined = [*base_list, *extra_from_text, *extra_from_text_urls, *extra_from_uploads]
+        # Si llega lista explícita (aunque sea vacía) o hay algo combinado, seteamos el campo
+        if combined or explicit_list_raw is not None:
             data['imagenes_adicionales'] = list(dict.fromkeys(x for x in combined if x))
 
         if imagen:

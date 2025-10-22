@@ -12,6 +12,7 @@ export default function EditReporte() {
   const [img, setImg] = useState(null);
   const [sending, setSending] = useState(false);
   const [finalizing, setFinalizing] = useState(false); // <-- nuevo
+  const [reopening, setReopening] = useState(false);   // <-- nuevo
 
   const load = () => adminService.reportes.retrieve(id).then(setItem);
 
@@ -38,6 +39,17 @@ export default function EditReporte() {
       await load();
     } finally {
       setFinalizing(false);
+    }
+  };
+
+  const onReopen = async () => { // <-- nuevo
+    if (!item || item.estado !== 'finalizado') return;
+    setReopening(true);
+    try {
+      await adminService.reportes.patch(id, { estado: 'en_revision' });
+      await load();
+    } finally {
+      setReopening(false);
     }
   };
 
@@ -91,21 +103,39 @@ export default function EditReporte() {
               <button onClick={onSaveEstado} disabled={savingEstado}>
                 {savingEstado ? 'Guardando…' : 'Guardar'}
               </button>
-              <button
-                onClick={onFinalize}
-                disabled={finalizing || isFinalizado}
-                title={isFinalizado ? 'Ya está finalizado' : 'Marcar como finalizado'}
-                style={{
-                  background: isFinalizado ? '#ddd' : '#16a34a',
-                  color: '#fff',
-                  padding: '6px 10px',
-                  borderRadius: 8,
-                  border: 'none',
-                  fontWeight: 700,
-                }}
-              >
-                {finalizing ? 'Finalizando…' : 'Finalizar'}
-              </button>
+              {!isFinalizado ? (
+                <button
+                  onClick={onFinalize}
+                  disabled={finalizing}
+                  title="Marcar como finalizado"
+                  style={{
+                    background: '#16a34a',
+                    color: '#fff',
+                    padding: '6px 10px',
+                    borderRadius: 8,
+                    border: 'none',
+                    fontWeight: 700,
+                  }}
+                >
+                  {finalizing ? 'Finalizando…' : 'Finalizar'}
+                </button>
+              ) : (
+                <button
+                  onClick={onReopen}
+                  disabled={reopening}
+                  title="Reabrir (volver a En revisión)"
+                  style={{
+                    background: '#0ea5e9',
+                    color: '#fff',
+                    padding: '6px 10px',
+                    borderRadius: 8,
+                    border: 'none',
+                    fontWeight: 700,
+                  }}
+                >
+                  {reopening ? 'Reabriendo…' : 'Reabrir'}
+                </button>
+              )}
             </div>
           </div>
 

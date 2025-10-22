@@ -107,10 +107,11 @@ export default function ListNotifications() {
           <thead>
             <tr style={{ background: '#f3f4f6', color: '#000000ff' }}>
               <th style={{ padding: '12px 8px', textAlign: 'left', width: '10%' }}>ID</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', width: '30%' }}>Usuario</th>
+              <th style={{ padding: '12px 8px', textAlign: 'left', width: '26%' }}>Usuario</th>
               <th style={{ padding: '12px 8px', textAlign: 'left' }}>Título</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', width: '20%' }}>Tipo</th>
+              <th style={{ padding: '12px 8px', textAlign: 'left', width: '12%' }}>Tipo</th>
               <th style={{ padding: '12px 8px', textAlign: 'left', width: '15%' }}>Fecha</th>
+              <th style={{ padding: '12px 8px', textAlign: 'left', width: '17%' }}>Expira</th> {/* nuevo */}
               <th style={{ padding: '12px 8px', textAlign: 'center', width: '10%' }}>Acciones</th>
             </tr>
           </thead>
@@ -138,6 +139,9 @@ export default function ListNotifications() {
                   <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{n.tipo}</td>
                   <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>
                     {fmt.date(n.fecha_creacion)}
+                  </td>
+                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>
+                    {fmt.date(n.expira)} {/* nuevo */}
                   </td>
                   <td style={{ padding: '10px 8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
                     <button

@@ -65,6 +65,21 @@ export default function EditProduct() {
     setForm((prev) => ({ ...prev, categoria_id: val }));
   };
 
+  const moveExtra = (idx, dir) => {
+    setExistingExtras((prev) => {
+      const arr = [...prev];
+      const newIdx = idx + dir;
+      if (newIdx < 0 || newIdx >= arr.length) return prev;
+      const [it] = arr.splice(idx, 1);
+      arr.splice(newIdx, 0, it);
+      return arr;
+    });
+  };
+
+  const removeExtra = (idx) => {
+    setExistingExtras((prev) => prev.filter((_, i) => i !== idx));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -77,11 +92,17 @@ export default function EditProduct() {
       fd.append('stock', String(form.stock));
       fd.append('categoria_id', String(form.categoria_id));
       fd.append('activo', form.activo ? 'true' : 'false');
+
       if (imagen) {
         fd.append('imagen', imagen);
       } else if (form.imagen_url) {
         fd.append('imagen_url', form.imagen_url);
       }
+
+      // Enviamos el orden final y eliminaciones
+      fd.append('imagenes_adicionales_list', JSON.stringify(existingExtras));
+
+      // Nuevos archivos a agregar (se añadirán al final)
       extras.forEach((file) => {
         if (file) fd.append('imagenes_adicionales', file);
       });
@@ -221,17 +242,47 @@ export default function EditProduct() {
             <div className="text-sm font-medium mb-1">Imágenes adicionales actuales</div>
             <div className="flex flex-wrap gap-8">
               {existingExtras.map((p, idx) => (
-                <div key={idx} className="w-28 h-20 rounded overflow-hidden border">
-                  <img
-                    src={resolveImageUrl(p)}
-                    alt={`extra-${idx}`}
-                    className="w-full h-full object-cover"
-                  />
+                <div key={idx} className="flex flex-col items-center gap-2">
+                  <div className="w-28 h-20 rounded overflow-hidden border">
+                    <img
+                      src={resolveImageUrl(p)}
+                      alt={`extra-${idx}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      className="px-2 py-1 text-xs border rounded"
+                      onClick={() => moveExtra(idx, -1)}
+                      disabled={idx === 0}
+                      title="Subir"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      className="px-2 py-1 text-xs border rounded"
+                      onClick={() => moveExtra(idx, 1)}
+                      disabled={idx === existingExtras.length - 1}
+                      title="Bajar"
+                    >
+                      ↓
+                    </button>
+                    <button
+                      type="button"
+                      className="px-2 py-1 text-xs border rounded text-red-600"
+                      onClick={() => removeExtra(idx)}
+                      title="Eliminar"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
             <div className="text-xs text-gray-500 mt-1">
-              (Por ahora solo agregamos; si necesitas eliminar, te lo habilito luego.)
+              Reordena con ↑/↓ y elimina con “Eliminar”. Las nuevas imágenes que agregues se añadirán al final.
             </div>
           </div>
         )}

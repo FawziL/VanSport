@@ -2,6 +2,14 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { adminService } from '@/services/auth';
 
+function toDatetimeLocalValue(isoOrNull) {
+  if (!isoOrNull) return '';
+  const d = new Date(isoOrNull);
+  if (isNaN(d.getTime())) return '';
+  const pad = (n) => n.toString().padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export default function EditNotification() {
   const { id } = useParams();
   const [form, setForm] = useState(null);
@@ -16,7 +24,12 @@ export default function EditNotification() {
       .retrieve(id)
       .then((data) => {
         if (!active) return;
-        setForm({ titulo: data.titulo || '', mensaje: data.mensaje || '', tipo: data.tipo || '' });
+        setForm({
+          titulo: data.titulo || '',
+          mensaje: data.mensaje || '',
+          tipo: data.tipo || 'banner',
+          expira: toDatetimeLocalValue(data.expira || ''),
+        });
       })
       .catch(() => setError('No se pudo cargar la notificación'))
       .finally(() => active && setLoading(false));
@@ -32,10 +45,24 @@ export default function EditNotification() {
     e.preventDefault();
     setError('');
     try {
-      await adminService.notificaciones.partialUpdate(id, form);
+      const payload = { titulo: form.titulo, mensaje: form.mensaje, tipo: form.tipo };
+      if (form.expira) {
+        const d = new Date(form.expira);
+        if (!isNaN(d.getTime())) {
+          payload.expira = d.toISOString();
+        }
+      } else {
+        payload.expira = null; // permitir limpiar la expiración
+      }
+      await adminService.notificaciones.partialUpdate(id, payload);
       navigate('/admin/notificaciones');
     } catch (err) {
-      setError(err?.detail || 'No se pudo actualizar la notificación');
+      const msg = err?.response?.data
+        ? Object.entries(err.response.data)
+            .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : String(v)}`)
+            .join(' | ')
+        : err?.message || 'No se pudo actualizar la notificación';
+      setError(msg);
     }
   };
 
@@ -56,8 +83,57 @@ export default function EditNotification() {
         </label>
         <label style={{ display: 'grid', gap: 6 }}>
           <span>Tipo</span>
-          <input name="tipo" value={form.tipo} onChange={onChange} />
+          <select name="tipo" value={form.tipo} onChange={onChange}>
+            <option value="banner">banner</option>
+            <option value="info">info</option>
+            <option value="aviso">aviso</option>
+            <option value="oferta">oferta</option>
+          </select>
         </label>
+
+        {form.tipo === 'oferta' && (
+          <div style={{ display: 'grid', gap: 6 }}>
+            <label style={{ display: 'grid', gap: 6 }}>
+              <span>Expira</span>
+              <input
+                type="datetime-local"
+                name="expira"
+                value={form.expira || ''}
+                onChange={onChange}
+              />
+              <small style={{ color: '#666' }}>
+                Fecha y hora límite de la oferta. Al llegar, el banner se ocultará.
+              </small>
+            </label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                type="button"
+                onClick={() => {
+                  const d = new Date(Date.now() + 2 * 60 * 60 * 1000);
+                  const pad = (n) => n.toString().padStart(2, '0');
+                  const val = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                  setForm((f) => ({ ...f, expira: val }));
+                }}
+                style={{ padding: '0.4rem 0.8rem', borderRadius: 6 }}
+              >
+                +2 horas
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const d = new Date(Date.now() + 24 * 60 * 60 * 1000);
+                  const pad = (n) => n.toString().padStart(2, '0');
+                  const val = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                  setForm((f) => ({ ...f, expira: val }));
+                }}
+                style={{ padding: '0.4rem 0.8rem', borderRadius: 6 }}
+              >
+                +1 día
+              </button>
+            </div>
+          </div>
+        )}
+
         <div style={{ display: 'flex', gap: 12 }}>
           <button
             type="submit"

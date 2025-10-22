@@ -19,6 +19,21 @@ function formatDuration(ms) {
   return `${h}:${m}:${s}`;
 }
 
+function makeDismissKey(n) {
+  // Fingerprint that changes when content changes
+  const parts = [
+    n.notificacion_id,
+    n.tipo || '',
+    n.titulo || '',
+    n.mensaje || '',
+    n.relacion_tipo || '',
+    n.relacion_id != null ? String(n.relacion_id) : '',
+    n.expira || '',
+  ];
+  const version = parts.join('|');
+  return `banner:dismiss:${version}`;
+}
+
 export default function HomeBanner() {
   const [banner, setBanner] = useState(null);
   const [now, setNow] = useState(Date.now());
@@ -27,7 +42,7 @@ export default function HomeBanner() {
     let alive = true;
     appService.notificaciones.latestBanner().then((n) => {
       if (!n || !n.notificacion_id) return;
-      const key = `banner:dismiss:${n.notificacion_id}`;
+      const key = makeDismissKey(n);
       if (localStorage.getItem(key)) return;
       if (alive) setBanner(n);
     });
@@ -45,7 +60,8 @@ export default function HomeBanner() {
 
   const dismiss = useCallback(() => {
     if (!banner) return;
-    localStorage.setItem(`banner:dismiss:${banner.notificacion_id}`, '1');
+    const key = makeDismissKey(banner);
+    localStorage.setItem(key, '1');
     setBanner(null);
   }, [banner]);
 
