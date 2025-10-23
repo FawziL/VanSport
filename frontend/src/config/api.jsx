@@ -1,17 +1,23 @@
-export const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+export const API_URL = import.meta.env.VITE_API_URL || ''; // en dev usa proxy ⇒ vacío
 
 // Si guardas el token en localStorage, este helper lo añade automáticamente
 function getAuthHeader() {
-  const token = localStorage.getItem('token'); // ajusta si guardas en otro lugar
+  const token = localStorage.getItem('access') || localStorage.getItem('token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-async function request(method, path, { body, headers = {}, signal } = {}) {
-  const url = `${API_URL}${path.startsWith('/') ? '' : '/'}${path}`;
+function buildUrl(base, path, params) {
+  const url = `${(base || '').replace(/\/+$/, '')}${path.startsWith('/') ? '' : '/'}${path}`;
+  if (!params) return url;
+  const qs = new URLSearchParams(params).toString();
+  return qs ? `${url}${url.includes('?') ? '&' : '?'}${qs}` : url;
+}
 
+async function request(method, path, { body, headers = {}, params, signal, responseType } = {}) {
+  const url = buildUrl(API_URL, path, params);
   const isFormData = body instanceof FormData;
   const finalHeaders = {
-    ...(!isFormData ? { 'Content-Type': 'application/json' } : {}),
+    ...(!isFormData && !responseType ? { 'Content-Type': 'application/json' } : {}),
     ...getAuthHeader(),
     ...headers,
   };
@@ -23,18 +29,19 @@ async function request(method, path, { body, headers = {}, signal } = {}) {
     signal,
   });
 
-  const contentType = res.headers.get('content-type') || '';
-  const isJson = contentType.includes('application/json');
-  const data = isJson ? await res.json() : await res.text();
-
   if (!res.ok) {
-    // Lanza un error que incluye el objeto de respuesta completo
-    const error = new Error((isJson && (data?.error || data?.detail)) || 'Error en la petición');
-    error.response = { data };
+    let errText = '';
+    try { errText = await res.text(); } catch {}
+    const error = new Error(errText || `HTTP ${res.status}`);
+    error.response = { status: res.status, data: errText };
     throw error;
   }
 
-  return data;
+  if (responseType === 'arraybuffer') return await res.arrayBuffer();
+  if (responseType === 'blob')        return await res.blob();
+
+  const ct = res.headers.get('content-type') || '';
+  return ct.includes('application/json') ? await res.json() : await res.text();
 }
 
 export const http = {

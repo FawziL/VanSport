@@ -82,6 +82,10 @@ export const adminService = {
     update: (id, data) => http.put(`/admin/productos/${encodeURIComponent(id)}/`, data),
     partialUpdate: (id, data) => http.patch(`/admin/productos/${encodeURIComponent(id)}/`, data),
     remove: (id) => http.delete(`/admin/productos/${encodeURIComponent(id)}/`),
+    export: (params) => http.get('/admin/productos/export/', {
+      params,
+      responseType: 'arraybuffer',
+    }),
   },
   usuarios: {
     list: (params) => http.get(`/admin/usuarios/${qs(params)}`),
@@ -98,6 +102,7 @@ export const adminService = {
     update: (id, data) => http.put(`/admin/pedidos/${encodeURIComponent(id)}/`, data),
     partialUpdate: (id, data) => http.patch(`/admin/pedidos/${encodeURIComponent(id)}/`, data),
     remove: (id) => http.delete(`/admin/pedidos/${encodeURIComponent(id)}/`),
+    export: (params) => http.get('/admin/pedidos/export/', { params, responseType: 'arraybuffer' }), // <-- nuevo
   },
   detallesPedido: {
     list: (params) => http.get(`/admin/detalles-pedido/${qs(params)}`),
@@ -141,6 +146,7 @@ export const adminService = {
     partialUpdate: (id, data) =>
       http.patch(`/admin/transacciones/${encodeURIComponent(id)}/`, data),
     remove: (id) => http.delete(`/admin/transacciones/${encodeURIComponent(id)}/`),
+    export: (params) => http.get('/admin/transacciones/export/', { params, responseType: 'arraybuffer' }), // <-- nuevo
   },
   envios: {
     list: (params) => http.get(`/admin/envios/${qs(params)}`),
@@ -149,6 +155,7 @@ export const adminService = {
     update: (id, data) => http.put(`/admin/envios/${encodeURIComponent(id)}/`, data),
     partialUpdate: (id, data) => http.patch(`/admin/envios/${encodeURIComponent(id)}/`, data),
     remove: (id) => http.delete(`/admin/envios/${encodeURIComponent(id)}/`),
+    export: (params) => http.get('/admin/envios/export/', { params, responseType: 'arraybuffer' }), // <-- nuevo
   },
   reportes: {
     list: (params) => http.get('/admin/reportes-fallas/', { params }),

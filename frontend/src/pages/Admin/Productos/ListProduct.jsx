@@ -16,6 +16,7 @@ export default function ListProduct() {
   const [deleteId, setDeleteId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [togglingId, setTogglingId] = useState(null);
+  const [exporting, setExporting] = useState(false);
   const navigate = useNavigate();
 
   // Fetch productos
@@ -54,6 +55,26 @@ export default function ListProduct() {
     }
   };
 
+  const handleExportExcel = async () => {
+    try {
+      setExporting(true);
+      const data = await adminService.productos.export(); // ArrayBuffer
+      const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `productos_${new Date().toISOString().slice(0,10)}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(a.href);
+    } catch (e) {
+      setError('No se pudo exportar a Excel');
+      console.error(e);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   // Paginado manual
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
@@ -85,28 +106,31 @@ export default function ListProduct() {
 
   return (
     <div style={{ maxWidth: 1100, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 18,
-        }}
-      >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
         <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Productos</h1>
-        <Link
-          to="/admin/productos/crear"
-          style={{
-            padding: '0.6rem 1.2rem',
-            borderRadius: 8,
-            background: '#1e88e5',
-            color: '#fff',
-            fontWeight: 800,
-            textDecoration: 'none',
-          }}
-        >
-          + Crear producto
-        </Link>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            type="button"
+            onClick={handleExportExcel}
+            disabled={exporting || loading}
+            title="Descargar Excel de productos"
+            style={{
+              padding: '0.6rem 1rem',
+              borderRadius: 8,
+              border: '1px solid #cfe3fb',
+              background: exporting ? '#e3f2fd' : '#f5faff',
+              color: '#1e88e5',
+              fontWeight: 800,
+              cursor: exporting || loading ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {exporting ? 'Exportando…' : 'Exportar Excel'}
+          </button>
+
+          <Link to="/admin/productos/crear" style={{ padding: '0.6rem 1.2rem', borderRadius: 8, background: '#1e88e5', color: '#fff', fontWeight: 800, textDecoration: 'none' }}>
+            + Crear producto
+          </Link>
+        </div>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>

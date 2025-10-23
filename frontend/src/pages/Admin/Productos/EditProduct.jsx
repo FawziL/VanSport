@@ -19,6 +19,7 @@ export default function EditProduct() {
     nombre: '',
     descripcion: '',
     precio: '',
+    precio_oferta: '',        // <-- nuevo
     stock: '',
     categoria_id: '',
     activo: true,
@@ -37,6 +38,7 @@ export default function EditProduct() {
           nombre: data?.nombre ?? '',
           descripcion: data?.descripcion ?? '',
           precio: data?.precio != null ? String(data.precio) : '',
+          precio_oferta: data?.precio_oferta != null ? String(data.precio_oferta) : '', // <-- nuevo
           stock: data?.stock != null ? String(data.stock) : '',
           categoria_id:
             data?.categoria?.categoria_id != null ? String(data.categoria.categoria_id) : '',
@@ -89,6 +91,7 @@ export default function EditProduct() {
       fd.append('nombre', form.nombre);
       fd.append('descripcion', form.descripcion || '');
       fd.append('precio', String(form.precio));
+      fd.append('precio_oferta', form.precio_oferta !== '' ? String(form.precio_oferta) : ''); // <-- nuevo
       fd.append('stock', String(form.stock));
       fd.append('categoria_id', String(form.categoria_id));
       fd.append('activo', form.activo ? 'true' : 'false');
@@ -166,7 +169,7 @@ export default function EditProduct() {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> {/* <-- cambia a 3 columnas */}
           <div>
             <label htmlFor="precio" className="block text-sm font-medium mb-1">
               Precio
@@ -183,6 +186,23 @@ export default function EditProduct() {
               className="border rounded px-3 py-2 w-full"
             />
           </div>
+
+          <div> {/* <-- nuevo: precio oferta */}
+            <label htmlFor="precio_oferta" className="block text-sm font-medium mb-1">
+              Precio oferta (opcional)
+            </label>
+            <input
+              id="precio_oferta"
+              name="precio_oferta"
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.precio_oferta}
+              onChange={handleChange}
+              className="border rounded px-3 py-2 w-full"
+            />
+          </div>
+
           <div>
             <label htmlFor="stock" className="block text-sm font-medium mb-1">
               Stock

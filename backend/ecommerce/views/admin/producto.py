@@ -1,3 +1,5 @@
+# pip install openpyxl
+
 from rest_framework import viewsets, permissions, status
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
@@ -6,6 +8,16 @@ import os
 import json
 from ecommerce.models import Producto
 from ecommerce.serializers import ProductoSerializer
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser
+from django.http import HttpResponse
+from django.utils import timezone
+from io import BytesIO
+from openpyxl import Workbook
+from openpyxl.styles import Font
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
+from decimal import Decimal
+from datetime import datetime
 
 class ProductoViewSetAdmin(viewsets.ModelViewSet):
     queryset = Producto.objects.all()
@@ -141,3 +153,100 @@ class ProductoViewSetAdmin(viewsets.ModelViewSet):
             for chunk in f.chunks():
                 destination.write(chunk)
         return os.path.join('media', 'productos', filename).replace('\\', '/')
+
+    # === Exportación a Excel (mover aquí, eliminar el segundo ViewSet) ===
+    def _resolve_image_url(self, path, request):
+        if not path:
+            return ''
+        s = str(path)
+        if s.lower().startswith('http'):
+            return s
+        return request.build_absolute_uri('/' + s.lstrip('/'))
+
+    def _safe_text(self, v, max_len=32767):
+        if v is None:
+            return ''
+        if isinstance(v, bool):
+            return 'Sí' if v else 'No'
+        s = str(v)
+        s = ILLEGAL_CHARACTERS_RE.sub('', s)
+        return s[:max_len]
+
+    def _safe_num(self, v):
+        if v is None or v == '':
+            return None
+        if isinstance(v, Decimal):
+            return float(v)
+        try:
+            return float(v)
+        except Exception:
+            return None
+
+    def _safe_dt(self, dt):
+        if not dt:
+            return None
+        # Excel no acepta tz-aware; quita tz
+        if getattr(dt, 'tzinfo', None) is not None:
+            dt = dt.replace(tzinfo=None)
+        return dt
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAdminUser], url_path='export')
+    def export(self, request):
+        qs = self.filter_queryset(self.get_queryset())
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = 'Productos'
+
+        headers = [
+            'ID','Nombre','Categoría','Descripción','Precio','Precio oferta',
+            'Stock','Activo','Destacado','Imagen URL',
+            'Fecha creación','Última actualización'
+        ]
+        ws.append(headers)
+        for c in ws[1]:
+            c.font = Font(bold=True)
+
+        for p in qs:
+            categoria = getattr(getattr(p, 'categoria', None), 'nombre', '') or ''
+            imagen_path = getattr(p, 'imagen_url', '') or getattr(getattr(p, 'imagen', None), 'url', '')
+            img_url = self._resolve_image_url(imagen_path, request)
+
+            row = [
+                getattr(p, 'producto_id', getattr(p, 'id', '')),
+                self._safe_text(getattr(p, 'nombre', '')),
+                self._safe_text(categoria),
+                self._safe_text(getattr(p, 'descripcion', '')),
+                self._safe_num(getattr(p, 'precio', None)),
+                self._safe_num(getattr(p, 'precio_oferta', None)),
+                self._safe_num(getattr(p, 'stock', None)),
+                self._safe_text(getattr(p, 'activo', False)),
+                self._safe_text(getattr(p, 'destacado', False)),
+                self._safe_text(img_url),
+                self._safe_dt(getattr(p, 'fecha_creacion', None)),
+                self._safe_dt(getattr(p, 'fecha_actualizacion', None)),
+            ]
+            ws.append(row)
+
+        # formatos de fecha (L y M)
+        for cell in ws['L'][1:]:
+            cell.number_format = 'yyyy-mm-dd hh:mm'
+        for cell in ws['M'][1:]:
+            cell.number_format = 'yyyy-mm-dd hh:mm'
+
+        # ancho columnas
+        for col in ws.columns:
+            max_len = max(len(str(c.value or '')) for c in col)
+            ws.column_dimensions[col[0].column_letter].width = max(10, min(60, int(max_len * 0.9)))
+
+        bio = BytesIO()
+        wb.save(bio)
+        bio.seek(0)
+
+        filename = f"productos_{timezone.now().date().isoformat()}.xlsx"
+        resp = HttpResponse(
+            bio.getvalue(),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        resp['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return resp

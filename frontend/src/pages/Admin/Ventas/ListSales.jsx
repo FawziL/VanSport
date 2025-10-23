@@ -11,6 +11,9 @@ export default function ListSales() {
   const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate,   setEndDate]   = useState('');
+  const [exporting, setExporting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,6 +59,32 @@ export default function ListSales() {
     return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
   };
 
+  const handleExportExcel = async () => {
+    try {
+      setExporting(true);
+      const params = {
+        ...(startDate ? { start_date: startDate } : {}),
+        ...(endDate   ? { end_date: endDate }     : {}),
+      };
+      const data = await adminService.transacciones.export(params); // ArrayBuffer
+      const blob = new Blob([data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `transacciones_${new Date().toISOString().slice(0,10)}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(a.href);
+    } catch (e) {
+      console.error(e);
+      setError('No se pudo exportar ventas');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div style={{ maxWidth: 1200, margin: '2.5rem auto', padding: '0 1rem' }}>
       <div
@@ -76,6 +105,34 @@ export default function ListSales() {
           options={[5, 10, 20, 50]}
           label="Por página"
         />
+      </div>
+
+            <div style={{ display: 'flex', gap: 8, alignItems: 'end', marginBottom: 12 }}>
+        <div>
+          <label className="block text-sm font-medium mb-1">Desde</label>
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
+                 className="border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Hasta</label>
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
+                 className="border rounded px-3 py-2" />
+        </div>
+        <button
+          onClick={handleExportExcel}
+          disabled={exporting}
+          style={{
+            padding: '0.6rem 1rem',
+            borderRadius: 8,
+            border: '1px solid #cfe3fb',
+            background: exporting ? '#e3f2fd' : '#f5faff',
+            color: '#1e88e5',
+            fontWeight: 800,
+            cursor: exporting ? 'not-allowed' : 'pointer',
+          }}
+        >
+          {exporting ? 'Exportando…' : 'Exportar Excel'}
+        </button>
       </div>
 
       {error && <div style={{ color: '#d32f2f', marginBottom: 12, fontWeight: 700 }}>{error}</div>}
@@ -154,7 +211,6 @@ export default function ListSales() {
           </tbody>
         </table>
       </div>
-
       <Pagination page={page} pages={pages} onChange={setPage} showNumbers />
     </div>
   );
