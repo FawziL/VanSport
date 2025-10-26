@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from 'react-router-dom';
 import { adminService } from '@/services/auth';
+import { ThemeToggleButton } from '@/components/ThemeToggleButton'; // <-- import
 
 function StatCard({ title, value, to, note }) {
   const content = (
@@ -149,7 +150,8 @@ export default function Dashboard() {
           </h1>
           <div style={{ color: '#666' }}>Gestiona tu tienda desde el panel de administración.</div>
         </div>
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <ThemeToggleButton /> {/* <-- botón modo oscuro */}
           <span style={{ color: '#888', fontSize: 13 }}>
             {new Date().toLocaleDateString('es-ES')}
           </span>
@@ -170,7 +172,9 @@ export default function Dashboard() {
           value={pendingCount}
           to="/admin/ventas/pendientes"
         />
-        <StatCard title="Productos" value={stats.productos} />
+        <StatCard title="Productos" 
+        value={stats.productos} 
+        to="/admin/productos"/>
         <StatCard
           title="Ventas totales"
           value={stats.ventasMes}

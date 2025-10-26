@@ -50,9 +50,9 @@ function AppShell() {
   const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
-    <>
+    <div className="app-shell">
       {!isAdminRoute && <Navbar />}
-      <main style={{ minHeight: '100vh' }}>
+      <main className="app-main">
         <Routes>
           {/* Públicas */}
           <Route path="/" element={<Home />} />
@@ -272,8 +272,8 @@ function AppShell() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      <Footer />
-    </>
+      {!isAdminRoute && <Footer />}
+    </div>
   );
 }
 
