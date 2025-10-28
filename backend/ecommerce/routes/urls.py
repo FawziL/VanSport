@@ -10,6 +10,8 @@ from ecommerce.views.api.notificacion import NotificacionViewSetApi
 from ecommerce.views.api.transaccion import TransaccionViewSetApi
 from ecommerce.views.api.envio import EnvioViewSetApi
 from ecommerce.views.api.reporte_falla import ReporteFallaViewSetApi
+from django.urls import path
+from ecommerce.views.api.utils import dolar_bcv_public
 
 router = routers.DefaultRouter()
 router.register(r'categorias', CategoriaViewSetApi)
@@ -24,4 +26,6 @@ router.register(r'transacciones', TransaccionViewSetApi)
 router.register(r'envios', EnvioViewSetApi)
 router.register(r'reportes-fallas', ReporteFallaViewSetApi, basename='reportes-fallas')
 
-urlpatterns = router.urls
+urlpatterns = router.urls + [
+    path('utils/dolar-bcv/', dolar_bcv_public),  # GET público
+]

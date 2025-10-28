@@ -63,6 +63,9 @@ export const appService = {
     retrieve: (id) => http.get(`/api/reportes-fallas/${id}/`),
     addFollowUp: (id, formData) => http.post(`/api/reportes-fallas/${id}/followups/`, formData),
   },
+    utils: {
+    dolarBcvHoy: () => http.get('/api/utils/dolar-bcv/'),
+  }
 };
 
 // ADMIN (/admin/...)

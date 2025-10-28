@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from 'react-router-dom';
-import { adminService } from '@/services/auth';
-import { ThemeToggleButton } from '@/components/ThemeToggleButton'; // <-- import
+import { adminService, appService } from '@/services/auth';
+import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 
 function StatCard({ title, value, to, note }) {
   const content = (
@@ -56,7 +56,19 @@ export default function Dashboard() {
     usuariosMes: 0,
   });
 
-  // Pagos pendientes
+  const [bcv, setBcv] = useState(null);
+
+  useEffect(() => {
+    appService.utils.dolarBcvHoy().then(setBcv).catch(() => setBcv(null));
+  }, []);
+
+  // En las tarjetas:
+  <StatCard
+    title="Dólar (BCV hoy)"
+    value={bcv ? `Bs ${Number(bcv.valor).toFixed(2)}` : '—'}
+    note={bcv?.fecha}
+  />
+
   useEffect(() => {
     let alive = true;
     adminService.transacciones
@@ -167,24 +179,11 @@ export default function Dashboard() {
           marginBottom: 16,
         }}
       >
-        <StatCard
-          title="Pagos pendientes"
-          value={pendingCount}
-          to="/admin/ventas/pendientes"
-        />
-        <StatCard title="Productos" 
-        value={stats.productos} 
-        to="/admin/productos"/>
-        <StatCard
-          title="Ventas totales"
-          value={stats.ventasMes}
-          note={stats.ventasDesde ? `desde ${stats.ventasDesde}` : ''}
-        />
-        <StatCard
-          title="Usuarios Registrados"
-          value={stats.usuariosTotal}
-          note={stats.usuariosMes ? `${stats.usuariosMes} desde ${stats.ventasDesde}` : ''}
-        />
+        <StatCard title="Dólar (BCV hoy)" value={bcv ? `Bs ${Number(bcv.valor).toFixed(2)}` : '—'} note={bcv?.fecha} />
+        <StatCard title="Pagos pendientes" value={pendingCount} to="/admin/ventas/pendientes" />
+        <StatCard title="Productos" value={stats.productos} to="/admin/productos" />
+        <StatCard title="Ventas totales" value={stats.ventasMes} note={stats.ventasDesde ? `desde ${stats.ventasDesde}` : ''} />
+        <StatCard title="Usuarios Registrados" value={stats.usuariosTotal} note={stats.usuariosMes ? `${stats.usuariosMes} desde ${stats.ventasDesde}` : ''} />
       </div>
 
       {/* Tarjetas de secciones */}
