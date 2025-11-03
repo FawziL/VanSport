@@ -63,9 +63,12 @@ export const appService = {
     retrieve: (id) => http.get(`/api/reportes-fallas/${id}/`),
     addFollowUp: (id, formData) => http.post(`/api/reportes-fallas/${id}/followups/`, formData),
   },
-    utils: {
+  utils: {
     dolarBcvHoy: () => http.get('/api/utils/dolar-bcv/'),
-  }
+  },
+  pagos: {
+    listarPublicos: () => http.get('/api/pagos/metodos/'),
+  },
 };
 
 // ADMIN (/admin/...)
@@ -165,6 +168,13 @@ export const adminService = {
     retrieve: (id) => http.get(`/admin/reportes-fallas/${id}/`),
     patch: (id, data) => http.patch(`/admin/reportes-fallas/${id}/`, data),
     addFollowUp: (id, formData) => http.post(`/admin/reportes-fallas/${id}/followups/`, formData),
+  },
+  pagos: {
+    list: (params) => http.get(`/admin/metodos-pago/${qs(params)}`),
+    create: (payload) => http.post('/admin/metodos-pago/', payload),
+    get: (id) => http.get(`/admin/metodos-pago/${id}/`),
+    partialUpdate: (id, payload) => http.patch(`/admin/metodos-pago/${id}/`, payload),
+    delete: (id) => http.delete(`/admin/metodos-pago/${id}/`),
   },
 };
 

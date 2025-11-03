@@ -31,6 +31,7 @@ const sections = [
   { to: '/admin/envios', label: 'Envíos', icon: <FaTruck /> },
   { to: '/admin/notificaciones', label: 'Notificaciones', icon: <FaBell /> },
   { to: '/admin/reportes', label: 'Reportes', icon: <FaTruck /> },
+  { to: '/admin/metodos-pago', label: 'Métodos de Pago', icon: <FaTags /> },
 ];
 
 const linkStyle = (isActive, collapsed) => ({

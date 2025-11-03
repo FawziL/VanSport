@@ -22,6 +22,26 @@ export default function VerPedido() {
   const [metodoPago, setMetodoPago] = useState('transferencia');
   const [referencia, setReferencia] = useState('');
 
+  // NUEVO: métodos de pago dinámicos
+  const [metodos, setMetodos] = useState([]);
+  const [metodoSel, setMetodoSel] = useState(null);
+
+  // NUEVO: BCV y total en Bs
+  const [bcv, setBcv] = useState(null);
+  const [bcvLoading, setBcvLoading] = useState(false);
+  const [bcvErr, setBcvErr] = useState('');
+  const [totalBs, setTotalBs] = useState(null);
+
+  const formatBs = (n) => {
+    const num = Number(n);
+    if (Number.isNaN(num)) return '-';
+    try {
+      return num.toLocaleString('es-VE', { style: 'currency', currency: 'VES', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    } catch {
+      return `Bs ${num.toFixed(2)}`;
+    }
+  };
+
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -48,12 +68,62 @@ export default function VerPedido() {
         if (alive) setLoading(false);
       }
     })();
+
+    // NUEVO: cargar métodos de pago públicos (para este pedido)
+    appService.pagos
+      ?.listarPublicos()
+      .then((arr) => {
+        const list = Array.isArray(arr) ? arr : arr?.results || [];
+        if (alive) {
+          setMetodos(list);
+          if (list.length) {
+            setMetodoSel(list[0]);
+            setMetodoPago(list[0].codigo); // mantener compat con variable existente
+          }
+        }
+      })
+      .catch(() => { if (alive) setMetodos([]); });
+
     return () => { alive = false; };
   }, [id, isAuthenticated]);
 
   const enRevision = !!pedido?.ultima_transaccion && pedido?.ultima_transaccion?.estado === 'pendiente';
   const mostrarFormulario = !!pedido && pedido.estado === 'creado' && !enRevision;
-  const canPay = mostrarFormulario && !paying && metodoPago && referencia.trim().length > 0;
+
+  // NUEVO: referencia requerida solo si el método lo pide (por convención en config o por tipo)
+  const requiereReferencia = !!(metodoSel?.config?.requiere_referencia || metodoSel?.tipo === 'pago_movil');
+  const canPay = mostrarFormulario && !paying && !!metodoSel && (!requiereReferencia || referencia.trim().length > 0);
+
+  // NUEVO: cuando el método es Pago Móvil, obtener BCV y calcular total en Bs
+  useEffect(() => {
+    let alive = true;
+    setTotalBs(null);
+    setBcv(null);
+    setBcvErr('');
+    if (metodoSel?.tipo === 'pago_movil' && pedido?.total != null) {
+      setBcvLoading(true);
+      appService.utils
+        .dolarBcvHoy()
+        .then((data) => {
+          if (!alive) return;
+          setBcv(data);
+          const tasa = Number(data?.valor);
+          const total = Number(pedido.total);
+          if (!Number.isNaN(tasa) && !Number.isNaN(total)) {
+            setTotalBs(total * tasa);
+          } else {
+            setBcvErr('Tasa inválida');
+          }
+        })
+        .catch(() => {
+          if (alive) setBcvErr('No se pudo obtener la tasa BCV');
+        })
+        .finally(() => alive && setBcvLoading(false));
+    }
+    return () => {
+      alive = false;
+    };
+  }, [metodoSel?.tipo, pedido?.total]);
 
   return (
     <div style={{ maxWidth: 1100, margin: '2rem auto', padding: '0 1rem', color: '#111827' }}>
@@ -117,6 +187,29 @@ export default function VerPedido() {
               <span style={{ color: '#6b7280' }}>Total</span>
               <span style={{ fontWeight: 900 }}>{formatPrice(pedido.total)}</span>
             </div>
+
+            {/* NUEVO: mostrar total en Bs solo si es Pago Móvil */}
+            {metodoSel?.tipo === 'pago_movil' && (
+              <div style={{ marginBottom: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#6b7280' }}>
+                    Total en Bs (BCV hoy{bcv?.desactualizado ? ' – anterior' : ''})
+                  </span>
+                  <span style={{ fontWeight: 900 }}>
+                    {bcvLoading ? 'Calculando…' : (bcvErr ? '—' : formatBs(totalBs))}
+                  </span>
+                </div>
+                {bcv?.fecha && (
+                  <div style={{ color: '#9ca3af', fontSize: 12, marginTop: 4 }}>
+                    Tasa: {Number(bcv.valor).toFixed(2)} Bs/USD · Fecha: {bcv.fecha}
+                  </div>
+                )}
+                {bcvErr && (
+                  <div style={{ color: '#b91c1c', fontSize: 12, marginTop: 4 }}>{bcvErr}</div>
+                )}
+              </div>
+            )}
+
             {pedido.ultima_transaccion && (
               <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 10, padding: '0.75rem 0.9rem', marginBottom: 12 }}>
                 <div style={{ fontWeight: 800, marginBottom: 6 }}>Último pago</div>
@@ -127,29 +220,69 @@ export default function VerPedido() {
             )}
             {mostrarFormulario && (
               <>
+                {/* NUEVO: métodos de pago dinámicos */}
                 <div style={{ marginBottom: 10 }}>
-                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 6 }}>Método de pago</label>
-                  <select value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: 10, padding: '0.6rem 0.8rem' }}>
-                    <option value="transferencia">Transferencia bancaria</option>
-                    <option value="yape">Yape/Plin</option>
-                    <option value="tarjeta">Tarjeta</option>
-                    <option value="efectivo">Efectivo (en tienda)</option>
-                  </select>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <label style={{ display: 'block', fontWeight: 800, marginBottom: 6 }}>Método de pago</label>
+                    {metodos.length === 0 && <span style={{ color: '#6b7280', fontSize: 13 }}>No hay métodos disponibles</span>}
+                  </div>
+                  {metodos.length > 0 && (
+                    <div style={{ display: 'grid', gap: 8 }}>
+                      {metodos.map((m) => (
+                        <label key={m.codigo} style={{ display: 'flex', gap: 8, padding: '8px 10px', border: '1px solid #e5e7eb', borderRadius: 10 }}>
+                          <input
+                            type="radio"
+                            name="metodo_pago"
+                            value={m.codigo}
+                            checked={metodoSel?.codigo === m.codigo}
+                            onChange={() => { setMetodoSel(m); setMetodoPago(m.codigo); }}
+                          />
+                          <div>
+                            <div style={{ fontWeight: 800 }}>
+                              {m.nombre} <span style={{ color: '#6b7280', fontWeight: 400 }}>({m.descripcion})</span>
+                            </div>
+                            {m.instrucciones && (
+                              <div style={{ color: '#64748b', fontSize: 13, whiteSpace: 'pre-wrap' }}>{m.instrucciones}</div>
+                            )}
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div style={{ marginBottom: 14 }}>
-                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 6 }}>Número de referencia / comprobante</label>
-                  <input value={referencia} onChange={(e) => setReferencia(e.target.value)} placeholder="# de operación o referencia" style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: 10, padding: '0.6rem 0.8rem' }} />
-                  <div style={{ fontSize: 12, color: '#6b7280', marginTop: 6 }}>Adjunta el número de operación o describe el comprobante. El admin validará tu pago.</div>
-                </div>
+
+                {/* NUEVO: referencia solo si aplica */}
+                {requiereReferencia && (
+                  <div style={{ marginBottom: 14 }}>
+                    <label style={{ display: 'block', fontWeight: 800, marginBottom: 6 }}>Número de referencia / comprobante</label>
+                    <input
+                      value={referencia}
+                      onChange={(e) => setReferencia(e.target.value)}
+                      placeholder="# de operación o referencia"
+                      style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: 10, padding: '0.6rem 0.8rem' }}
+                    />
+                    <div style={{ fontSize: 12, color: '#6b7280', marginTop: 6 }}>
+                      Ingresa la referencia del pago. El admin validará tu comprobante.
+                    </div>
+                  </div>
+                )}
               </>
             )}
+
             <button
               disabled={!canPay}
               onClick={async () => {
                 setErrMsg('');
                 setPaying(true);
                 try {
-                  await appService.transacciones.pay({ pedido_id: id, metodo_pago: metodoPago, codigo_transaccion: referencia, monto: pedido.total });
+                  await appService.transacciones.pay({
+                    pedido_id: id,
+                    // enviar el código del método seleccionado
+                    metodo_pago: metodoSel?.codigo || metodoPago,
+                    // si no se requiere, enviamos vacío
+                    codigo_transaccion: requiereReferencia ? referencia : '',
+                    monto: pedido.total,
+                  });
                   const p = await appService.pedidos.retrieve(id);
                   setPedido(p);
                 } catch (e) {
@@ -169,7 +302,7 @@ export default function VerPedido() {
                 ? 'Pagado'
                 : enRevision
                 ? 'Pago en revisión'
-                : 'Enviar comprobante'}
+                : (metodoSel?.tipo === 'paypal' ? 'Registrar pago (PayPal)' : 'Enviar comprobante')}
             </button>
           </div>
         </div>

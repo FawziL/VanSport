@@ -43,6 +43,7 @@ const sections = [
   { to: '/admin/envios', label: 'Envíos', desc: 'Configura y monitorea envíos' },
   { to: '/admin/notificaciones', label: 'Notificaciones', desc: 'Mensajería y avisos a clientes' },
   { to: '/admin/reportes', label: 'Reportes', desc: 'Gestiona reportes de fallas' },
+  { to: '/admin/metodos-pago', label: 'Métodos de Pago', desc: 'Configura los métodos de pago' },
 ];
 
 export default function Dashboard() {
