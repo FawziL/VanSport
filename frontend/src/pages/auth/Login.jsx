@@ -10,25 +10,18 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-
-  // --- PALETA DE COLORES (Definida como constantes separadas para fácil referencia) ---
-  const PRIMARY_COLOR = '#FF4136'; // Rojo vibrante/energía
-  const SECONDARY_COLOR = '#0074D9'; // Azul eléctrico
-  const TEXT_COLOR = '#333333';
-  const ERROR_COLOR = '#D9534F';
-  const SUCCESS_COLOR = '#5CB85C';
-  const BORDER_COLOR = '#DDDDDD';
-  const BG_LIGHT = '#F4F4F4';
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess(false);
+    setLoading(true);
+    
     try {
       const data = await authService.login(email, password);
       login(data.user, data.access);
       setSuccess(true);
-      // Retraso breve para que el usuario vea el mensaje de éxito antes de la redirección
       setTimeout(() => navigate('/'), 1000); 
     } catch (err) {
       const data = err?.response?.data;
@@ -43,171 +36,106 @@ function Login() {
       } else {
         setError(err.message || 'Error de autenticación. Verifica tus credenciales.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    // CONTENEDOR PRINCIPAL
-    <div 
-      style={{
-        maxWidth: 450,
-        margin: '3rem auto',
-        padding: '40px 30px',
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
-        fontFamily: 'sans-serif',
-      }}
-    >
-      {/* TÍTULO */}
-      <h2 
-        style={{
-          textAlign: 'center',
-          marginBottom: '30px',
-          fontSize: '2rem',
-          fontWeight: 800,
-          color: TEXT_COLOR,
-          borderBottom: `3px solid ${PRIMARY_COLOR}`,
-          paddingBottom: '10px',
-          letterSpacing: '1px',
-          textTransform: 'uppercase',
-        }}
-      >
-        INICIO DE SESION
-      </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 p-5 font-sans">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white p-8 text-center">
+          <h2 className="text-2xl font-bold mb-2">Bienvenido de nuevo</h2>
+          <p className="opacity-90 text-sm">Ingresa a tu cuenta para continuar</p>
+        </div>
 
-      <form onSubmit={handleSubmit}>
-        {/* INPUT DE CORREO */}
-        <input
-          type="email"
-          placeholder="Tu Correo Electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{
-            display: 'block',
-            width: '92%',
-            padding: '12px 15px',
-            marginBottom: '20px',
-            border: `2px solid ${BORDER_COLOR}`,
-            borderRadius: '8px',
-            fontSize: '1rem',
-            fontWeight: 600,
-            outline: 'none',
-            // Nota: Los pseudo-selectores como :hover o :focus no funcionan directamente en estilos en línea, solo con CSS externo o librerías específicas.
-          }}
-        />
-
-        {/* INPUT DE CONTRASEÑA */}
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{
-            display: 'block',
-            width: '92%',
-            padding: '12px 15px',
-            marginBottom: '20px',
-            border: `2px solid ${BORDER_COLOR}`,
-            borderRadius: '8px',
-            fontSize: '1rem',
-            fontWeight: 600,
-            outline: 'none',
-          }}
-        />
-
-        {/* BOTÓN DE ENTRAR */}
-        <button 
-          type="submit" 
-          style={{
-            width: '100%',
-            padding: '14px',
-            backgroundColor: PRIMARY_COLOR,
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            fontSize: '1.1rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            transition: 'background-color 0.3s', // Mantengo transition aunque :hover no funciona directo
-          }}
-        >
-          INICIAR SESION
-        </button>
-
-        {/* MENSAJE DE ERROR */}
-        {error && (
-          <div 
-            style={{ 
-              padding: '10px',
-              marginTop: '15px',
-              borderRadius: '6px',
-              fontWeight: 600,
-              textAlign: 'center',
-              backgroundColor: '#F2DEDE',
-              color: ERROR_COLOR,
-              border: `1px solid ${ERROR_COLOR}`,
-            }}
-          >
-            ❌ {error}
+        <form onSubmit={handleSubmit} className="p-8">
+          <div className="mb-5">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Correo Electrónico
+            </label>
+            <input
+              id="email"
+              type="email"
+              placeholder="tu.correo@ejemplo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={loading}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base transition-all duration-200 focus:outline-none focus:ring-3 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-70"
+            />
           </div>
-        )}
 
-        {/* MENSAJE DE ÉXITO */}
-        {success && (
-          <div 
-            style={{ 
-              padding: '10px',
-              marginTop: '15px',
-              borderRadius: '6px',
-              fontWeight: 600,
-              textAlign: 'center',
-              backgroundColor: '#D9EDF7',
-              color: SECONDARY_COLOR,
-              border: `1px solid ${SECONDARY_COLOR}`,
-            }}
-          >
-            ✅ ¡Login Exitoso! Redirigiendo...
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              Contraseña
+            </label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Tu contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base transition-all duration-200 focus:outline-none focus:ring-3 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-70"
+            />
           </div>
-        )}
-      </form>
 
-      {/* ENLACES RÁPIDOS */}
-      <div 
-        style={{ 
-          marginTop: 25,
-          display: 'flex',
-          justifyContent: 'space-between',
-          paddingTop: 15,
-          borderTop: '1px solid #EEEEEE',
-        }}
-      >
-        <Link 
-          to="/register" 
-          style={{
-            color: SECONDARY_COLOR,
-            textDecoration: 'none',
-            fontWeight: 700,
-            fontSize: '0.9rem',
-          }}
-        >
-          ⭐ Crear una Nueva Cuenta
-        </Link>
-        <Link 
-          to="/password-reset" 
-          style={{ 
-            color: SECONDARY_COLOR,
-            textDecoration: 'none',
-            fontWeight: 700,
-            fontSize: '0.9rem',
-          }}
-        >
-          🔑 ¿Olvidaste tu Acceso?
-        </Link>
+          <button 
+            type="submit" 
+            disabled={loading}
+            className={`w-full py-3.5 px-4 bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-lg font-semibold text-base transition-all duration-200 flex items-center justify-center gap-2
+              ${loading 
+                ? 'bg-gray-400 cursor-not-allowed opacity-70' 
+                : 'hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40'
+              } disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none`}
+          >
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-transparent border-t-white rounded-full animate-spin"></div>
+                Iniciando sesión...
+              </>
+            ) : (
+              'Iniciar Sesión'
+            )}
+          </button>
+
+          {error && (
+            <div className="mt-4 bg-red-50 text-red-700 p-3 rounded-lg text-sm border-l-4 border-red-600 flex items-center gap-2">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className="flex-shrink-0">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+              </svg>
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="mt-4 bg-green-50 text-green-800 p-3 rounded-lg text-sm border-l-4 border-green-500 flex items-center gap-2">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className="flex-shrink-0">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L7.28 10.22a.75.75 0 00-1.06 1.04l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+              </svg>
+              ¡Inicio de sesión exitoso! Redirigiendo...
+            </div>
+          )}
+        </form>
+
+        <div className="px-8 py-6 text-center border-t border-gray-200">
+          <div className="flex flex-col gap-3">
+            <Link 
+              to="/register" 
+              className="text-indigo-600 font-medium text-sm transition-colors duration-200 hover:text-purple-600 hover:underline"
+            >
+              ¿No tienes cuenta? Regístrate
+            </Link>
+            <Link 
+              to="/password-reset" 
+              className="text-indigo-600 font-medium text-sm transition-colors duration-200 hover:text-purple-600 hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
