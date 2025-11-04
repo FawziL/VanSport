@@ -65,91 +65,54 @@ export default function Home() {
       alive = false;
     };
   }, []);
+  
   return (
     <>
       <HomeBanner />
       <div>
         {/* Hero */}
-        <section
-          style={{
-            background: 'linear-gradient(90deg, #131313 60%, #1e88e5 100%)',
-            color: '#fff',
-            padding: '3.5rem 0 2.5rem',
-            textAlign: 'center',
-          }}
-        >
-          <h1 style={{ fontSize: 38, fontWeight: 800, marginBottom: 12 }}>¡Equípate para ganar!</h1>
-          <p style={{ fontSize: 20, color: '#e0e0e0', marginBottom: 28 }}>
+        <section className="bg-gradient-to-r from-[#131313] from-60% to-[#1e88e5] to-100% text-white py-14 pb-10 text-center">
+          <h1 className="text-4xl font-extrabold mb-3">¡Equípate para ganar!</h1>
+          <p className="text-xl text-gray-300 mb-7">
             Todo lo que necesitas para tu deporte favorito, en un solo lugar.
           </p>
           <Link
             to="/productos"
-            style={{
-              background: '#fff',
-              color: '#131313',
-              fontWeight: 700,
-              padding: '0.8rem 2.2rem',
-              borderRadius: 30,
-              fontSize: 18,
-              textDecoration: 'none',
-              boxShadow: '0 2px 12px rgba(30,136,229,0.08)',
-              transition: 'background 0.2s',
-            }}
+            className="bg-white text-[#131313] font-bold py-3 px-9 rounded-full text-lg no-underline shadow-lg shadow-blue-500/20 transition-colors duration-200 inline-block hover:bg-gray-100"
           >
             Ver productos
           </Link>
         </section>
+
         {/* Categorías destacadas */}
-        <section style={{ maxWidth: 1200, margin: '2.5rem auto', padding: '0 1rem' }}>
-          <h2 style={{ fontSize: 26, fontWeight: 700, marginBottom: 18, textAlign: 'center' }}>
+        <section className="max-w-7xl mx-auto my-10 px-4">
+          <h2 className="text-2xl font-bold mb-5 text-center">
             Categorías destacadas
           </h2>
           {catsError && (
-            <div style={{ textAlign: 'center', color: '#c62828', marginBottom: 10, fontWeight: 700 }}>
+            <div className="text-center text-red-700 mb-3 font-bold">
               {catsError}
             </div>
           )}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: 24,
-              marginBottom: 10,
-            }}
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-3">
             {(catsLoading ? Array.from({ length: 3 }) : cats).map((cat, idx) => (
               <Link
                 to={cat ? `/productos?categoria_id=${encodeURIComponent(cat.id)}` : '#'}
                 key={cat ? cat.id : idx}
-                style={{
-                  display: 'block',
-                  background: '#fafafa',
-                  borderRadius: 18,
-                  overflow: 'hidden',
-                  boxShadow: '0 2px 12px rgba(30,136,229,0.07)',
-                  textDecoration: 'none',
-                  color: '#222',
-                  transition: 'transform 0.15s',
-                  cursor: 'pointer',
-                }}
+                className="block bg-gray-50 rounded-xl overflow-hidden shadow-md shadow-blue-500/10 no-underline text-gray-800 transition-transform duration-150 cursor-pointer hover:scale-105"
               >
                 {catsLoading ? (
-                  <div style={{ width: '100%', height: 140, background: '#eee' }} />
+                  <div className="w-full h-36 bg-gray-200" />
                 ) : (
                   <img
                     src={cat.img}
                     alt={cat.name}
-                    style={{
-                      width: '100%',
-                      height: 140,
-                      objectFit: 'cover',
-                      display: 'block',
-                    }}
+                    className="w-full h-36 object-cover block"
                   />
                 )}
-                <div style={{ padding: '1rem', textAlign: 'center', fontWeight: 600 }}>
+                <div className="p-4 text-center font-semibold">
                   {catsLoading ? (
-                    <div style={{ height: 20, background: '#eee', borderRadius: 8 }} />
+                    <div className="h-5 bg-gray-200 rounded-lg" />
                   ) : (
                     cat.name
                   )}
@@ -160,61 +123,40 @@ export default function Home() {
         </section>
 
         {/* Productos destacados */}
-        <section style={{ maxWidth: 1200, margin: '2.5rem auto', padding: '0 1rem' }}>
-          <h2 style={{ fontSize: 26, fontWeight: 700, marginBottom: 18, textAlign: 'center' }}>
+        <section className="max-w-7xl mx-auto my-10 px-4">
+          <h2 className="text-2xl font-bold mb-5 text-center">
             Más populares
           </h2>
           {error && (
-            <div style={{ textAlign: 'center', color: '#c62828', marginBottom: 10, fontWeight: 700 }}>
+            <div className="text-center text-red-700 mb-3 font-bold">
               {error}
             </div>
           )}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: 24,
-            }}
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {(loading ? Array.from({ length: 3 }) : featured).map((prod, idx) => (
               <Link
                 to={prod ? `/productos/${prod.id}` : '#'}
                 key={prod ? prod.id : idx}
-                style={{
-                  display: 'block',
-                  background: '#fff',
-                  borderRadius: 18,
-                  overflow: 'hidden',
-                  boxShadow: '0 2px 12px rgba(30,136,229,0.09)',
-                  textDecoration: 'none',
-                  color: '#222',
-                  transition: 'transform 0.15s',
-                  cursor: 'pointer',
-                }}
+                className="block bg-white rounded-xl overflow-hidden shadow-md shadow-blue-500/20 no-underline text-gray-800 transition-transform duration-150 cursor-pointer hover:scale-105"
               >
                 {loading ? (
-                  <div style={{ width: '100%', height: 160, background: '#eee' }} />
+                  <div className="w-full h-40 bg-gray-200" />
                 ) : (
                   <img
                     src={prod.img}
                     alt={prod.name}
-                    style={{
-                      width: '100%',
-                      height: 160,
-                      objectFit: 'cover',
-                      display: 'block',
-                    }}
+                    className="w-full h-40 object-cover block"
                   />
                 )}
-                <div style={{ padding: '1rem' }}>
+                <div className="p-4">
                   {loading ? (
-                    <div style={{ height: 20, background: '#eee', borderRadius: 8 }} />
+                    <div className="h-5 bg-gray-200 rounded-lg" />
                   ) : (
                     <>
-                      <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 6 }}>
+                      <div className="font-bold text-lg mb-2">
                         {prod.name}
                       </div>
-                      <div style={{ color: '#1e88e5', fontWeight: 700, fontSize: 17 }}>
+                      <div className="text-blue-600 font-bold text-lg">
                         {Number(prod.price).toLocaleString('es-ES', {
                           style: 'currency',
                           currency: 'USD',
@@ -229,34 +171,16 @@ export default function Home() {
         </section>
 
         {/* CTA final */}
-        <section
-          style={{
-            background: 'linear-gradient(90deg, #1e88e5 60%, #131313 100%)',
-            color: '#fff',
-            padding: '2.5rem 0 2rem',
-            textAlign: 'center',
-            marginTop: 40,
-          }}
-        >
-          <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 10 }}>
+        <section className="bg-gradient-to-r from-[#1e88e5] from-60% to-[#131313] to-100% text-white py-10 pb-8 text-center mt-10">
+          <h2 className="text-3xl font-extrabold mb-3">
             ¿Listo para tu próxima meta?
           </h2>
-          <p style={{ fontSize: 18, color: '#e0e0e0', marginBottom: 22 }}>
+          <p className="text-lg text-gray-300 mb-6">
             Descubre ofertas exclusivas y productos de calidad.
           </p>
           <Link
             to="/productos"
-            style={{
-              background: '#fff',
-              color: '#1e88e5',
-              fontWeight: 700,
-              padding: '0.7rem 2rem',
-              borderRadius: 30,
-              fontSize: 17,
-              textDecoration: 'none',
-              boxShadow: '0 2px 12px rgba(30,136,229,0.08)',
-              transition: 'background 0.2s',
-            }}
+            className="bg-white text-blue-600 font-bold py-3 px-8 rounded-full text-lg no-underline shadow-lg shadow-blue-500/20 transition-colors duration-200 inline-block hover:bg-gray-100"
           >
             Comprar ahora
           </Link>

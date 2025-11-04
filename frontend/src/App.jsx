@@ -3,7 +3,7 @@ import './App.css';
 import Login from '@/pages/Auth/Login';
 import Register from '@/pages/Auth/Register';
 import PasswordReset from '@/pages/Auth/PasswordReset';
-import PasswordResetConfirm from '@/pages/Auth/PasswordResetConfirm'; // <-- nuevo
+import PasswordResetConfirm from '@/pages/Auth/PasswordResetConfirm';
 import Navbar from '@/components/Navbar';
 import NotFound from '@/pages/App/NotFound';
 import Home from '@/pages/App/Home/Home';
@@ -43,7 +43,7 @@ import MisReportes from '@/pages/App/Reportes/MisReportes';
 import VerReporte from '@/pages/App/Reportes/VerReporte';
 import ListReportes from '@/pages/Admin/Reportes/ListReport';
 import EditReporte from '@/pages/Admin/Reportes/EditReport';
-import Footer from '@/components/Footer'; // importa el componente
+import Footer from '@/components/Footer';
 
 function AppShell() {
   const location = useLocation();
@@ -61,7 +61,7 @@ function AppShell() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/password-reset" element={<PasswordReset />} />
-          <Route path="/password-reset/confirm" element={<PasswordResetConfirm />} /> {/* <-- nuevo */}
+          <Route path="/password-reset/confirm" element={<PasswordResetConfirm />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/pedidos" element={<MisPedidos />} />
           <Route path="/pedidos/:id" element={<VerPedido />} />
