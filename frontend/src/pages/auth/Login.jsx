@@ -42,16 +42,18 @@ function Login() {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <h2>Bienvenido de nuevo</h2>
-          <p>Ingresa a tu cuenta para continuar</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 p-5 font-sans">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white p-8 text-center">
+          <h2 className="text-2xl font-bold mb-2">Bienvenido de nuevo</h2>
+          <p className="opacity-90 text-sm">Ingresa a tu cuenta para continuar</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label htmlFor="email">Correo Electrónico</label>
+        <form onSubmit={handleSubmit} className="p-8">
+          <div className="mb-5">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Correo Electrónico
+            </label>
             <input
               id="email"
               type="email"
@@ -60,11 +62,14 @@ function Login() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base transition-all duration-200 focus:outline-none focus:ring-3 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-70"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              Contraseña
+            </label>
             <input
               id="password"
               type="password"
@@ -73,17 +78,22 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={loading}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base transition-all duration-200 focus:outline-none focus:ring-3 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-70"
             />
           </div>
 
           <button 
             type="submit" 
-            className={`submit-btn ${loading ? 'submitting' : ''}`}
             disabled={loading}
+            className={`w-full py-3.5 px-4 bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-lg font-semibold text-base transition-all duration-200 flex items-center justify-center gap-2
+              ${loading 
+                ? 'bg-gray-400 cursor-not-allowed opacity-70' 
+                : 'hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40'
+              } disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none`}
           >
             {loading ? (
               <>
-                <div className="spinner"></div>
+                <div className="w-4 h-4 border-2 border-transparent border-t-white rounded-full animate-spin"></div>
                 Iniciando sesión...
               </>
             ) : (
@@ -92,8 +102,8 @@ function Login() {
           </button>
 
           {error && (
-            <div className="error-message">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <div className="mt-4 bg-red-50 text-red-700 p-3 rounded-lg text-sm border-l-4 border-red-600 flex items-center gap-2">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className="flex-shrink-0">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
               </svg>
               {error}
@@ -101,8 +111,8 @@ function Login() {
           )}
 
           {success && (
-            <div className="success-message">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <div className="mt-4 bg-green-50 text-green-800 p-3 rounded-lg text-sm border-l-4 border-green-500 flex items-center gap-2">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className="flex-shrink-0">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L7.28 10.22a.75.75 0 00-1.06 1.04l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
               </svg>
               ¡Inicio de sesión exitoso! Redirigiendo...
@@ -110,227 +120,23 @@ function Login() {
           )}
         </form>
 
-        <div className="login-footer">
-          <div className="footer-links">
-            <Link to="/register" className="login-link">
+        <div className="px-8 py-6 text-center border-t border-gray-200">
+          <div className="flex flex-col gap-3">
+            <Link 
+              to="/register" 
+              className="text-indigo-600 font-medium text-sm transition-colors duration-200 hover:text-purple-600 hover:underline"
+            >
               ¿No tienes cuenta? Regístrate
             </Link>
-            <Link to="/password-reset" className="login-link">
+            <Link 
+              to="/password-reset" 
+              className="text-indigo-600 font-medium text-sm transition-colors duration-200 hover:text-purple-600 hover:underline"
+            >
               ¿Olvidaste tu contraseña?
             </Link>
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .login-container {
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          padding: 20px;
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .login-card {
-          background: white;
-          border-radius: 16px;
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-          width: 100%;
-          max-width: 450px;
-          overflow: hidden;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .login-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .login-header {
-          background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-          color: white;
-          padding: 2rem;
-          text-align: center;
-        }
-
-        .login-header h2 {
-          margin: 0 0 0.5rem 0;
-          font-size: 1.8rem;
-          font-weight: 700;
-        }
-
-        .login-header p {
-          margin: 0;
-          opacity: 0.9;
-          font-size: 0.95rem;
-        }
-
-        .login-form {
-          padding: 2rem;
-        }
-
-        .form-group {
-          margin-bottom: 1.25rem;
-        }
-
-        .form-group label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-weight: 500;
-          color: #374151;
-          font-size: 0.9rem;
-        }
-
-        .form-group input {
-          width: 100%;
-          padding: 0.75rem 1rem;
-          border: 1px solid #d1d5db;
-          border-radius: 8px;
-          font-size: 1rem;
-          transition: all 0.2s ease;
-          box-sizing: border-box;
-        }
-
-        .form-group input:focus {
-          outline: none;
-          border-color: #4f46e5;
-          box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .form-group input:disabled {
-          background-color: #f9fafb;
-          cursor: not-allowed;
-          opacity: 0.7;
-        }
-
-        .submit-btn {
-          width: 100%;
-          padding: 0.875rem;
-          background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-          color: white;
-          border: none;
-          border-radius: 8px;
-          font-size: 1rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-        }
-
-        .submit-btn:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
-        }
-
-        .submit-btn:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-          transform: none;
-        }
-
-        .submit-btn.submitting {
-          background: #9ca3af;
-        }
-
-        .spinner {
-          width: 18px;
-          height: 18px;
-          border: 2px solid transparent;
-          border-top: 2px solid white;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-
-        .error-message {
-          background-color: #fee2e2;
-          color: #dc2626;
-          padding: 0.75rem;
-          border-radius: 8px;
-          margin-top: 1rem;
-          font-size: 0.9rem;
-          border-left: 4px solid #dc2626;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .success-message {
-          background-color: #d1fae5;
-          color: #065f46;
-          padding: 0.75rem;
-          border-radius: 8px;
-          margin-top: 1rem;
-          font-size: 0.9rem;
-          border-left: 4px solid #10b981;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .login-footer {
-          padding: 1.5rem 2rem;
-          text-align: center;
-          border-top: 1px solid #e5e7eb;
-        }
-
-        .footer-links {
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-        }
-
-        .login-link {
-          color: #4f46e5;
-          text-decoration: none;
-          font-weight: 500;
-          font-size: 0.9rem;
-          transition: color 0.2s ease;
-        }
-
-        .login-link:hover {
-          color: #7c3aed;
-          text-decoration: underline;
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-          .login-container {
-            padding: 10px;
-          }
-          
-          .login-form {
-            padding: 1.5rem;
-          }
-          
-          .login-header {
-            padding: 1.5rem;
-          }
-          
-          .login-header h2 {
-            font-size: 1.5rem;
-          }
-          
-          .footer-links {
-            gap: 1rem;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .login-footer {
-            padding: 1rem 1.5rem;
-          }
-        }
-      `}</style>
     </div>
   );
 }
