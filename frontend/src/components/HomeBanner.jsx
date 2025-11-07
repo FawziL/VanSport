@@ -20,7 +20,6 @@ function formatDuration(ms) {
 }
 
 function makeDismissKey(n) {
-  // Fingerprint that changes when content changes
   const parts = [
     n.notificacion_id,
     n.tipo || '',
