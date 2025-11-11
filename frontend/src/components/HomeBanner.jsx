@@ -151,21 +151,7 @@ export default function HomeBanner() {
               {cta.label} ↗
             </a>
           )}
-          <button
-            onClick={dismiss}
-            title="Cerrar"
-            style={{
-              background: 'transparent',
-              border: '1px solid #fff',
-              color: '#fff',
-              borderRadius: 8,
-              padding: '6px 10px',
-              fontWeight: 800,
-            }}
-          >
-            ✕
-          </button>
-        </div>
+          </div>
       </div>
     </div>
   );
