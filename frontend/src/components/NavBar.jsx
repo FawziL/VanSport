@@ -3,7 +3,6 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { appService } from '@/services/auth';
 import { FaShoppingCart } from 'react-icons/fa';
-import { ThemeToggleButton } from '../components/ThemeToggleButton';
 
 export default function NavBar() {
   const { user, logout } = useAuth();
@@ -121,7 +120,6 @@ export default function NavBar() {
             </div>
 
             <div className="nav-right">
-              <ThemeToggleButton />
               <NavLink to="/carrito" style={linkStyle}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                   <FaShoppingCart />
