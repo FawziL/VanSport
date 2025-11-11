@@ -1,4 +1,4 @@
-export const API_URL = import.meta.env.VITE_API_URL || ''; // en dev usa proxy ⇒ vacío
+export const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'; // en dev usa proxy ⇒ vacío
 
 // Si guardas el token en localStorage, este helper lo añade automáticamente
 function getAuthHeader() {

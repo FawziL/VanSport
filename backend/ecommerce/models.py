@@ -130,6 +130,10 @@ class Transaccion(models.Model):
 	estado = models.CharField(max_length=50)
 	fecha_transaccion = models.DateTimeField(db_column='fecha_transaccion')
 	codigo_transaccion = models.CharField(max_length=100)
+	metodo_pago_codigo = models.SlugField(max_length=50)      # snapshot del método seleccionado
+	referencia = models.CharField(max_length=100, blank=True, default='')
+	comprobante = models.ImageField(upload_to='transacciones/', blank=True, null=True)
+	notas_pago = models.TextField(blank=True, default='')
 
 	class Meta:
 		db_table = 'transacciones'
@@ -178,3 +182,25 @@ class ReporteFallaFollowUp(models.Model):
     class Meta:
         db_table = 'reportes_falla_followups'
         managed = True
+
+class MetodoPago(models.Model):
+    codigo = models.SlugField(max_length=50, unique=True)     # ej: paypal, pago_movil, efectivo
+    nombre = models.CharField(max_length=80)
+    tipo = models.CharField(max_length=40)                    # no limitado; ej: paypal, pago_movil, efectivo, zelle, etc.
+    activo = models.BooleanField(default=True)
+    orden = models.PositiveIntegerField(default=0)
+
+    descripcion = models.TextField(blank=True, default='')
+    instrucciones = models.TextField(blank=True, default='')  # texto a mostrar en checkout
+    config = models.JSONField(default=dict, blank=True)       # datos específicos (banco, teléfono, etc.)
+    icono = models.CharField(max_length=80, blank=True, default='')  # nombre de icono en FE (opcional)
+
+    actualizado = models.DateTimeField(auto_now=True)
+    creado = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'metodos_pago'
+        ordering = ['orden', 'id']
+
+    def __str__(self):
+        return f'{self.nombre} ({self.tipo})'

@@ -43,7 +43,10 @@ import MisReportes from '@/pages/App/Reportes/MisReportes';
 import VerReporte from '@/pages/App/Reportes/VerReporte';
 import ListReportes from '@/pages/Admin/Reportes/ListReport';
 import EditReporte from '@/pages/Admin/Reportes/EditReport';
-import Footer from '@/components/Footer';
+import Footer from '@/components/Footer'; // importa el componente
+import ListPaymentMethods from '@/pages/Admin/MetodosPago/ListPaymentMethods';
+import CreatePaymentMethod from '@/pages/Admin/MetodosPago/CreatePaymentMethod';
+import EditPaymentMethod from '@/pages/Admin/MetodosPago/EditPaymentMethod';
 
 function AppShell() {
   const location = useLocation();
@@ -268,6 +271,11 @@ function AppShell() {
           {/* Reportes Admin */}
           <Route path="/admin/reportes" element={<AdminPage><ListReportes /></AdminPage>} />
           <Route path="/admin/reportes/:id" element={<AdminPage><EditReporte /></AdminPage>} />
+
+          {/* Pagos Admin */}
+          <Route path="/admin/metodos-pago" element={<AdminPage><ListPaymentMethods /></AdminPage>} />
+          <Route path="/admin/metodos-pago/crear" element={<AdminPage><CreatePaymentMethod /></AdminPage>} />
+          <Route path="/admin/metodos-pago/editar/:id" element={<AdminPage><EditPaymentMethod /></AdminPage>} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>
