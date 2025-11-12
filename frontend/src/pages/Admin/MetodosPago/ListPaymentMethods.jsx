@@ -1,6 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminService } from '@/services/auth';
+import {
+  Table,
+  TableHead,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+  ActionButton
+} from '@/components/ui/Table';
+import Pagination from '@/components/Pagination';
+import ConfirmModal from '@/components/ConfirmModal';
 
 export default function ListPaymentMethods() {
   const [items, setItems] = useState([]);
@@ -9,6 +20,8 @@ export default function ListPaymentMethods() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [togglingId, setTogglingId] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,7 +51,7 @@ export default function ListPaymentMethods() {
     }
   };
 
-  const remove = async (id) => {
+  const handleDelete = async (id) => {
     if (!window.confirm('¿Eliminar este método de pago?')) return;
     try {
       await adminService.pagos.remove(id);
@@ -49,96 +62,120 @@ export default function ListPaymentMethods() {
   };
 
   return (
-    <div style={{ maxWidth: 1100, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Métodos de pago</h1>
-        <Link to="/admin/metodos-pago/crear" style={{ padding: '0.6rem 1.2rem', borderRadius: 8, background: '#1e88e5', color: '#fff', fontWeight: 800, textDecoration: 'none' }}>
-          + Crear método
+    <div className="max-w-[1100px] mx-auto my-10 px-4">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-extrabold">Métodos de Pago</h1>
+        <Link 
+          to="/admin/metodos-pago/crear" 
+          className="px-4 py-2 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
+        >
+          + Crear Método
         </Link>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginBottom: 10 }}>
-        <label style={{ color: '#555' }}>
-          Por página:{' '}
-          <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}>
-            {[5, 10, 20, 50].map((n) => <option key={n} value={n}>{n}</option>)}
+      {/* Page Size Selector */}
+      <div className="flex justify-end mb-3">
+        <label className="flex items-center gap-2 text-gray-700">
+          Por página:
+          <select 
+            value={pageSize} 
+            onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
+            className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            {[5, 10, 20, 50].map((n) => (
+              <option key={n} value={n}>{n}</option>
+            ))}
           </select>
         </label>
       </div>
 
-      {error && <div style={{ color: '#d32f2f', marginBottom: 12, fontWeight: 700 }}>{error}</div>}
+      {/* Error Message */}
+      {error && <div className="text-red-700 font-bold mb-3">{error}</div>}
 
-      <div style={{ overflowX: 'auto', background: '#fff', borderRadius: 10, boxShadow: '0 2px 12px #0001' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
-          <thead>
-            <tr style={{ background: '#f3f4f6', color: '#000' }}>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>ID</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Código</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Nombre</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Tipo</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Orden</th>
-              <th style={{ padding: '12px 8px', textAlign: 'center' }}>Activo</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Actualizado</th>
-              <th style={{ padding: '12px 8px', textAlign: 'center' }}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={8} style={{ textAlign: 'center', padding: 24 }}>Cargando...</td></tr>
-            ) : pageItems.length === 0 ? (
-              <tr><td colSpan={8} style={{ textAlign: 'center', padding: 24, color: '#888' }}>No hay métodos.</td></tr>
-            ) : (
-              pageItems.map((m) => (
-                <tr key={m.id} style={{ color: '#444' }}>
-                  <td style={{ padding: '10px 8px' }}>{m.id}</td>
-                  <td style={{ padding: '10px 8px' }}>{m.codigo}</td>
-                  <td style={{ padding: '10px 8px' }}>{m.nombre}</td>
-                  <td style={{ padding: '10px 8px' }}>{m.tipo}</td>
-                  <td style={{ padding: '10px 8px' }}>{m.orden}</td>
-                  <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                    <button
-                      onClick={() => toggleActivo(m)}
-                      style={{
-                        background: 'transparent',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: 16,
-                        padding: '2px 10px',
-                        cursor: togglingId === m.id ? 'not-allowed' : 'pointer',
-                        color: m.activo ? '#2e7d32' : '#b91c1c',
-                        opacity: togglingId === m.id ? 0.6 : 1,
-                      }}
-                      disabled={togglingId === m.id}
-                    >
-                      {m.activo ? 'Activo' : 'Inactivo'}
-                    </button>
-                  </td>
-                  <td style={{ padding: '10px 8px' }}>{m.actualizado ? new Date(m.actualizado).toLocaleString() : '-'}</td>
-                  <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                    <button
-                      onClick={() => navigate(`/admin/metodos-pago/editar/${m.id}`)}
-                      style={{ marginRight: 8, padding: '0.4rem 0.8rem', borderRadius: 6, border: 'none', background: '#1e88e5', color: '#fff', fontWeight: 700, cursor: 'pointer' }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => remove(m.id)}
-                      style={{ padding: '0.4rem 0.8rem', borderRadius: 6, border: 'none', background: '#e53935', color: '#fff', fontWeight: 700, cursor: 'pointer' }}
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {/* Table */}
+      <Table minWidth="min-w-[900px]">
+        <TableHead>
+          <TableHeader>ID</TableHeader>
+          <TableHeader>Código</TableHeader>
+          <TableHeader>Nombre</TableHeader>
+          <TableHeader>Tipo</TableHeader>
+          <TableHeader>Orden</TableHeader>
+          <TableHeader align="center">Activo</TableHeader>
+          <TableHeader>Actualizado</TableHeader>
+          <TableHeader align="center">Acciones</TableHeader>
+        </TableHead>
+        
+        <TableBody 
+          loading={loading} 
+          empty={pageItems.length === 0}
+          colSpan={8}
+          loadingText="Cargando métodos de pago..."
+          emptyText="No hay métodos de pago."
+        >
+          {pageItems.map((m) => (
+            <TableRow key={m.id}>
+              <TableCell>{m.id}</TableCell>
+              <TableCell>{m.codigo}</TableCell>
+              <TableCell>{m.nombre}</TableCell>
+              <TableCell>{m.tipo}</TableCell>
+              <TableCell>{m.orden}</TableCell>
+              <TableCell align="center">
+                <button
+                  onClick={() => toggleActivo(m)}
+                  disabled={togglingId === m.id}
+                  className={`border rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                    m.activo 
+                      ? 'bg-green-100 border-green-300 text-green-800 hover:bg-green-200' 
+                      : 'bg-red-100 border-red-300 text-red-800 hover:bg-red-200'
+                  } ${togglingId === m.id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                >
+                  {m.activo ? 'Activo' : 'Inactivo'}
+                </button>
+              </TableCell>
+              <TableCell>
+                {m.actualizado ? new Date(m.actualizado).toLocaleString('es-ES', {
+                  dateStyle: 'short',
+                  timeStyle: 'short'
+                }) : '-'}
+              </TableCell>
+              <TableCell align="center">
+                <div className="flex justify-center gap-2">
+                  <ActionButton
+                    variant="edit"
+                    onClick={() => navigate(`/admin/metodos-pago/editar/${m.id}`)}
+                  >
+                    Editar
+                  </ActionButton>
+                  <ActionButton
+                    variant="delete"
+                    onClick={() => {
+                      setDeleteId(m.id);
+                      setModalOpen(true);
+                    }}
+                  >
+                    Eliminar
+                  </ActionButton>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 12 }}>
-        <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>Anterior</button>
-        <div style={{ padding: '4px 10px' }}>{page} / {pages}</div>
-        <button onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page >= pages}>Siguiente</button>
-      </div>
+      {/* Pagination */}
+      <Pagination page={page} pages={pages} onChange={setPage} showNumbers />
+
+      <ConfirmModal
+        open={modalOpen}
+        title="¿Estás seguro de eliminar este método de pago?"
+        message="Esta acción no se puede deshacer."
+        confirmText="Sí, eliminar"
+        cancelText="Cancelar"
+        danger
+        onCancel={() => setModalOpen(false)}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

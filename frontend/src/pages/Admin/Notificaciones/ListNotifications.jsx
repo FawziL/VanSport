@@ -4,6 +4,15 @@ import { adminService } from '@/services/auth';
 import ConfirmModal from '@/components/ConfirmModal';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
+import {
+  Table,
+  TableHead,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+  ActionButton
+} from '@/components/ui/Table';
 
 export default function ListNotifications() {
   const [items, setItems] = useState([]);
@@ -45,7 +54,10 @@ export default function ListNotifications() {
   const pageItems = items.slice(start, end);
 
   const fmt = {
-    date: (s) => (s ? new Date(s).toLocaleString() : '-'),
+    date: (s) => (s ? new Date(s).toLocaleString('es-ES', {
+      dateStyle: 'short',
+      timeStyle: 'short'
+    }) : '-'),
   };
 
   const getUserLabel = (n) => {
@@ -58,33 +70,34 @@ export default function ListNotifications() {
     return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
   };
 
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await adminService.notificaciones.remove(deleteId);
+      setItems((prev) => prev.filter((x) => x.notificacion_id !== deleteId));
+    } catch {
+      setError('No se pudo eliminar la notificación');
+    } finally {
+      setDeleteId(null);
+      setModalOpen(false);
+    }
+  };
+
   return (
-    <div style={{ maxWidth: 1200, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 18,
-        }}
-      >
-        <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Notificaciones</h1>
+    <div className="max-w-[1200px] mx-auto my-10 px-4">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-extrabold">Notificaciones</h1>
         <button
           onClick={() => navigate('/admin/notificaciones/crear')}
-          style={{
-            padding: '0.6rem 1.2rem',
-            borderRadius: 8,
-            background: '#1e88e5',
-            color: '#fff',
-            fontWeight: 800,
-            border: 'none',
-          }}
+          className="px-4 py-2 rounded-lg bg-blue-600 text-white! font-bold hover:bg-blue-700 transition-colors"
         >
-          + Crear notificación
+          + Crear Notificación
         </button>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+      {/* Page Size Selector */}
+      <div className="flex justify-end mb-3">
         <PageSizeSelector
           value={pageSize}
           onChange={setPageSize}
@@ -93,99 +106,64 @@ export default function ListNotifications() {
         />
       </div>
 
-      {error && <div style={{ color: '#d32f2f', marginBottom: 12, fontWeight: 700 }}>{error}</div>}
+      {/* Error Message */}
+      {error && <div className="text-red-700 font-bold mb-3">{error}</div>}
 
-      <div
-        style={{
-          overflowX: 'auto',
-          background: '#fff',
-          borderRadius: 10,
-          boxShadow: '0 2px 12px #0001',
-        }}
-      >
-        <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: '#f3f4f6', color: '#000000ff' }}>
-              <th style={{ padding: '12px 8px', textAlign: 'left', width: '10%' }}>ID</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', width: '26%' }}>Usuario</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Título</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', width: '12%' }}>Tipo</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', width: '15%' }}>Fecha</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', width: '17%' }}>Expira</th> {/* nuevo */}
-              <th style={{ padding: '12px 8px', textAlign: 'center', width: '10%' }}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: 24 }}>
-                  Cargando...
-                </td>
-              </tr>
-            ) : pageItems.length === 0 ? (
-              <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: 24, color: '#888' }}>
-                  No hay notificaciones.
-                </td>
-              </tr>
-            ) : (
-              pageItems.map((n) => (
-                <tr key={n.notificacion_id} style={{ color: '#444' }}>
-                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{n.notificacion_id}</td>
-                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>
-                    {getUserLabel(n)}
-                  </td>
-                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{n.titulo}</td>
-                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{n.tipo}</td>
-                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>
-                    {fmt.date(n.fecha_creacion)}
-                  </td>
-                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>
-                    {fmt.date(n.expira)} {/* nuevo */}
-                  </td>
-                  <td style={{ padding: '10px 8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    <button
-                      onClick={() => navigate(`/admin/notificaciones/editar/${n.notificacion_id}`)}
-                      style={{
-                        padding: '0.4rem 0.8rem',
-                        borderRadius: 6,
-                        border: 'none',
-                        background: '#1e88e5',
-                        color: '#fff',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDeleteId(n.notificacion_id);
-                        setModalOpen(true);
-                      }}
-                      style={{
-                        marginLeft: 8,
-                        padding: '0.4rem 0.8rem',
-                        borderRadius: 6,
-                        border: 'none',
-                        background: '#e53935',
-                        color: '#fff',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {/* Table */}
+      <Table>
+        <TableHead>
+          <TableHeader width="10%">ID</TableHeader>
+          <TableHeader width="26%">Usuario</TableHeader>
+          <TableHeader>Título</TableHeader>
+          <TableHeader width="12%">Tipo</TableHeader>
+          <TableHeader width="15%">Fecha</TableHeader>
+          <TableHeader width="17%">Expira</TableHeader>
+          <TableHeader width="10%" align="center">Acciones</TableHeader>
+        </TableHead>
+        
+        <TableBody 
+          loading={loading} 
+          empty={pageItems.length === 0}
+          colSpan={7}
+          loadingText="Cargando notificaciones..."
+          emptyText="No hay notificaciones."
+        >
+          {pageItems.map((n) => (
+            <TableRow key={n.notificacion_id}>
+              <TableCell className="whitespace-nowrap">{n.notificacion_id}</TableCell>
+              <TableCell className="break-words">{getUserLabel(n)}</TableCell>
+              <TableCell className="break-words">{n.titulo}</TableCell>
+              <TableCell className="break-words">{n.tipo}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.date(n.fecha_creacion)}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.date(n.expira)}</TableCell>
+              <TableCell align="center">
+                <div className="flex justify-center gap-2">
+                  <ActionButton
+                    variant="edit"
+                    onClick={() => navigate(`/admin/notificaciones/editar/${n.notificacion_id}`)}
+                  >
+                    Editar
+                  </ActionButton>
+                  <ActionButton
+                    variant="delete"
+                    onClick={() => {
+                      setDeleteId(n.notificacion_id);
+                      setModalOpen(true);
+                    }}
+                  >
+                    Eliminar
+                  </ActionButton>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
+      {/* Pagination */}
       <Pagination page={page} pages={pages} onChange={setPage} showNumbers />
 
+      {/* Confirm Modal */}
       <ConfirmModal
         open={modalOpen}
         title="¿Eliminar notificación?"
@@ -194,18 +172,7 @@ export default function ListNotifications() {
         cancelText="Cancelar"
         danger
         onCancel={() => setModalOpen(false)}
-        onConfirm={async () => {
-          if (!deleteId) return;
-          try {
-            await adminService.notificaciones.remove(deleteId);
-            setItems((prev) => prev.filter((x) => x.notificacion_id !== deleteId));
-          } catch {
-            setError('No se pudo eliminar la notificación');
-          } finally {
-            setDeleteId(null);
-            setModalOpen(false);
-          }
-        }}
+        onConfirm={handleDelete}
       />
     </div>
   );

@@ -3,6 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { adminService } from '@/services/auth';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
+import {
+  Table,
+  TableHead,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+  ActionButton
+} from '@/components/ui/Table';
 
 export default function ListUsers() {
   const [usuarios, setUsuarios] = useState([]);
@@ -53,32 +62,20 @@ export default function ListUsers() {
   };
 
   return (
-    <div style={{ maxWidth: 1100, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 18,
-        }}
-      >
-        <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Usuarios</h1>
+    <div className="max-w-[1100px] mx-auto my-10 px-4">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-extrabold">Usuarios</h1>
         <Link
           to="/admin/usuarios/crear"
-          style={{
-            padding: '0.6rem 1.2rem',
-            borderRadius: 8,
-            background: '#1e88e5',
-            color: '#fff',
-            fontWeight: 800,
-            textDecoration: 'none',
-          }}
+          className="px-4 py-2 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
         >
-          + Crear usuario
+          + Crear Usuario
         </Link>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+      {/* Page Size Selector */}
+      <div className="flex justify-end mb-3">
         <PageSizeSelector
           value={pageSize}
           onChange={setPageSize}
@@ -87,91 +84,80 @@ export default function ListUsers() {
         />
       </div>
 
-      {error && <div style={{ color: '#d32f2f', marginBottom: 12, fontWeight: 700 }}>{error}</div>}
+      {/* Error Message */}
+      {error && <div className="text-red-700 font-bold mb-3">{error}</div>}
 
-      <div
-        style={{
-          overflowX: 'auto',
-          background: '#fff',
-          borderRadius: 10,
-          boxShadow: '0 2px 12px #0001',
-        }}
-      >
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
-          <thead>
-            <tr style={{ background: '#f3f4f6', color: '#000000ff' }}>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>ID</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Nombre</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Email</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Teléfono</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Activo</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Rol</th>
-              <th style={{ padding: '12px 8px', textAlign: 'center' }}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={7} style={{ textAlign: 'center', padding: 24 }}>
-                  Cargando...
-                </td>
-              </tr>
-            ) : usuariosPage.length === 0 ? (
-              <tr>
-                <td colSpan={7} style={{ textAlign: 'center', padding: 24, color: '#888' }}>
-                  No hay usuarios.
-                </td>
-              </tr>
-            ) : (
-              usuariosPage.map((u) => (
-                <tr key={u.usuario_id} style={{ color: '#444' }}>
-                  <td style={{ padding: '10px 8px' }}>{u.usuario_id}</td>
-                  <td style={{ padding: '10px 8px' }}>
-                    {`${u.nombre ?? ''} ${u.apellido ?? ''}`.trim() || '-'}
-                  </td>
-                  <td style={{ padding: '10px 8px' }}>{u.email}</td>
-                  <td style={{ padding: '10px 8px' }}>{u.telefono || '-'}</td>
-                  <td style={{ padding: '10px 8px' }}>{u.is_active ? 'Sí' : 'No'}</td>
-                  <td style={{ padding: '10px 8px' }}>{u.is_staff ? 'Admin' : 'Cliente'}</td>
-                  <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                    <button
-                      onClick={() => navigate(`/admin/usuarios/editar/${u.usuario_id}`)}
-                      style={{
-                        marginRight: 8,
-                        padding: '0.4rem 0.8rem',
-                        borderRadius: 6,
-                        border: 'none',
-                        background: '#1e88e5',
-                        color: '#fff',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => toggleActivo(u)}
-                      style={{
-                        marginRight: 8,
-                        padding: '0.4rem 0.8rem',
-                        borderRadius: 6,
-                        border: 'none',
-                        background: u.is_active ? '#f57c00' : '#2e7d32',
-                        color: '#fff',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {u.is_active ? 'Desactivar' : 'Activar'}
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {/* Table */}
+      <Table minWidth="min-w-[900px]">
+        <TableHead>
+          <TableHeader>ID</TableHeader>
+          <TableHeader>Nombre</TableHeader>
+          <TableHeader>Email</TableHeader>
+          <TableHeader>Teléfono</TableHeader>
+          <TableHeader>Activo</TableHeader>
+          <TableHeader>Rol</TableHeader>
+          <TableHeader align="center">Acciones</TableHeader>
+        </TableHead>
+        
+        <TableBody 
+          loading={loading} 
+          empty={usuariosPage.length === 0}
+          colSpan={7}
+          loadingText="Cargando usuarios..."
+          emptyText="No hay usuarios."
+        >
+          {usuariosPage.map((u) => (
+            <TableRow key={u.usuario_id}>
+              <TableCell>{u.usuario_id}</TableCell>
+              <TableCell className="font-medium">
+                {`${u.nombre ?? ''} ${u.apellido ?? ''}`.trim() || '-'}
+              </TableCell>
+              <TableCell>{u.email}</TableCell>
+              <TableCell>{u.telefono || '-'}</TableCell>
+              <TableCell>
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
+                  u.is_active 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {u.is_active ? 'Sí' : 'No'}
+                </span>
+              </TableCell>
+              <TableCell>
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
+                  u.is_staff 
+                    ? 'bg-purple-100 text-purple-800' 
+                    : 'bg-blue-100 text-blue-800'
+                }`}>
+                  {u.is_staff ? 'Admin' : 'Cliente'}
+                </span>
+              </TableCell>
+              <TableCell align="center">
+                <div className="flex justify-center gap-2">
+                  <ActionButton
+                    variant="edit"
+                    onClick={() => navigate(`/admin/usuarios/editar/${u.usuario_id}`)}
+                  >
+                    Editar
+                  </ActionButton>
+                  <button
+                    onClick={() => toggleActivo(u)}
+                    className={`px-3 py-1 rounded font-bold text-white transition-colors ${
+                      u.is_active 
+                        ? 'bg-orange-600 hover:bg-orange-700' 
+                        : 'bg-green-600 hover:bg-green-700'
+                    }`}
+                  >
+                    {u.is_active ? 'Desactivar' : 'Activar'}
+                  </button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
+      {/* Pagination */}
       <Pagination page={page} pages={pages} onChange={setPage} showNumbers />
     </div>
   );

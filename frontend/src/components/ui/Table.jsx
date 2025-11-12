@@ -11,7 +11,7 @@ export function Table({ children, minWidth = 'min-w-[950px]' }) {
 export function TableHead({ children }) {
   return (
     <thead>
-      <tr className="bg-gray-100 text-black">
+      <tr className="bg-blue-100 text-black">
         {children}
       </tr>
     </thead>

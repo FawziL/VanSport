@@ -1,5 +1,6 @@
-export default function StatusBadge({ estado, className = '' }) {
-  const getStatusConfig = (estado) => {
+export default function StatusBadge({ estado, className = '', variant = 'default' }) {
+  // Configuración para reportes (variante por defecto)
+  const getReportStatusConfig = (estado) => {
     const config = {
       pendiente: {
         bg: 'bg-yellow-100',
@@ -27,6 +28,64 @@ export default function StatusBadge({ estado, className = '' }) {
       icon: '❓',
       label: estado
     };
+  };
+
+  // Configuración para pedidos
+  const getOrderStatusConfig = (estado) => {
+    const estadoLower = estado.toLowerCase();
+    const config = {
+      pendiente: {
+        bg: 'bg-yellow-100',
+        text: 'text-yellow-800',
+        icon: '⏳',
+        label: 'Pendiente'
+      },
+      completado: {
+        bg: 'bg-green-100',
+        text: 'text-green-800',
+        icon: '✅',
+        label: 'Completado'
+      },
+      cancelado: {
+        bg: 'bg-red-100',
+        text: 'text-red-800',
+        icon: '❌',
+        label: 'Cancelado'
+      },
+      en_proceso: {
+        bg: 'bg-blue-100',
+        text: 'text-blue-800',
+        icon: '🔄',
+        label: 'En proceso'
+      },
+      pagado: {
+        bg: 'bg-purple-100',
+        text: 'text-purple-800',
+        icon: '🚚',
+        label: 'Pagado'
+      },
+      entregado: {
+        bg: 'bg-green-100',
+        text: 'text-green-800',
+        icon: '📦',
+        label: 'Entregado'
+      }
+    };
+    
+    return config[estadoLower] || {
+      bg: 'bg-gray-100',
+      text: 'text-gray-800',
+      icon: '❓',
+      label: estado
+    };
+  };
+
+  // Seleccionar la configuración según la variante
+  const getStatusConfig = (estado) => {
+    if (variant === 'order') {
+      return getOrderStatusConfig(estado);
+    }
+    return getReportStatusConfig(estado);
   };
 
   const status = getStatusConfig(estado);

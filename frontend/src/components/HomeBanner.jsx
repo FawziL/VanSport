@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { appService } from '@/services/auth';
 
@@ -20,7 +20,6 @@ function formatDuration(ms) {
 }
 
 function makeDismissKey(n) {
-  // Fingerprint that changes when content changes
   const parts = [
     n.notificacion_id,
     n.tipo || '',
@@ -37,6 +36,9 @@ function makeDismissKey(n) {
 export default function HomeBanner() {
   const [banner, setBanner] = useState(null);
   const [now, setNow] = useState(Date.now());
+  const [isAnimating, setIsAnimating] = useState(false);
+  const contentRef = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     let alive = true;
@@ -58,6 +60,35 @@ export default function HomeBanner() {
     return () => clearInterval(id);
   }, [banner]);
 
+  // Efecto para iniciar la animación después de que el contenido se renderice
+  useEffect(() => {
+    if (!banner) return;
+
+    const checkAnimation = () => {
+      if (contentRef.current && containerRef.current) {
+        const contentWidth = contentRef.current.scrollWidth;
+        const containerWidth = containerRef.current.clientWidth;
+
+        if (contentWidth > containerWidth) {
+          setIsAnimating(true);
+        } else {
+          setIsAnimating(false);
+        }
+      }
+    };
+
+    // Pequeño delay para asegurar que el DOM se ha renderizado
+    const timeoutId = setTimeout(checkAnimation, 100);
+    
+    // También verificar en resize
+    window.addEventListener('resize', checkAnimation);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', checkAnimation);
+    };
+  }, [banner]);
+
   const dismiss = useCallback(() => {
     if (!banner) return;
     const key = makeDismissKey(banner);
@@ -65,10 +96,10 @@ export default function HomeBanner() {
     setBanner(null);
   }, [banner]);
 
-  // Calcular deadline/remaining siempre, aunque no haya banner (será null y no hará nada)
+  // Calcular deadline/remaining
   const isOffer = banner?.tipo === 'oferta';
   const startMs = banner?.fecha_creacion ? new Date(banner.fecha_creacion).getTime() : Date.now();
-  const fallbackDurationMs = 2 * 60 * 60 * 1000; // 2h para 'oferta' si no hay expira
+  const fallbackDurationMs = 2 * 60 * 60 * 1000;
   const deadlineMs = banner?.expira
     ? new Date(banner.expira).getTime()
     : isOffer
@@ -76,49 +107,61 @@ export default function HomeBanner() {
       : null;
   const remainingMs = deadlineMs ? Math.max(0, deadlineMs - now) : null;
 
-  // Auto-cierre al expirar (hook siempre presente)
+  // Auto-cierre al expirar
   useEffect(() => {
     if (remainingMs === 0 && banner) dismiss();
   }, [remainingMs, banner, dismiss]);
 
-  // A partir de aquí ya puedes salir si no hay banner
   if (!banner) return null;
-
   const cta = resolveCta(banner);
 
   return (
     <div style={{ background: '#131313', color: '#fff', padding: '10px 14px' }}>
       <div
         style={{
-          maxWidth: 1200,
           margin: '0 auto',
+          overflow: 'hidden',
+          position: 'relative',
           display: 'flex',
-          gap: 12,
           alignItems: 'center',
-          justifyContent: 'space-between',
         }}
       >
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flex: 1, flexWrap: 'wrap' }}>
-          <strong style={{ fontWeight: 900 }}>{banner.titulo}</strong>
-          <span style={{ opacity: 0.9 }}>{banner.mensaje}</span>
-          {remainingMs !== null && remainingMs > 0 && (
-            <span
-              title="Tiempo restante"
-              style={{
-                marginLeft: 8,
-                background: '#e53935',
-                color: '#fff',
-                padding: '4px 8px',
-                borderRadius: 8,
-                fontWeight: 800,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              Termina en {formatDuration(remainingMs)}
-            </span>
-          )}
+        <div 
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            whiteSpace: 'nowrap',
+            animation: 'scrollBanner 10s linear infinite',
+            flex: 1,
+          }}
+        >
+          {/* Múltiples repeticiones para efecto continuo */}
+          
+            <div style={{ display: 'inline-flex', gap: 10, alignItems: 'center' }}>
+              <strong style={{ fontWeight: 900 }}>{banner.titulo}</strong>
+              <span style={{ opacity: 0.9 }}>{banner.mensaje}</span>
+              {remainingMs !== null && remainingMs > 0 && (
+                <span
+                  style={{
+                    background: '#e53935',
+                    color: '#fff',
+                    padding: '4px 8px',
+                    borderRadius: 8,
+                    fontWeight: 800,
+                  }}
+                >
+                  Termina en {formatDuration(remainingMs)}
+                </span>
+              )}
+              <span style={{ opacity: 0.5 }}>•</span>
+            </div>
+          
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+
+        <div style={{ 
+          marginLeft: 20,
+          flexShrink: 0 
+        }}>
           {cta && cta.to && (
             <Link
               to={cta.to}
@@ -151,7 +194,20 @@ export default function HomeBanner() {
               {cta.label} ↗
             </a>
           )}
-          </div>
+        </div>
+
+        <style>
+          {`
+            @keyframes scrollBanner {
+              0% {
+                transform: translateX(0);
+              }
+              100% {
+                transform: translateX(100%);
+              }
+            }
+          `}
+        </style>
       </div>
     </div>
   );

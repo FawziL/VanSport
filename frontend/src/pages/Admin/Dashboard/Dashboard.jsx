@@ -6,26 +6,17 @@ import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 
 function StatCard({ title, value, to, note }) {
   const content = (
-    <div
-      style={{
-        background: '#fff',
-        border: '1px solid #eee',
-        borderRadius: 12,
-        padding: '1rem',
-        boxShadow: '0 2px 12px rgba(30,136,229,0.06)',
-        color: 'black',
-        height: '76px',
-      }}
-    >
-      <div style={{ color: '#666', fontSize: 13 }}>{title}</div>
-      <div style={{ fontSize: 22, fontWeight: 800 }}>{value}</div>
-      {note ? (
-        <div style={{ color: '#888', fontSize: 12, marginTop: 4 }}>{note}</div>
-      ) : null}
+    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm h-24">
+      <div className="text-gray-600 text-sm">{title}</div>
+      <div className="text-2xl font-extrabold text-gray-900">{value}</div>
+      {note && (
+        <div className="text-gray-500 text-xs mt-1">{note}</div>
+      )}
     </div>
   );
+  
   return to ? (
-    <Link to={to} style={{ textDecoration: 'none', color: 'inherit' }}>
+    <Link to={to} className="no-underline text-inherit hover:opacity-90 transition-opacity">
       {content}
     </Link>
   ) : (
@@ -62,13 +53,6 @@ export default function Dashboard() {
   useEffect(() => {
     appService.utils.dolarBcvHoy().then(setBcv).catch(() => setBcv(null));
   }, []);
-
-  // En las tarjetas:
-  <StatCard
-    title="Dólar (BCV hoy)"
-    value={bcv ? `Bs ${Number(bcv.valor).toFixed(2)}` : '—'}
-    note={bcv?.fecha}
-  />
 
   useEffect(() => {
     let alive = true;
@@ -146,91 +130,72 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <>
-      {/* Header superior con “Bienvenido” */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
-          marginBottom: 16,
-        }}
-      >
+    <div className="space-y-6 p-6">
+      {/* Header superior con "Bienvenido" */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>
+          <h1 className="text-2xl font-extrabold text-gray-600">
             Bienvenido{user?.nombre ? `, ${user.nombre} ${user.apellido}` : ''}
           </h1>
-          <div style={{ color: '#666' }}>Gestiona tu tienda desde el panel de administración.</div>
+          <div className="text-gray-600 mt-1">
+            Gestiona tu tienda desde el panel de administración.
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <ThemeToggleButton /> {/* <-- botón modo oscuro */}
-          <span style={{ color: '#888', fontSize: 13 }}>
+        <div className="flex items-center gap-4">
+          <ThemeToggleButton />
+          <span className="text-gray-500 text-sm">
             {new Date().toLocaleDateString('es-ES')}
           </span>
         </div>
       </div>
 
       {/* Quick stats */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: 12,
-          marginBottom: 16,
-        }}
-      >
-        <StatCard title="Dólar (BCV hoy)" value={bcv ? `Bs ${Number(bcv.valor).toFixed(2)}` : '—'} note={bcv?.fecha} />
-        <StatCard title="Pagos pendientes" value={pendingCount} to="/admin/ventas/pendientes" />
-        <StatCard title="Productos" value={stats.productos} to="/admin/productos" />
-        <StatCard title="Ventas totales" value={stats.ventasMes} note={stats.ventasDesde ? `desde ${stats.ventasDesde}` : ''} />
-        <StatCard title="Usuarios Registrados" value={stats.usuariosTotal} note={stats.usuariosMes ? `${stats.usuariosMes} desde ${stats.ventasDesde}` : ''} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2">
+        <StatCard 
+          title="Dólar (BCV hoy)" 
+          value={bcv ? `Bs ${Number(bcv.valor).toFixed(2)}` : '—'} 
+          note={bcv?.fecha} 
+        />
+        <StatCard 
+          title="Pagos pendientes" 
+          value={pendingCount} 
+          to="/admin/ventas/pendientes" 
+        />
+        <StatCard 
+          title="Productos" 
+          value={stats.productos} 
+          to="/admin/productos" 
+        />
+        <StatCard 
+          title="Ventas totales" 
+          value={stats.ventasMes} 
+          note={stats.ventasDesde ? `desde ${stats.ventasDesde}` : ''} 
+        />
+        <StatCard 
+          title="Usuarios Registrados" 
+          value={stats.usuariosTotal} 
+          note={stats.usuariosMes ? `${stats.usuariosMes} desde ${stats.ventasDesde}` : ''} 
+        />
       </div>
 
       {/* Tarjetas de secciones */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: 16,
-        }}
-      >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {sections.map((s) => (
           <Link
             to={s.to}
             key={s.to}
-            style={{
-              display: 'block',
-              background: '#fff',
-              border: '1px solid #eee',
-              borderRadius: 12,
-              padding: '1rem',
-              textDecoration: 'none',
-              color: '#222',
-              boxShadow: '0 2px 12px rgba(30,136,229,0.06)',
-              transition: 'transform 0.15s',
-            }}
+            className="block bg-white border border-gray-200 rounded-xl p-6 no-underline text-gray-900 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
           >
-            <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>{s.label}</div>
-            <div style={{ color: '#666', fontSize: 14 }}>{s.desc}</div>
-            <div style={{ marginTop: 12 }}>
-              <span
-                style={{
-                  display: 'inline-block',
-                  padding: '0.4rem 0.7rem',
-                  borderRadius: 8,
-                  background: '#131313',
-                  color: '#fff',
-                  fontWeight: 700,
-                  fontSize: 13,
-                }}
-              >
-                Ver →
+            <div className="text-gray-800 text-lg font-extrabold mb-2">{s.label}</div>
+            <div className="text-gray-600 text-sm mb-4">{s.desc}</div>
+            <div>
+              <span className="w-20 inline-block px-3 py-2 bg-gray-900 text-white font-bold text-sm rounded-lg">
+                Ver
               </span>
             </div>
           </Link>
         ))}
       </div>
-    </>
+    </div>
   );
 }

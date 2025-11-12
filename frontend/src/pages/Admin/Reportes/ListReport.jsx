@@ -77,7 +77,6 @@ export default function ListReportes() {
 
       <Table minWidth="min-w-[1000px]">
         <TableHead>
-          <TableHeader>UUID</TableHeader>
           <TableHeader>Título</TableHeader>
           <TableHeader>Usuario</TableHeader>
           <TableHeader>Estado</TableHeader>
@@ -94,7 +93,6 @@ export default function ListReportes() {
         >
           {itemsPage.map((report) => (
             <TableRow key={report.id}>
-              <TableCell className="font-mono">{report.id}</TableCell>
               <TableCell className="font-medium">{report.titulo}</TableCell>
               <TableCell>
                 {report.usuario_nombre} {report.usuario_apellido} 

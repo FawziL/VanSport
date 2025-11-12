@@ -88,7 +88,7 @@ export default function VerPedido() {
   }, [id, isAuthenticated]);
 
   const enRevision = !!pedido?.ultima_transaccion && pedido?.ultima_transaccion?.estado === 'pendiente';
-  const mostrarFormulario = !!pedido && pedido.estado === 'creado' && !enRevision;
+  const mostrarFormulario = !!pedido && pedido.estado === 'pendiente' && !enRevision;
 
   // NUEVO: referencia requerida solo si el método lo pide (por convención en config o por tipo)
   const requiereReferencia = !!(metodoSel?.config?.requiere_referencia || metodoSel?.tipo === 'pago_movil');

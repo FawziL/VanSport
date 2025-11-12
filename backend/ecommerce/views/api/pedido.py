@@ -64,7 +64,7 @@ class PedidoViewSetApi(viewsets.ModelViewSet):
             pedido = Pedido.objects.create(
                 usuario_id=usuario_id,
                 fecha_pedido=timezone.now(),
-                estado='creado',
+                estado='pendiente',
                 total=total,
                 direccion_envio=direccion_envio,
                 notas=notas,

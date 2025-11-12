@@ -3,6 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { adminService } from '@/services/auth';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
+import {
+  Table,
+  TableHead,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+  ActionButton
+} from '@/components/ui/Table';
 
 export default function ListOrders() {
   const [items, setItems] = useState([]);
@@ -45,8 +54,11 @@ export default function ListOrders() {
   const pageItems = items.slice(start, end);
 
   const fmt = {
-    date: (s) => (s ? new Date(s).toLocaleString() : '-'),
-    money: (n) => (n != null ? Number(n).toFixed(2) : '-'),
+    date: (s) => (s ? new Date(s).toLocaleString('es-ES', {
+      dateStyle: 'short',
+      timeStyle: 'short'
+    }) : '-'),
+    money: (n) => (n != null ? `$${Number(n).toFixed(2)}` : '-'),
   };
 
   const getUserLabel = (p) => {
@@ -86,43 +98,40 @@ export default function ListOrders() {
   };
 
   return (
-    <div style={{ maxWidth: 1200, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 18,
-          gap: 12,
-          flexWrap: 'wrap',
-        }}
-      >
-        <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Pedidos</h1>
+    <div className="max-w-[1200px] mx-auto my-10 px-4">
+      {/* Header with Filters */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+        <h1 className="text-2xl font-extrabold">Pedidos</h1>
 
-        <div style={{ display: 'flex', gap: 8, alignItems: 'end' }}>
-          <div>
-            <label className="block text-sm font-medium mb-1">Desde</label>
-            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
-                   className="border rounded px-3 py-2" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Hasta</label>
-            <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
-                   className="border rounded px-3 py-2" />
+        <div className="flex flex-col sm:flex-row gap-4 items-end">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Desde</label>
+              <input 
+                type="date" 
+                value={startDate} 
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Hasta</label>
+              <input 
+                type="date" 
+                value={endDate} 
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
           </div>
           <button
             onClick={handleExportExcel}
             disabled={exporting}
-            style={{
-              padding: '0.6rem 1rem',
-              borderRadius: 8,
-              border: '1px solid #cfe3fb',
-              background: exporting ? '#e3f2fd' : '#f5faff',
-              color: '#1e88e5',
-              fontWeight: 800,
-              cursor: exporting ? 'not-allowed' : 'pointer',
-              whiteSpace: 'nowrap',
-            }}
+            className={`px-4 py-2 rounded-lg border font-bold transition-colors whitespace-nowrap ${
+              exporting
+                ? 'bg-blue-50 border-blue-200 text-blue-400 cursor-not-allowed'
+                : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 cursor-pointer'
+            }`}
             title="Exportar pedidos a Excel"
           >
             {exporting ? 'Exportando…' : 'Exportar Excel'}
@@ -130,7 +139,8 @@ export default function ListOrders() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+      {/* Page Size Selector */}
+      <div className="flex justify-end mb-3">
         <PageSizeSelector
           value={pageSize}
           onChange={setPageSize}
@@ -139,77 +149,48 @@ export default function ListOrders() {
         />
       </div>
 
-      {error && <div style={{ color: '#d32f2f', marginBottom: 12, fontWeight: 700 }}>{error}</div>}
+      {/* Error Message */}
+      {error && <div className="text-red-700 font-bold mb-3">{error}</div>}
 
-      <div
-        style={{
-          overflowX: 'auto',
-          background: '#fff',
-          borderRadius: 10,
-          boxShadow: '0 2px 12px #0001',
-        }}
-      >
-        <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: '#f3f4f6', color: '#000000ff' }}>
-              <th style={{ padding: '12px 8px', textAlign: 'left', width: '10%' }}>ID</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', width: '30%' }}>Usuario</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', width: '20%' }}>Fecha</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', width: '20%' }}>Estado</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', width: '10%' }}>Total</th>
-              <th style={{ padding: '12px 8px', textAlign: 'center', width: '10%' }}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: 24 }}>
-                  Cargando...
-                </td>
-              </tr>
-            ) : pageItems.length === 0 ? (
-              <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: 24, color: '#888' }}>
-                  No hay pedidos.
-                </td>
-              </tr>
-            ) : (
-              pageItems.map((p) => (
-                <tr key={p.pedido_id} style={{ color: '#444' }}>
-                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>{p.pedido_id}</td>
-                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>
-                    {getUserLabel(p)}
-                  </td>
-                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>
-                    {fmt.date(p.fecha_pedido)}
-                  </td>
-                  <td style={{ padding: '10px 8px', wordBreak: 'break-word' }}>{p.estado}</td>
-                  <td style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>
-                    {fmt.money(p.total)}
-                  </td>
-                  <td style={{ padding: '10px 8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    <button
-                      onClick={() => navigate(`/admin/pedidos/editar/${p.pedido_id}`)}
-                      style={{
-                        padding: '0.4rem 0.8rem',
-                        borderRadius: 6,
-                        border: 'none',
-                        background: '#1e88e5',
-                        color: '#fff',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Editar
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {/* Table */}
+      <Table>
+        <TableHead>
+          <TableHeader width="10%">ID</TableHeader>
+          <TableHeader width="30%">Usuario</TableHeader>
+          <TableHeader width="20%">Fecha</TableHeader>
+          <TableHeader width="20%">Estado</TableHeader>
+          <TableHeader width="10%">Total</TableHeader>
+          <TableHeader width="10%" align="center">Acciones</TableHeader>
+        </TableHead>
+        
+        <TableBody 
+          loading={loading} 
+          empty={pageItems.length === 0}
+          colSpan={6}
+          loadingText="Cargando pedidos..."
+          emptyText="No hay pedidos."
+        >
+          {pageItems.map((p) => (
+            <TableRow key={p.pedido_id}>
+              <TableCell className="whitespace-nowrap">{p.pedido_id}</TableCell>
+              <TableCell className="break-words">{getUserLabel(p)}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.date(p.fecha_pedido)}</TableCell>
+              <TableCell className="break-words">{p.estado}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.money(p.total)}</TableCell>
+              <TableCell align="center">
+                <ActionButton
+                  variant="edit"
+                  onClick={() => navigate(`/admin/pedidos/editar/${p.pedido_id}`)}
+                >
+                  Editar
+                </ActionButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
+      {/* Pagination */}
       <Pagination page={page} pages={pages} onChange={setPage} showNumbers />
     </div>
   );

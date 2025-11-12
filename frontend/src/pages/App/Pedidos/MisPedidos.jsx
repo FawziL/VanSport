@@ -1,7 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { appService } from '@/services/auth';
 import { useAuth } from '@/context/AuthContext';
+import {
+  Table,
+  TableHead,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+  ActionButton
+} from '@/components/ui/Table';
+import StatusBadge from '@/components/StatusBadge';
 
 function formatPrice(n) {
   const num = Number(n);
@@ -13,7 +23,10 @@ function formatDate(d) {
   try {
     const dt = new Date(d);
     if (isNaN(dt)) return String(d ?? '');
-    return dt.toLocaleString('es-ES');
+    return dt.toLocaleString('es-ES', {
+      dateStyle: 'short',
+      timeStyle: 'short'
+    });
   } catch {
     return String(d ?? '');
   }
@@ -55,47 +68,67 @@ export default function MisPedidos() {
   }, [isAuthenticated]);
 
   return (
-    <div style={{ maxWidth: 1100, margin: '2rem auto', padding: '0 1rem', color: '#111827' }}>
-      <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 14 }}>Mis pedidos</h1>
+    <div className="max-w-[1100px] mx-auto my-8 px-4">
+      <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-4">Mis Pedidos</h1>
 
       {errMsg && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', borderRadius: 12, padding: '0.75rem 1rem', marginBottom: 16, fontWeight: 700 }}>{errMsg}</div>
+        <div className="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 mb-4 font-bold">
+          {errMsg}
+        </div>
       )}
 
       {loading ? (
-        <div>Cargando…</div>
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Cargando pedidos...</p>
+        </div>
       ) : items.length === 0 ? (
-        <div>
-          Aún no tienes pedidos.
-          <button onClick={() => navigate('/productos')} style={{ marginLeft: 8, background: '#1e88e5', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 10px', fontWeight: 800 }}>Ver productos</button>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+          <p className="text-gray-600 mb-4">Aún no tienes pedidos.</p>
+          <button 
+            onClick={() => navigate('/productos')} 
+            className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Ver Productos
+          </button>
         </div>
       ) : (
-        <div style={{ overflowX: 'auto', background: '#fff', border: '1px solid #eee', borderRadius: 12 }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ background: '#fafafa' }}>
-                <th style={{ textAlign: 'left', padding: '10px' }}>#</th>
-                <th style={{ textAlign: 'left', padding: '10px' }}>Fecha</th>
-                <th style={{ textAlign: 'left', padding: '10px' }}>Estado</th>
-                <th style={{ textAlign: 'right', padding: '10px' }}>Total</th>
-                <th style={{ textAlign: 'right', padding: '10px' }}>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((p) => (
-                <tr key={p.pedido_id} style={{ borderTop: '1px solid #eee' }}>
-                  <td style={{ padding: '10px' }}>#{p.pedido_id}</td>
-                  <td style={{ padding: '10px' }}>{formatDate(p.fecha_pedido)}</td>
-                  <td style={{ padding: '10px', textTransform: 'capitalize' }}>{p.estado}</td>
-                  <td style={{ padding: '10px', textAlign: 'right', fontWeight: 800 }}>{formatPrice(p.total)}</td>
-                  <td style={{ padding: '10px', textAlign: 'right' }}>
-                    <Link to={`/pedidos/${p.pedido_id}`} style={{ background: '#1e88e5', color: '#fff', borderRadius: 8, padding: '6px 10px', fontWeight: 800, textDecoration: 'none' }}>Ver</Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table>
+          <TableHead>
+            <TableHeader width="15%">#</TableHeader>
+            <TableHeader width="25%">Fecha</TableHeader>
+            <TableHeader width="20%">Estado</TableHeader>
+            <TableHeader width="20%" align="right">Total</TableHeader>
+            <TableHeader width="20%" align="center">Acciones</TableHeader>
+          </TableHead>
+          
+          <TableBody 
+            loading={false} 
+            empty={false}
+            colSpan={5}
+          >
+            {items.map((p) => (
+              <TableRow key={p.pedido_id}>
+                <TableCell className="font-semibold">#{p.pedido_id}</TableCell>
+                <TableCell>{formatDate(p.fecha_pedido)}</TableCell>
+                <TableCell>
+                  <StatusBadge estado={p.estado} variant="order" />
+                </TableCell>
+                <TableCell align="right" className="font-bold text-gray-900">
+                  {formatPrice(p.total)}
+                </TableCell>
+                <TableCell align="center">
+                  <ActionButton
+                    variant="edit"
+                    onClick={() => navigate(`/pedidos/${p.pedido_id}`)}
+                  >
+                    Ver Detalles
+                  </ActionButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       )}
     </div>
   );
