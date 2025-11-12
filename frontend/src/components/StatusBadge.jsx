@@ -19,6 +19,12 @@ export default function StatusBadge({ estado, className = '', variant = 'default
         text: 'text-green-800',
         icon: '✅',
         label: 'Finalizado'
+      },
+      completado: {
+        bg: 'bg-green-100',
+        text: 'text-green-800',
+        icon: '✅',
+        label: 'Completado'
       }
     };
     
@@ -52,11 +58,11 @@ export default function StatusBadge({ estado, className = '', variant = 'default
         icon: '❌',
         label: 'Cancelado'
       },
-      en_proceso: {
+      en_transito: {
         bg: 'bg-blue-100',
         text: 'text-blue-800',
         icon: '🔄',
-        label: 'En proceso'
+        label: 'En tránsito'
       },
       pagado: {
         bg: 'bg-purple-100',

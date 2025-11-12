@@ -113,7 +113,7 @@ export default function ListNotifications() {
       <Table>
         <TableHead>
           <TableHeader width="10%">ID</TableHeader>
-          <TableHeader width="26%">Usuario</TableHeader>
+          {/*<TableHeader width="26%">Usuario</TableHeader>*/}
           <TableHeader>Título</TableHeader>
           <TableHeader width="12%">Tipo</TableHeader>
           <TableHeader width="15%">Fecha</TableHeader>
@@ -131,7 +131,7 @@ export default function ListNotifications() {
           {pageItems.map((n) => (
             <TableRow key={n.notificacion_id}>
               <TableCell className="whitespace-nowrap">{n.notificacion_id}</TableCell>
-              <TableCell className="break-words">{getUserLabel(n)}</TableCell>
+              {/*<TableCell className="break-words">{getUserLabel(n)}</TableCell>*/}
               <TableCell className="break-words">{n.titulo}</TableCell>
               <TableCell className="break-words">{n.tipo}</TableCell>
               <TableCell className="whitespace-nowrap">{fmt.date(n.fecha_creacion)}</TableCell>

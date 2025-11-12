@@ -22,13 +22,13 @@ import { FiSettings } from 'react-icons/fi';
 
 const sections = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: <FaThLarge /> },
+  { to: '/admin/usuarios', label: 'Usuarios', icon: <FaUsers /> },
   { to: '/admin/categorias', label: 'Categorias', icon: <FaTags /> },
   { to: '/admin/productos', label: 'Productos', icon: <FaBoxOpen /> },
   { to: '/admin/pedidos', label: 'Pedidos', icon: <FaClipboardList /> },
-  { to: '/admin/usuarios', label: 'Usuarios', icon: <FaUsers /> },
+  { to: '/admin/envios', label: 'Envíos', icon: <FaTruck /> },
   { to: '/admin/ventas', label: 'Ventas', icon: <FaChartBar /> },
   { to: '/admin/resenas', label: 'Reseñas', icon: <FaStar /> },
-  { to: '/admin/envios', label: 'Envíos', icon: <FaTruck /> },
   { to: '/admin/notificaciones', label: 'Notificaciones', icon: <FaBell /> },
   { to: '/admin/reportes', label: 'Reportes', icon: <FaTruck /> },
   { to: '/admin/metodos-pago', label: 'Métodos de Pago', icon: <FaTags /> },
@@ -93,7 +93,6 @@ export default function AdminSidebar({ collapsed, onToggle }) {
         width: sidebarWidth,
         transition: 'width .5s',
         position: 'relative',
-        // Permitimos overflow visible para que el menú no se recorte
         overflow: 'visible',
         display: 'flex',
         flexDirection: 'column',

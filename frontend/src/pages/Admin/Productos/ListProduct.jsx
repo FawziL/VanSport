@@ -28,6 +28,7 @@ export default function ListProduct() {
   const [modalOpen, setModalOpen] = useState(false);
   const [togglingId, setTogglingId] = useState(null);
   const [exporting, setExporting] = useState(false);
+  const [togglingActivoId, setTogglingActivoId] = useState(null);
   const navigate = useNavigate();
 
   // Fetch productos
@@ -107,6 +108,18 @@ export default function ListProduct() {
     }
   };
 
+  const toggleActivoProduct = async (p) => {
+    try {
+      setTogglingActivoId(p.producto_id);
+      await adminService.productos.partialUpdate(p.producto_id, { activo: !p.activo });
+      setProductos((prev) => prev.map((it) => (it.producto_id === p.producto_id ? { ...it, activo: !p.activo } : it)));
+    } catch (e) {
+      setError('No se pudo actualizar el estado');
+    } finally {
+      setTogglingActivoId(null);
+    }
+  };
+  
   // Render helpers
   const fmtPrecio = (v) => {
     if (v == null || v === '') return '-';
@@ -194,7 +207,19 @@ export default function ListProduct() {
                   disabled={togglingId === p.producto_id}
                 />
               </TableCell>
-              <TableCell>{p.activo ? 'Activo' : 'Inactivo'}</TableCell>
+              <TableCell>
+                <button
+                  onClick={() => toggleActivoProduct(p)}
+                  disabled={togglingActivoId === p.producto_id}
+                  className={`border rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                    p.activo
+                      ? 'bg-green-100 border-green-300 text-green-800 hover:bg-green-200'
+                      : 'bg-red-100 border-red-300 text-red-800 hover:bg-red-200'
+                  } ${togglingActivoId === p.producto_id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                >
+                  {p.activo ? 'Activo' : 'Inactivo'}
+                </button>
+              </TableCell>
               <TableCell align="center">
                 <div className="flex justify-center gap-2">
                   <ActionButton

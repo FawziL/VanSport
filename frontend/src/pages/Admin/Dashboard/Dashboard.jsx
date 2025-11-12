@@ -3,39 +3,8 @@ import { useAuth } from '@/context/AuthContext';
 import { Link } from 'react-router-dom';
 import { adminService, appService } from '@/services/auth';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
-
-function StatCard({ title, value, to, note }) {
-  const content = (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm h-24">
-      <div className="text-gray-600 text-sm">{title}</div>
-      <div className="text-2xl font-extrabold text-gray-900">{value}</div>
-      {note && (
-        <div className="text-gray-500 text-xs mt-1">{note}</div>
-      )}
-    </div>
-  );
-  
-  return to ? (
-    <Link to={to} className="no-underline text-inherit hover:opacity-90 transition-opacity">
-      {content}
-    </Link>
-  ) : (
-    content
-  );
-}
-
-const sections = [
-  { to: '/admin/categorias', label: 'Categorias', desc: 'Gestiona las categorías del catálogo' },
-  { to: '/admin/productos', label: 'Productos', desc: 'Crea, edita y publica productos' },
-  { to: '/admin/pedidos', label: 'Pedidos', desc: 'Revisa y administra pedidos' },
-  { to: '/admin/usuarios', label: 'Usuarios', desc: 'Gestiona cuentas y roles' },
-  { to: '/admin/ventas', label: 'Ventas', desc: 'Resumen y estadísticas de ventas' },
-  { to: '/admin/resenas', label: 'Reseñas', desc: 'Modera y responde reseñas' },
-  { to: '/admin/envios', label: 'Envíos', desc: 'Configura y monitorea envíos' },
-  { to: '/admin/notificaciones', label: 'Notificaciones', desc: 'Mensajería y avisos a clientes' },
-  { to: '/admin/reportes', label: 'Reportes', desc: 'Gestiona reportes de fallas' },
-  { to: '/admin/metodos-pago', label: 'Métodos de Pago', desc: 'Configura los métodos de pago' },
-];
+import StatCard from '@/components/admin/StatCard';
+import sections from '@/utils/adminSections';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -71,7 +40,6 @@ export default function Dashboard() {
     };
   }, []);
 
-  // Stats: productos, ventas del mes, usuarios (total y del mes)
   useEffect(() => {
     let alive = true;
     Promise.all([

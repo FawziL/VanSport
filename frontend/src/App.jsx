@@ -66,13 +66,13 @@ function AppShell() {
           <Route path="/register" element={<Register />} />
           <Route path="/password-reset" element={<PasswordReset />} />
           <Route path="/password-reset/confirm" element={<PasswordResetConfirm />} />
+
+          {/* Usuario autenticado */}
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/pedidos" element={<MisPedidos />} />
           <Route path="/pedidos/:id" element={<VerPedido />} />
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/checkout" element={<Checkout />} />
-
-          {/* Reportes Usuario */}
           <Route path="/reportes" element={<MisReportes />} />
           <Route path="/reportes/nuevo" element={<NuevoReporte />} />
           <Route path="/reportes/:id" element={<VerReporte />} />

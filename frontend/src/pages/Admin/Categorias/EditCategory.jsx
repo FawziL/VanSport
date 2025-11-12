@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { adminService } from '@/services/auth';
-import ConfirmModal from '@/components/ConfirmModal';
 
 function FieldError({ error }) {
   if (!error) return null;
@@ -111,19 +110,6 @@ export default function EditCategory() {
     }
   };
 
-  const handleDelete = async () => {
-    try {
-      await adminService.categorias.remove(id);
-      navigate('/admin/categorias');
-    } catch (err) {
-      const msg =
-        err?.response?.data?.detail || err?.message || 'No se pudo eliminar la categoría.';
-      setGlobalError(msg);
-    } finally {
-      setModalOpen(false);
-    }
-  };
-
   if (loading) {
     return (
       <div style={{ maxWidth: 800, margin: '2rem auto', padding: '0 1rem' }}>
@@ -170,21 +156,6 @@ export default function EditCategory() {
           >
             ← Volver
           </Link>
-          <button
-            type="button"
-            onClick={() => setModalOpen(true)}
-            style={{
-              padding: '0.4rem 0.8rem',
-              borderRadius: 8,
-              border: 'none',
-              background: '#e53935',
-              color: '#fff',
-              fontWeight: 800,
-              cursor: 'pointer',
-            }}
-          >
-            Eliminar
-          </button>
         </div>
       </div>
 
@@ -309,17 +280,6 @@ export default function EditCategory() {
           </Link>
         </div>
       </form>
-
-      <ConfirmModal
-        open={modalOpen}
-        title="¿Eliminar categoría?"
-        message="Esta acción no se puede deshacer."
-        confirmText="Sí, eliminar"
-        cancelText="Cancelar"
-        danger
-        onCancel={() => setModalOpen(false)}
-        onConfirm={handleDelete}
-      />
     </div>
   );
 }

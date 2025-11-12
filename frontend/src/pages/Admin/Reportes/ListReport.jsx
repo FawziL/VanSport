@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/Table';
 import StatusBadge from '@/components/StatusBadge';
 import { useNavigate } from 'react-router-dom';
+import PageSizeSelector from '@/components/PageSizeSelector';
 
 export default function ListReportes() {
   const [items, setItems] = useState([]);
@@ -71,6 +72,15 @@ export default function ListReportes() {
             + Crear Reporte
           </Link>
         </div>
+      </div>
+
+      <div className="flex justify-end mb-3">
+        <PageSizeSelector
+          value={pageSize}
+          onChange={setPageSize}
+          options={[5, 10, 20, 50]}
+          label="Por página"
+        />
       </div>
 
       {error && <div className="text-red-700 font-bold mb-3">{error}</div>}

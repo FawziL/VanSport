@@ -12,6 +12,7 @@ import {
   TableCell,
   ActionButton
 } from '@/components/ui/Table';
+import StatusBadge from '@/components/StatusBadge';
 
 export default function ListOrders() {
   const [items, setItems] = useState([]);
@@ -20,7 +21,7 @@ export default function ListOrders() {
   const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [startDate, setStartDate] = useState(''); // YYYY-MM-DD
+  const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [exporting, setExporting] = useState(false);
   const navigate = useNavigate();
@@ -175,7 +176,9 @@ export default function ListOrders() {
               <TableCell className="whitespace-nowrap">{p.pedido_id}</TableCell>
               <TableCell className="break-words">{getUserLabel(p)}</TableCell>
               <TableCell className="whitespace-nowrap">{fmt.date(p.fecha_pedido)}</TableCell>
-              <TableCell className="break-words">{p.estado}</TableCell>
+              <TableCell className="break-words">
+                <StatusBadge estado={p.estado} variant="order" />
+              </TableCell>
               <TableCell className="whitespace-nowrap">{fmt.money(p.total)}</TableCell>
               <TableCell align="center">
                 <ActionButton

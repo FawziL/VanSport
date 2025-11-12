@@ -12,6 +12,7 @@ import {
   TableCell,
   ActionButton
 } from '@/components/ui/Table';
+import StatusBadge from '@/components/StatusBadge';
 
 export default function ListShipments() {
   const [items, setItems] = useState([]);
@@ -20,8 +21,8 @@ export default function ListShipments() {
   const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [startDate, setStartDate] = useState(''); // YYYY-MM-DD
-  const [endDate, setEndDate] = useState('');   // YYYY-MM-DD
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [exporting, setExporting] = useState(false);
   const navigate = useNavigate();
 
@@ -180,7 +181,9 @@ export default function ListShipments() {
               <TableCell className="whitespace-nowrap">{e.pedido ?? '-'}</TableCell>
               <TableCell className="break-words">{getUserLabel(e)}</TableCell>
               <TableCell className="break-words">{e.metodo_envio}</TableCell>
-              <TableCell className="break-words">{e.estado}</TableCell>
+              <TableCell className="break-words">
+                 <StatusBadge estado={e.estado} variant="order" />
+              </TableCell>
               <TableCell className="whitespace-nowrap">{fmt.money(e.costo_envio)}</TableCell>
               <TableCell className="whitespace-nowrap">{fmt.date(e.fecha_envio)}</TableCell>
               <TableCell align="center">

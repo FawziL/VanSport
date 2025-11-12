@@ -27,21 +27,35 @@ async function request(method, path, { body, headers = {}, params, signal, respo
     headers: finalHeaders,
     body: isFormData ? body : body ? JSON.stringify(body) : undefined,
     signal,
+    credentials: 'same-origin',
   });
 
-  if (!res.ok) {
-    let errText = '';
-    try { errText = await res.text(); } catch {}
-    const error = new Error(errText || `HTTP ${res.status}`);
-    error.response = { status: res.status, data: errText };
-    throw error;
+  const ct = (res.headers.get('content-type') || '').toLowerCase();
+
+  // Leer cuerpo (intentar JSON primero)
+  let data;
+  try {
+    if (ct.includes('application/json')) data = await res.json();
+    else if (responseType === 'arraybuffer') data = await res.arrayBuffer();
+    else if (responseType === 'blob') data = await res.blob();
+    else data = await res.text();
+  } catch (e) {
+    data = null;
   }
 
-  if (responseType === 'arraybuffer') return await res.arrayBuffer();
-  if (responseType === 'blob')        return await res.blob();
+  if (!res.ok) {
+    const err = new Error(data?.detail || data?.message || `HTTP ${res.status}`);
+    err.response = { status: res.status, data: data ?? (await res.text().catch(() => null)) };
+    // Normalizar 401 con mensaje amigable
+    if (res.status === 401) {
+      err.response.data = err.response.data || {};
+      if (!err.response.data.detail) err.response.data.detail = 'No autorizado. Por favor inicia sesión.';
+    }
+    throw err;
+  }
 
-  const ct = res.headers.get('content-type') || '';
-  return ct.includes('application/json') ? await res.json() : await res.text();
+  // Responder datos procesados
+  return data;
 }
 
 export const http = {

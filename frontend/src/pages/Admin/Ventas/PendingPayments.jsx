@@ -12,6 +12,7 @@ import {
   TableCell,
   ActionButton
 } from '@/components/ui/Table';
+import StatusBadge from '@/components/StatusBadge';
 
 export default function PendingPayments() {
   const [items, setItems] = useState([]);
@@ -112,14 +113,12 @@ export default function PendingPayments() {
           {pageItems.map((t) => (
             <TableRow key={t.transaccion_id}>
               <TableCell className="whitespace-nowrap">{t.transaccion_id}</TableCell>
-              <TableCell className="whitespace-nowrap">{t.pedido_id ?? '-'}</TableCell>
+              <TableCell className="whitespace-nowrap">{t.pedido ?? '-'}</TableCell>
               <TableCell className="break-words">{getUserLabel(t)}</TableCell>
               <TableCell className="whitespace-nowrap font-medium">{fmt.money(t.monto)}</TableCell>
               <TableCell className="break-words">{t.metodo_pago}</TableCell>
               <TableCell className="break-words">
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
-                  {t.estado}
-                </span>
+                <StatusBadge estado={t.estado} />
               </TableCell>
               <TableCell className="whitespace-nowrap">{fmt.date(t.fecha_transaccion)}</TableCell>
               <TableCell align="center">
