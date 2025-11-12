@@ -12,6 +12,7 @@ import {
   TableCell,
   ActionButton
 } from '@/components/ui/Table';
+import { toast } from 'react-toastify';
 
 export default function ListUsers() {
   const [usuarios, setUsuarios] = useState([]);
@@ -52,12 +53,22 @@ export default function ListUsers() {
 
   const toggleActivo = async (u) => {
     try {
-      await adminService.usuarios.partialUpdate(u.usuario_id, { is_active: !u.is_active });
+      // optimista: actualizar UI inmediatamente (opcional)
       setUsuarios((prev) =>
-        prev.map((x) => (x.usuario_id === u.usuario_id ? { ...x, is_active: !u.is_active } : x))
+        prev.map((x) => (x.usuario_id === u.usuario_id ? { ...x, is_active: !x.is_active } : x))
       );
-    } catch {
-      setError('No se pudo actualizar el estado del usuario');
+
+      await adminService.usuarios.partialUpdate(u.usuario_id, { is_active: !u.is_active });
+
+      toast.success(`${u.nombre ?? u.email} ${u.is_active ? 'desactivado' : 'activado'}`);
+    } catch (err) {
+      // revertir cambio si hubo optimista
+      setUsuarios((prev) =>
+        prev.map((x) => (x.usuario_id === u.usuario_id ? { ...x, is_active: u.is_active } : x))
+      );
+      const msg = err?.response?.data?.detail || 'No se pudo actualizar el estado del usuario';
+      toast.error(msg);
+      setError(msg);
     }
   };
 

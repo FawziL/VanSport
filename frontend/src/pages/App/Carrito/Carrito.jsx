@@ -3,6 +3,7 @@ import { appService } from '@/services/auth';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { resolveImageUrl } from '@/utils/resolveUrl';
+import { toast } from 'react-toastify';
 
 function formatPrice(n) {
   const num = Number(n);
@@ -99,7 +100,14 @@ export default function Carrito() {
         producto_id: item.producto?.producto_id ?? item.producto_id,
         cantidad: nuevaCantidad,
       });
-      // Éxito: ya está actualizado en memoria; no hacemos nada más
+      
+      // Éxito: mostrar toast
+      if (delta > 0) {
+        toast.success('Cantidad aumentada');
+      } else {
+        toast.success('Cantidad reducida');
+      }
+      
       const newCount = items.reduce((acc, i) => acc + (i === item ? nuevaCantidad : i.cantidad), 0);
       window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: newCount } }));
     } catch (err) {
@@ -111,7 +119,7 @@ export default function Carrito() {
             : i
         )
       );
-      setErrMsg('No se pudo actualizar la cantidad');
+      toast.error('No se pudo actualizar la cantidad');
     } finally {
       setUpdating(false);
     }
@@ -125,10 +133,11 @@ export default function Carrito() {
         producto_id: item.producto?.producto_id ?? item.producto_id,
       });
       await fetchCarrito();
+      toast.success('Producto eliminado del carrito');
       const newCount = items.reduce((acc, i) => acc + (i === item ? 0 : i.cantidad), 0);
       window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: newCount } }));
     } catch {
-      setErrMsg('No se pudo eliminar el producto');
+      toast.error('No se pudo eliminar el producto');
     } finally {
       setUpdating(false);
     }
@@ -140,9 +149,10 @@ export default function Carrito() {
     try {
       await appService.carrito.clear();
       await fetchCarrito();
+      toast.success('Carrito vaciado correctamente');
       window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: 0 } }));
     } catch {
-      setErrMsg('No se pudo vaciar el carrito');
+      toast.error('No se pudo vaciar el carrito');
     } finally {
       setUpdating(false);
     }
@@ -153,36 +163,13 @@ export default function Carrito() {
     0
   );
 
-  // UI helpers
-  const Section = ({ children, style }) => (
-    <div
-      style={{
-        background: '#fff',
-        border: '1px solid #e5e7eb',
-        borderRadius: 12,
-        boxShadow: '0 4px 24px rgba(17,24,39,0.06)',
-        ...style,
-      }}
-    >
-      {children}
-    </div>
-  );
-
+  // UI helpers con Tailwind
   const QtyButton = ({ disabled, onClick, children, ariaLabel }) => (
     <button
       aria-label={ariaLabel}
       onClick={onClick}
       disabled={disabled}
-      style={{
-        padding: '6px 10px',
-        borderRadius: 8,
-        border: '1px solid #d1d5db',
-        background: disabled ? '#f3f4f6' : '#f9fafb',
-        color: '#111827',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        minWidth: 36,
-        fontWeight: 800,
-      }}
+      className="px-2 py-1 rounded-lg border border-gray-300 bg-gray-50 text-gray-900 font-bold min-w-9 disabled:bg-gray-100 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
     >
       {children}
     </button>
@@ -190,116 +177,64 @@ export default function Carrito() {
 
   if (loading) {
     return (
-      <div style={{ maxWidth: 1200, margin: '2rem auto', padding: '0 1rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
-          <Section style={{ padding: '1rem' }}>
+      <div className="max-w-7xl mx-auto my-8 px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} style={{ display: 'flex', gap: 14, marginBottom: 16 }}>
-                <div style={{ width: 84, height: 84, borderRadius: 12, background: '#f3f4f6' }} />
-                <div style={{ flex: 1 }}>
-                  <div
-                    style={{
-                      width: '60%',
-                      height: 18,
-                      background: '#f3f4f6',
-                      borderRadius: 8,
-                      marginBottom: 8,
-                    }}
-                  />
-                  <div
-                    style={{
-                      width: '40%',
-                      height: 14,
-                      background: '#f3f4f6',
-                      borderRadius: 8,
-                      marginBottom: 8,
-                    }}
-                  />
-                  <div
-                    style={{ width: '30%', height: 16, background: '#f3f4f6', borderRadius: 8 }}
-                  />
+              <div key={i} className="flex gap-3 mb-4">
+                <div className="w-20 h-20 bg-gray-200 rounded-xl" />
+                <div className="flex-1">
+                  <div className="w-3/5 h-5 bg-gray-200 rounded mb-2" />
+                  <div className="w-2/5 h-4 bg-gray-200 rounded mb-2" />
+                  <div className="w-1/4 h-4 bg-gray-200 rounded" />
                 </div>
               </div>
             ))}
-          </Section>
-          <Section style={{ padding: '1rem', height: 220 }}>
-            <div
-              style={{
-                width: '70%',
-                height: 18,
-                background: '#f3f4f6',
-                borderRadius: 8,
-                marginBottom: 12,
-              }}
-            />
-            <div
-              style={{
-                width: '50%',
-                height: 16,
-                background: '#f3f4f6',
-                borderRadius: 8,
-                marginBottom: 12,
-              }}
-            />
-            <div style={{ width: '100%', height: 44, background: '#f3f4f6', borderRadius: 10 }} />
-          </Section>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 h-56">
+            <div className="w-3/4 h-5 bg-gray-200 rounded mb-3" />
+            <div className="w-1/2 h-4 bg-gray-200 rounded mb-3" />
+            <div className="w-full h-11 bg-gray-200 rounded-lg" />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <div style={{ marginBottom: 18 }}>
-        <h1 style={{ fontSize: 30, fontWeight: 900, color: '#111827', margin: 0 }}>Mi carrito</h1>
-        <p style={{ color: '#6b7280', marginTop: 6 }}>
+    <div className="max-w-7xl mx-auto my-10 px-4">
+      <div className="mb-5">
+        <h1 className="text-3xl font-black text-gray-900 mb-2">Mi carrito</h1>
+        <p className="text-gray-600">
           Revisa tu selección antes de finalizar la compra.
         </p>
       </div>
 
       {errMsg && (
-        <div
-          style={{
-            background: '#fef2f2',
-            border: '1px solid #fecaca',
-            color: '#991b1b',
-            borderRadius: 12,
-            padding: '0.75rem 1rem',
-            marginBottom: 16,
-            fontWeight: 700,
-          }}
-        >
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 mb-4 font-bold">
           {errMsg}
         </div>
       )}
 
       {items.length === 0 ? (
-        <Section style={{ padding: '2rem', textAlign: 'center' }}>
-          <div style={{ fontSize: 20, fontWeight: 800, color: '#111827', marginBottom: 8 }}>
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center">
+          <div className="text-xl font-black text-gray-900 mb-2">
             Tu carrito está vacío
           </div>
-          <p style={{ color: '#6b7280', marginBottom: 16 }}>
+          <p className="text-gray-600 mb-4">
             Explora los productos y añade tus favoritos.
           </p>
-          <Link
-            to="/productos"
-            style={{
-              display: 'inline-block',
-              padding: '0.7rem 1.4rem',
-              borderRadius: 10,
-              background: '#1e88e5',
-              color: '#fff',
-              fontWeight: 800,
-              textDecoration: 'none',
-            }}
-          >
-            Ver productos
-          </Link>
-        </Section>
+<Link
+  to="/productos"
+  className="inline-block px-5 py-3 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
+>
+  Ver productos
+</Link>
+        </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
+        <div className="flex gap-6">
           {/* Listado de items */}
-          <Section style={{ padding: '1rem' }}>
+          <div className="w-2/3 bg-white border border-gray-200 rounded-xl shadow-sm p-4">
             {items.map((item) => {
               const producto = item.producto || {};
               const precioUnit = Number(producto.precio ?? item.precio ?? 0);
@@ -308,67 +243,39 @@ export default function Carrito() {
               return (
                 <div
                   key={item.carrito_id ?? item.id}
-                  style={{
-                    display: 'flex',
-                    gap: 14,
-                    padding: '0.75rem',
-                    borderRadius: 12,
-                    border: '1px solid #e5e7eb',
-                    marginBottom: 12,
-                    alignItems: 'center',
-                  }}
+                  className="flex gap-3 p-3 rounded-xl border border-gray-200 mb-3 items-center"
                 >
                   <img
                     src={resolveImageUrl(producto.imagen_url)}
                     alt={producto.nombre || `Producto ${producto.producto_id ?? ''}`}
-                    style={{
-                      width: 84,
-                      height: 84,
-                      objectFit: 'cover',
-                      borderRadius: 12,
-                      background: '#f3f4f6',
-                      flexShrink: 0,
-                    }}
+                    className="w-20 h-20 object-cover rounded-xl bg-gray-100 flex-shrink-0"
                     onError={(e) => {
                       e.target.src = '';
                     }}
                   />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-                      <div style={{ minWidth: 0 }}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between gap-3">
+                      <div className="min-w-0">
                         <div
-                          style={{
-                            fontWeight: 800,
-                            color: '#111827',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          }}
+                          className="font-black text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis"
                           title={producto.nombre}
                         >
                           {producto.nombre ?? `Producto #${producto.producto_id ?? ''}`}
                         </div>
-                        <div style={{ color: '#6b7280', fontSize: 13 }}>
+                        <div className="text-gray-600 text-sm">
                           {producto.categoria?.nombre || producto.categoria || ''}
                         </div>
                       </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ color: '#111827', fontWeight: 800 }}>
+                      <div className="text-right">
+                        <div className="text-gray-900 font-black">
                           {formatPrice(precioUnit)}
                         </div>
-                        <div style={{ color: '#6b7280', fontSize: 12 }}>Precio unitario</div>
+                        <div className="text-gray-600 text-xs">Precio unitario</div>
                       </div>
                     </div>
 
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        marginTop: 10,
-                        alignItems: 'center',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="flex justify-between mt-3 items-center">
+                      <div className="flex items-center gap-2">
                         <QtyButton
                           ariaLabel="Disminuir cantidad"
                           disabled={item.cantidad <= 1 || updating}
@@ -376,14 +283,7 @@ export default function Carrito() {
                         >
                           −
                         </QtyButton>
-                        <span
-                          style={{
-                            minWidth: 32,
-                            textAlign: 'center',
-                            fontWeight: 800,
-                            color: '#111827',
-                          }}
-                        >
+                        <span className="min-w-8 text-center font-black text-gray-900">
                           {item.cantidad}
                         </span>
                         <QtyButton
@@ -395,23 +295,15 @@ export default function Carrito() {
                         </QtyButton>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <div style={{ fontWeight: 900, color: '#111827' }}>
+                      <div className="flex items-center gap-3">
+                        <div className="font-black text-gray-900">
                           {formatPrice(subtotal)}
                         </div>
                         <button
                           onClick={() => handleRemove(item)}
                           disabled={updating}
                           title="Eliminar"
-                          style={{
-                            padding: '6px 10px',
-                            borderRadius: 8,
-                            border: '1px solid #fecaca',
-                            background: '#fef2f2',
-                            color: '#b91c1c',
-                            fontWeight: 800,
-                            cursor: updating ? 'not-allowed' : 'pointer',
-                          }}
+                          className="px-3 py-1 rounded-lg border border-red-300 bg-red-50 text-red-700 font-bold disabled:cursor-not-allowed hover:bg-red-100 transition-colors"
                         >
                           Eliminar
                         </button>
@@ -421,41 +313,28 @@ export default function Carrito() {
                 </div>
               );
             })}
-          </Section>
+          </div>
 
           {/* Resumen */}
-          <Section style={{ padding: '1rem', position: 'sticky', top: 24, alignSelf: 'start' }}>
-            {/* Dirección y notas ahora se piden en Checkout */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-              <span style={{ color: '#6b7280' }}>Productos</span>
-              <span style={{ fontWeight: 800, color: '#111827' }}>
+          <div className="w-1/3 bg-white border border-gray-200 rounded-xl shadow-sm p-4 sticky top-6 self-start">
+            <div className="flex justify-between mb-3">
+              <span className="text-gray-600">Productos</span>
+              <span className="font-black text-gray-900">
                 {items.reduce((acc, i) => acc + i.cantidad, 0)}
               </span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-              <span style={{ color: '#6b7280' }}>Subtotal</span>
-              <span style={{ fontWeight: 800, color: '#111827' }}>{formatPrice(total)}</span>
+            <div className="flex justify-between mb-3">
+              <span className="text-gray-600">Subtotal</span>
+              <span className="font-black text-gray-900">{formatPrice(total)}</span>
             </div>
-            {/* Si agregas costos de envío/impuestos, colócalos aquí */}
-            <hr style={{ border: 0, borderTop: '1px solid #e5e7eb', margin: '12px 0' }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
-              <span style={{ fontWeight: 900, color: '#111827' }}>Total</span>
-              <span style={{ fontWeight: 900, color: '#111827' }}>{formatPrice(total)}</span>
+            <hr className="border-t border-gray-200 my-3" />
+            <div className="flex justify-between mb-4">
+              <span className="font-black text-gray-900">Total</span>
+              <span className="font-black text-gray-900">{formatPrice(total)}</span>
             </div>
 
             <button
-              style={{
-                width: '100%',
-                padding: '0.8rem 1.2rem',
-                borderRadius: 10,
-                border: 'none',
-                background: '#1e88e5',
-                color: '#fff',
-                fontWeight: 900,
-                fontSize: 16,
-                cursor: placing ? 'not-allowed' : 'pointer',
-                opacity: placing ? 0.8 : 1,
-              }}
+              className="w-full py-3 px-4 rounded-lg bg-blue-600 text-white font-black text-lg disabled:cursor-not-allowed disabled:opacity-80 hover:bg-blue-700 transition-colors"
               disabled={updating || placing || items.length === 0}
               onClick={() => navigate('/checkout')}
             >
@@ -465,30 +344,20 @@ export default function Carrito() {
             <button
               onClick={handleVaciar}
               disabled={updating}
-              style={{
-                width: '100%',
-                marginTop: 10,
-                padding: '0.7rem 1.2rem',
-                borderRadius: 10,
-                border: '1px solid #e53935',
-                background: '#fff',
-                color: '#e53935',
-                fontWeight: 800,
-                cursor: updating ? 'not-allowed' : 'pointer',
-              }}
+              className="w-full mt-3 py-2 px-4 rounded-lg border border-red-600 bg-white text-red-600 font-bold disabled:cursor-not-allowed hover:bg-red-50 transition-colors"
             >
               Vaciar carrito
             </button>
 
-            <div style={{ marginTop: 10, textAlign: 'center' }}>
+            <div className="mt-3 text-center">
               <Link
                 to="/productos"
-                style={{ color: '#1e88e5', fontWeight: 800, textDecoration: 'none' }}
+                className="text-blue-600 font-bold no-underline hover:text-blue-800"
               >
                 Seguir comprando
               </Link>
             </div>
-          </Section>
+          </div>
         </div>
       )}
     </div>

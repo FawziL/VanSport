@@ -5,6 +5,7 @@ import { CATEGORIAS_FALLA } from '@/utils/categorias';
 import { resolveImageUrl } from '@/utils/resolveUrl';
 import StatusBadge from '@/components/StatusBadge';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export default function EditReporte() {
   const { id } = useParams();
@@ -27,6 +28,10 @@ export default function EditReporte() {
     try {
       await adminService.reportes.patch(id, { estado: 'finalizado' });
       await load();
+      toast.success('Reporte finalizado correctamente');
+    } catch (err) {
+      const msg = err?.response?.data?.detail || 'No se pudo finalizar el reporte';
+      toast.error(msg);
     } finally {
       setFinalizing(false);
     }
@@ -38,6 +43,10 @@ export default function EditReporte() {
     try {
       await adminService.reportes.patch(id, { estado: 'en_revision' });
       await load();
+      toast.success('Reporte reabierto correctamente');
+    } catch (err) {
+      const msg = err?.response?.data?.detail || 'No se pudo reabrir el reporte';
+      toast.error(msg);
     } finally {
       setReopening(false);
     }

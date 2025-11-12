@@ -16,6 +16,7 @@ import {
   ActionButton,
   FavoriteButton
 } from '@/components/ui/Table';
+import { toast } from 'react-toastify';
 
 export default function ListProduct() {
   const [productos, setProductos] = useState([]);
@@ -43,7 +44,10 @@ export default function ListProduct() {
         setPages(Math.max(1, Math.ceil(items.length / pageSize)));
         setPage((prev) => Math.min(prev, Math.max(1, Math.ceil(items.length / pageSize))));
       })
-      .catch(() => setError('No se pudieron cargar los productos'))
+      .catch(() => {
+        setError('No se pudieron cargar los productos');
+        toast.error('No se pudieron cargar los productos');
+      })
       .finally(() => setLoading(false));
     // eslint-disable-next-line
   }, [pageSize]);
@@ -62,8 +66,11 @@ export default function ListProduct() {
       setProductos((prev) => prev.filter((p) => p.producto_id !== deleteId));
       setModalOpen(false);
       setDeleteId(null);
-    } catch {
-      setError('No se pudo eliminar el producto');
+      toast.success('Producto eliminado correctamente');
+    } catch (err) {
+      const msg = err?.response?.data?.detail || 'No se pudo eliminar el producto';
+      setError(msg);
+      toast.error(msg);
     }
   };
 
@@ -79,9 +86,12 @@ export default function ListProduct() {
       a.click();
       a.remove();
       URL.revokeObjectURL(a.href);
-    } catch (e) {
-      setError('No se pudo exportar a Excel');
-      console.error(e);
+      toast.success('Excel exportado correctamente');
+    } catch (err) {
+      const msg = err?.response?.data?.detail || 'No se pudo exportar a Excel';
+      setError(msg);
+      toast.error(msg);
+      console.error(err);
     } finally {
       setExporting(false);
     }
@@ -95,14 +105,30 @@ export default function ListProduct() {
   const toggleDestacado = async (p) => {
     try {
       setTogglingId(p.producto_id);
-      await adminService.productos.partialUpdate(p.producto_id, { destacado: !p.destacado });
+      
+      // Actualización optimista
       setProductos((prev) =>
         prev.map((it) =>
           it.producto_id === p.producto_id ? { ...it, destacado: !p.destacado } : it
         )
       );
-    } catch (e) {
-      setError('No se pudo actualizar destacado');
+      
+      await adminService.productos.partialUpdate(p.producto_id, { destacado: !p.destacado });
+      
+      toast.success(
+        `Producto ${!p.destacado ? 'destacado' : 'quitado de destacados'} correctamente`
+      );
+    } catch (err) {
+      // Revertir cambio en caso de error
+      setProductos((prev) =>
+        prev.map((it) =>
+          it.producto_id === p.producto_id ? { ...it, destacado: p.destacado } : it
+        )
+      );
+      
+      const msg = err?.response?.data?.detail || 'No se pudo actualizar destacado';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setTogglingId(null);
     }
@@ -111,10 +137,30 @@ export default function ListProduct() {
   const toggleActivoProduct = async (p) => {
     try {
       setTogglingActivoId(p.producto_id);
+      
+      // Actualización optimista
+      setProductos((prev) => 
+        prev.map((it) => 
+          it.producto_id === p.producto_id ? { ...it, activo: !p.activo } : it
+        )
+      );
+      
       await adminService.productos.partialUpdate(p.producto_id, { activo: !p.activo });
-      setProductos((prev) => prev.map((it) => (it.producto_id === p.producto_id ? { ...it, activo: !p.activo } : it)));
-    } catch (e) {
-      setError('No se pudo actualizar el estado');
+      
+      toast.success(
+        `Producto ${!p.activo ? 'activado' : 'desactivado'} correctamente`
+      );
+    } catch (err) {
+      // Revertir cambio en caso de error
+      setProductos((prev) => 
+        prev.map((it) => 
+          it.producto_id === p.producto_id ? { ...it, activo: p.activo } : it
+        )
+      );
+      
+      const msg = err?.response?.data?.detail || 'No se pudo actualizar el estado';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setTogglingActivoId(null);
     }

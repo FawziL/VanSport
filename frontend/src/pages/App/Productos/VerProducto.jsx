@@ -4,7 +4,8 @@ import { appService } from '@/services/auth';
 import { resolveImageUrl } from '@/utils/resolveUrl';
 import { useAuth } from '@/context/AuthContext';
 import ProductReviews from '@/components/ProductReviews';
-import {StarRow} from '@/utils/reviews';
+import { StarRow } from '@/utils/reviews';
+import { toast } from 'react-toastify';
 
 function formatPrice(n) {
   const num = Number(n);
@@ -20,15 +21,15 @@ export default function VerProducto() {
   const [selectedImage, setSelectedImage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { isAuthenticated } = useAuth ? useAuth() : { isAuthenticated: true }; // Si tienes AuthContext
+  const { isAuthenticated } = useAuth ? useAuth() : { isAuthenticated: true };
 
   const [addMsg, setAddMsg] = useState('');
   const [addLoading, setAddLoading] = useState(false);
-  const [inCart, setInCart] = useState(false); // NUEVO: estado para saber si está en el carrito
-  const [qty, setQty] = useState(1); // Cantidad seleccionada
-  const [cartQty, setCartQty] = useState(0); // Cantidad actual en el carrito (si existe)
-  const [avgRating, setAvgRating] = useState(0);      // <-- nuevo
-  const [reviewsCount, setReviewsCount] = useState(0); // <-- nuevo
+  const [inCart, setInCart] = useState(false);
+  const [qty, setQty] = useState(1);
+  const [cartQty, setCartQty] = useState(0);
+  const [avgRating, setAvgRating] = useState(0);
+  const [reviewsCount, setReviewsCount] = useState(0);
 
   // Usar appService para obtener el detalle
   useEffect(() => {
@@ -67,10 +68,9 @@ export default function VerProducto() {
               : typeof data.categoria === 'object' && data.categoria !== null
                 ? (data.categoria.nombre ?? data.categoria.id ?? '')
                 : (data.categoria ?? ''),
-
           stock: data.stock ?? 0,
           imagen: resolveImageUrl(data.imagen_url ?? data.imagen ?? ''),
-          imagenes: extras.map((p) => resolveImageUrl(p)), // <-- ahora fuente oficial
+          imagenes: extras.map((p) => resolveImageUrl(p)),
           atributos: data.atributos ?? null,
         };
 
@@ -204,52 +204,115 @@ export default function VerProducto() {
     };
   }, [producto?.id]);
 
+  // Función para manejar añadir/actualizar carrito
+  const handleCartAction = async () => {
+    if (!isAuthenticated) {
+      window.location.href = '/login';
+      return;
+    }
+    setAddMsg('');
+    setAddLoading(true);
+    try {
+      if (inCart) {
+        // Actualizar cantidad del carrito
+        await appService.carrito.updateQuantity({
+          producto_id: producto.id,
+          cantidad: Number(qty) || 1,
+        });
+        setCartQty(Number(qty) || 1);
+        toast.success('Cantidad actualizada en el carrito');
+      } else {
+        // Añadir al carrito
+        await appService.carrito.add({
+          producto_id: producto.id,
+          cantidad: Number(qty) || 1,
+        });
+        setInCart(true);
+        setCartQty(Number(qty) || 1);
+        toast.success('¡Producto añadido al carrito!');
+      }
+      // Actualizar contador global
+      try {
+        const data = await appService.carrito.list();
+        const items = Array.isArray(data) ? data : data?.results || [];
+        const totalQty = items.reduce(
+          (acc, it) => acc + (Number(it?.cantidad) || 1),
+          0
+        );
+        window.dispatchEvent(
+          new CustomEvent('cart:updated', { detail: { count: totalQty } })
+        );
+      } catch {}
+    } catch (err) {
+      const backendMsg = err?.response?.data;
+      const msg =
+        typeof backendMsg === 'object'
+          ? Object.entries(backendMsg)
+              .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+              .join(' | ')
+          : backendMsg || err.message || 'Error al procesar el carrito';
+      toast.error(msg);
+    } finally {
+      setAddLoading(false);
+    }
+  };
+
+  // Función para eliminar del carrito
+  const handleRemoveFromCart = async () => {
+    if (!isAuthenticated) {
+      window.location.href = '/login';
+      return;
+    }
+    setAddMsg('');
+    setAddLoading(true);
+    try {
+      await appService.carrito.remove({ producto_id: producto.id });
+      setInCart(false);
+      setCartQty(0);
+      setQty(1);
+      toast.success('Producto eliminado del carrito');
+      try {
+        const data = await appService.carrito.list();
+        const items = Array.isArray(data) ? data : data?.results || [];
+        const totalQty = items.reduce(
+          (acc, it) => acc + (Number(it?.cantidad) || 1),
+          0
+        );
+        window.dispatchEvent(
+          new CustomEvent('cart:updated', { detail: { count: totalQty } })
+        );
+      } catch {}
+    } catch (err) {
+      const backendMsg = err?.response?.data;
+      const msg =
+        typeof backendMsg === 'object'
+          ? Object.entries(backendMsg)
+              .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+              .join(' | ')
+          : backendMsg || err.message || 'No se pudo quitar del carrito';
+      toast.error(msg);
+    } finally {
+      setAddLoading(false);
+    }
+  };
+
   if (loading) {
     return (
-      <div style={{ maxWidth: 1200, margin: '2rem auto', padding: '0 1rem' }}>
-        <div
-          style={{ width: 120, height: 16, background: '#eee', borderRadius: 6, marginBottom: 16 }}
-        />
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
+      <div className="max-w-7xl mx-auto my-8 px-4">
+        <div className="w-32 h-4 bg-gray-200 rounded mb-4"></div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
-            <div
-              style={{
-                width: '100%',
-                height: 360,
-                background: '#eee',
-                borderRadius: 12,
-                marginBottom: 12,
-              }}
-            />
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div className="w-full h-96 bg-gray-200 rounded-xl mb-3"></div>
+            <div className="flex gap-2">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div
-                  key={i}
-                  style={{ width: 80, height: 60, background: '#eee', borderRadius: 8 }}
-                />
+                <div key={i} className="w-20 h-16 bg-gray-200 rounded-lg"></div>
               ))}
             </div>
           </div>
           <div>
-            <div
-              style={{
-                width: '80%',
-                height: 24,
-                background: '#eee',
-                borderRadius: 8,
-                marginBottom: 12,
-              }}
-            />
-            <div
-              style={{
-                width: '60%',
-                height: 20,
-                background: '#eee',
-                borderRadius: 8,
-                marginBottom: 12,
-              }}
-            />
-            <div style={{ width: '100%', height: 160, background: '#eee', borderRadius: 12 }} />
+            <div className="w-4/5 h-6 bg-gray-200 rounded mb-3"></div>
+            <div className="w-3/5 h-5 bg-gray-200 rounded mb-3"></div>
+            <div className="w-full h-40 bg-gray-200 rounded-xl"></div>
           </div>
         </div>
       </div>
@@ -258,23 +321,12 @@ export default function VerProducto() {
 
   if (errMsg) {
     return (
-      <div style={{ maxWidth: 900, margin: '2rem auto', padding: '0 1rem' }}>
-        <div
-          style={{
-            background: '#ffecec',
-            border: '1px solid #ffb4b4',
-            color: '#c62828',
-            borderRadius: 12,
-            padding: '1rem',
-          }}
-        >
+      <div className="max-w-4xl mx-auto my-8 px-4">
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">
           {errMsg}
         </div>
-        <div style={{ marginTop: 12 }}>
-          <Link
-            to="/productos"
-            style={{ textDecoration: 'none', color: '#1e88e5', fontWeight: 700 }}
-          >
+        <div className="mt-3">
+          <Link to="/productos" className="text-blue-600 font-bold no-underline hover:text-blue-800">
             Volver a productos
           </Link>
         </div>
@@ -284,13 +336,10 @@ export default function VerProducto() {
 
   if (!producto) {
     return (
-      <div style={{ maxWidth: 900, margin: '2rem auto', padding: '0 1rem', textAlign: 'center' }}>
+      <div className="max-w-4xl mx-auto my-8 px-4 text-center">
         No se encontró el producto.
-        <div style={{ marginTop: 12 }}>
-          <Link
-            to="/productos"
-            style={{ textDecoration: 'none', color: '#1e88e5', fontWeight: 700 }}
-          >
+        <div className="mt-3">
+          <Link to="/productos" className="text-blue-600 font-bold no-underline hover:text-blue-800">
             Volver a productos
           </Link>
         </div>
@@ -311,209 +360,150 @@ export default function VerProducto() {
   const isDisabled = stockNum <= 0 || addLoading || invalidQty || exceedsStock || noChangeDisabled;
 
   return (
-    <div style={{ maxWidth: 1200, margin: '2rem auto', padding: '0 1rem' }}>
+    <div className="max-w-7xl mx-auto my-8 px-4">
       {/* Breadcrumb */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-        <Link to="/" style={{ color: '#1e88e5', textDecoration: 'none', fontWeight: 600 }}>
+      <div className="flex items-center gap-2 mb-4">
+        <Link to="/" className="text-blue-600 font-semibold no-underline hover:text-blue-800">
           Inicio
         </Link>
-        <span style={{ color: '#888' }}>/</span>
-        <Link to="/productos" style={{ color: '#1e88e5', textDecoration: 'none', fontWeight: 600 }}>
+        <span className="text-gray-500">/</span>
+        <Link to="/productos" className="text-blue-600 font-semibold no-underline hover:text-blue-800">
           Productos
         </Link>
-        <span style={{ color: '#888' }}>/</span>
-        <span style={{ color: '#333', fontWeight: 600 }}>{producto.nombre}</span>
+        <span className="text-gray-500">/</span>
+        <span className="text-gray-800 font-semibold">{producto.nombre}</span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
+      <div className="flex justify-between gap-6">
         {/* Galería */}
-        <div>
-          <div style={{ position: 'relative' }}>
+        <div className='w-full'>
+          <div className="relative">
             {discountPct !== null && (
-              <span
-                style={{
-                  position: 'absolute',
-                  top: 12,
-                  right: 12,
-                  background: '#e53935',
-                  color: '#fff',
-                  fontWeight: 700,
-                  fontSize: 13,
-                  borderRadius: 8,
-                  padding: '2px 10px',
-                  zIndex: 2,
-                }}
-              >
+              <span className="absolute top-3 right-3 bg-red-600 text-white font-bold text-sm rounded-lg px-2 py-1 z-10">
                 {discountPct}% OFF
               </span>
             )}
             <div
               onClick={handleOpenModal}
-              style={{
-                width: '100%',
-                height: 420,
-                background: '#fafafa',
-                borderRadius: 12,
-                overflow: 'hidden',
-                cursor: 'zoom-in',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+              className="w-full h-96 bg-gray-100 rounded-xl overflow-hidden cursor-zoom-in flex items-center justify-center"
             >
               {selectedImage ? (
                 <img
                   src={selectedImage}
                   alt={producto.nombre}
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  className="w-full h-full object-contain"
                 />
               ) : (
-                <div style={{ color: '#999' }}>Sin imagen</div>
+                <div className="text-gray-500">Sin imagen</div>
               )}
             </div>
           </div>
 
-          <div
-            style={{ display: 'flex', gap: 8, marginTop: 12, overflowX: 'auto', paddingBottom: 6 }}
-          >
+          <div className="flex gap-2 mt-3 overflow-x-auto pb-2 bg-gray-100">
             {allImages.map((img, index) => (
               <button
                 key={index}
                 onMouseEnter={() => setSelectedImage(img)}
                 onClick={() => setSelectedImage(img)}
-                style={{
-                  width: 90,
-                  height: 70,
-                  borderRadius: 8,
-                  overflow: 'hidden',
-                  border: selectedImage === img ? '2px solid #131313' : '2px solid transparent',
-                  padding: 0,
-                  cursor: 'pointer',
-                  background: '#fff',
-                }}
+                className={`w-20 h-16 rounded-lg overflow-hidden border-2 p-0 cursor-pointer bg-white ${
+                  selectedImage === img ? 'border-gray-900' : 'border-transparent'
+                }`}
                 aria-label={`Imagen ${index + 1}`}
               >
                 <img
                   src={img}
                   alt={`Miniatura ${index + 1}`}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  className="w-full h-full object-cover"
                 />
               </button>
             ))}
           </div>
 
           {/* Descripción y atributos */}
-          <div style={{ marginTop: 24 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>Descripción</h2>
-            <p style={{ color: '#444', lineHeight: 1.6 }}>
+          <div className="mt-6">
+            <h2 className="text-xl font-bold mb-2">Descripción</h2>
+            <p className="text-gray-700 leading-relaxed">
               {producto.descripcion || 'Sin descripción.'}
             </p>
 
             {producto.atributos && Object.keys(producto.atributos).length > 0 && (
-              <div style={{ marginTop: 16 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Detalles</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="mt-4">
+                <h3 className="text-lg font-semibold mb-2">Detalles</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {Object.entries(producto.atributos).map(([label, value]) => (
                     <div
                       key={label}
-                      style={{
-                        background: '#f7f7f7',
-                        border: '1px solid #eee',
-                        borderRadius: 10,
-                        padding: '0.75rem',
-                      }}
+                      className="bg-gray-50 border border-gray-200 rounded-lg p-3"
                     >
-                      <div style={{ color: '#666', fontSize: 13 }}>{label}</div>
-                      <div style={{ fontWeight: 700 }}>{String(value)}</div>
+                      <div className="text-gray-600 text-sm">{label}</div>
+                      <div className="font-semibold">{String(value)}</div>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* --- Reseñas --- */}
-            <div style={{ marginTop: 28 }}>
+            {/* Reseñas */}
+            <div className="mt-7">
               <ProductReviews productoId={producto.id} nombre={producto.nombre} />
             </div>
           </div>
         </div>
 
         {/* Sidebar: precio, stock, acciones */}
-        <div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 6 }}>{producto.nombre}</h1>
-          <div style={{ color: '#666', marginBottom: 8 }}>{producto.categoria || 'Categoría'}</div>
+        <div className='w-1/2'>
+          <h1 className="text-2xl font-bold mb-2">{producto.nombre}</h1>
+          <div className="text-gray-600 mb-2">{producto.categoria || 'Categoría'}</div>
 
           {/* Promedio de estrellas (solo si hay reseñas) */}
           {reviewsCount > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <div className="flex items-center gap-2 mb-2">
               <StarRow value={avgRating} size={16} />
-              <span style={{ color: '#333', fontWeight: 800 }}>{avgRating.toFixed(1)}</span>
-              <span style={{ color: '#777' }}>({reviewsCount})</span>
+              <span className="text-gray-800 font-bold">{avgRating.toFixed(1)}</span>
+              <span className="text-gray-500">({reviewsCount})</span>
             </div>
           )}
 
-          <div
-            style={{
-              background: '#fff',
-              border: '1px solid #eee',
-              borderRadius: 12,
-              padding: '1rem',
-              boxShadow: '0 2px 12px rgba(30,136,229,0.06)',
-              marginBottom: 16,
-            }}
-          >
+          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm mb-4">
             {/* Precio */}
             {producto.precio_oferta ? (
               <div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                  <span style={{ textDecoration: 'line-through', color: '#888' }}>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-gray-500 line-through">
                     {formatPrice(producto.precio)}
                   </span>
-                  <span style={{ color: '#e53935', fontWeight: 800, fontSize: 22 }}>
+                  <span className="text-red-600 font-bold text-xl">
                     {formatPrice(producto.precio_oferta)}
                   </span>
                 </div>
                 {discountPct !== null && (
-                  <div style={{ color: '#e53935', fontWeight: 700, fontSize: 13, marginTop: 4 }}>
+                  <div className="text-red-600 font-semibold text-sm mt-1">
                     Ahorra {discountPct}% vs. precio original
                   </div>
                 )}
               </div>
             ) : (
-              <div style={{ color: '#1e88e5', fontWeight: 800, fontSize: 22 }}>
+              <div className="text-blue-600 font-bold text-xl">
                 {formatPrice(producto.precio)}
               </div>
             )}
 
-            <div
-              style={{
-                marginTop: 10,
-                color: producto.stock > 0 ? '#43a047' : '#e53935',
-                fontWeight: 700,
-              }}
-            >
+            <div className={`mt-2 font-semibold ${
+              producto.stock > 0 ? 'text-green-600' : 'text-red-600'
+            }`}>
               {producto.stock > 0 ? 'En stock' : 'Agotado'}
             </div>
 
             {/* Selector de cantidad */}
             {producto.stock > 0 && (
-              <div style={{ marginTop: 12 }}>
-                <div style={{ fontWeight: 700, marginBottom: 6 }}>Cantidad</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div className="mt-3">
+                <div className="font-semibold mb-1">Cantidad</div>
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setQty((q) => Math.max(1, Number(q) - 1))}
                     aria-label="Disminuir"
-                    style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 8,
-                      border: '1px solid #ddd',
-                      background: '#fafafa',
-                      cursor: 'pointer',
-                      fontSize: 18,
-                      fontWeight: 800,
-                    }}
+                    className="w-9 h-9 rounded-lg border border-gray-300 bg-gray-50 cursor-pointer text-lg font-bold hover:bg-gray-100"
                   >
                     –
                   </button>
@@ -531,14 +521,7 @@ export default function VerProducto() {
                       const max = Number(producto.stock) || 1;
                       setQty(Math.min(Math.max(1, v), max));
                     }}
-                    style={{
-                      width: 70,
-                      height: 36,
-                      borderRadius: 8,
-                      border: '1px solid #ddd',
-                      textAlign: 'center',
-                      fontWeight: 700,
-                    }}
+                    className="w-16 h-9 rounded-lg border border-gray-300 text-center font-semibold"
                   />
                   <button
                     type="button"
@@ -549,97 +532,34 @@ export default function VerProducto() {
                       })
                     }
                     aria-label="Aumentar"
-                    style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 8,
-                      border: '1px solid #ddd',
-                      background: '#fafafa',
-                      cursor: 'pointer',
-                      fontSize: 18,
-                      fontWeight: 800,
-                    }}
+                    className="w-9 h-9 rounded-lg border border-gray-300 bg-gray-50 cursor-pointer text-lg font-bold hover:bg-gray-100"
                   >
                     +
                   </button>
                 </div>
                 {qty > (Number(producto.stock) || 0) && (
-                  <div style={{ color: '#e53935', fontWeight: 700, marginTop: 6, fontSize: 13 }}>
+                  <div className="text-red-600 font-semibold mt-1 text-sm">
                     Máximo disponible: {Number(producto.stock)}
                   </div>
                 )}
               </div>
             )}
 
-            <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+            <div className="flex gap-2 mt-3">
               <button
                 type="button"
-                style={{
-                  flex: 1,
-                  padding: '0.7rem 1rem',
-                  borderRadius: 10,
-                  border: noChangeDisabled ? '2px dashed #90caf9' : 'none',
-                  background:
-                    producto.stock > 0 ? (noChangeDisabled ? '#e3f2fd' : '#1e88e5') : '#aaa',
-                  color: producto.stock > 0 ? (noChangeDisabled ? '#1e88e5' : '#fff') : '#fff',
-                  fontWeight: 800,
-                  cursor:
-                    producto.stock > 0 ? (isDisabled ? 'not-allowed' : 'pointer') : 'not-allowed',
-                  transition: 'background 0.2s',
-                }}
+                className={`flex-1 py-2 px-4 rounded-lg font-bold transition-colors ${
+                  noChangeDisabled
+                    ? 'border-2 border-dashed border-blue-300 bg-blue-50 text-blue-600'
+                    : producto.stock > 0
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-gray-400 text-white'
+                } ${
+                  isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                }`}
                 title={noChangeDisabled ? 'Sin cambios' : undefined}
                 disabled={isDisabled}
-                onClick={async () => {
-                  if (!isAuthenticated) {
-                    window.location.href = '/login';
-                    return;
-                  }
-                  setAddMsg('');
-                  setAddLoading(true);
-                  try {
-                    if (inCart) {
-                      // Actualizar cantidad del carrito
-                      await appService.carrito.updateQuantity({
-                        producto_id: producto.id,
-                        cantidad: Number(qty) || 1,
-                      });
-                      setCartQty(Number(qty) || 1);
-                      setAddMsg('Cantidad actualizada.');
-                    } else {
-                      // Añadir al carrito
-                      await appService.carrito.add({
-                        producto_id: producto.id,
-                        cantidad: Number(qty) || 1,
-                      });
-                      setInCart(true);
-                      setCartQty(Number(qty) || 1);
-                      setAddMsg('¡Producto añadido al carrito!');
-                    }
-                    // Actualizar contador global
-                    try {
-                      const data = await appService.carrito.list();
-                      const items = Array.isArray(data) ? data : data?.results || [];
-                      const totalQty = items.reduce(
-                        (acc, it) => acc + (Number(it?.cantidad) || 1),
-                        0
-                      );
-                      window.dispatchEvent(
-                        new CustomEvent('cart:updated', { detail: { count: totalQty } })
-                      );
-                    } catch {}
-                  } catch (err) {
-                    const backendMsg = err?.response?.data;
-                    const msg =
-                      typeof backendMsg === 'object'
-                        ? Object.entries(backendMsg)
-                            .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
-                            .join(' | ')
-                        : backendMsg || err.message || 'Error al procesar el carrito';
-                    setAddMsg(msg);
-                  } finally {
-                    setAddLoading(false);
-                  }
-                }}
+                onClick={handleCartAction}
               >
                 {addLoading
                   ? inCart
@@ -653,94 +573,27 @@ export default function VerProducto() {
               {inCart && (
                 <button
                   type="button"
-                  style={{
-                    width: 44,
-                    borderRadius: 10,
-                    border: '1px solid #f2b8b8',
-                    background: '#fff5f5',
-                    color: '#c62828',
-                    fontWeight: 900,
-                    cursor: 'pointer',
-                  }}
+                  className="w-11 rounded-lg border border-red-300 bg-red-50 text-red-700 font-bold cursor-pointer hover:bg-red-100"
                   title="Quitar del carrito"
-                  onClick={async () => {
-                    if (!isAuthenticated) {
-                      window.location.href = '/login';
-                      return;
-                    }
-                    setAddMsg('');
-                    setAddLoading(true);
-                    try {
-                      await appService.carrito.remove({ producto_id: producto.id });
-                      setInCart(false);
-                      setCartQty(0);
-                      setQty(1);
-                      setAddMsg('Producto quitado del carrito.');
-                      try {
-                        const data = await appService.carrito.list();
-                        const items = Array.isArray(data) ? data : data?.results || [];
-                        const totalQty = items.reduce(
-                          (acc, it) => acc + (Number(it?.cantidad) || 1),
-                          0
-                        );
-                        window.dispatchEvent(
-                          new CustomEvent('cart:updated', { detail: { count: totalQty } })
-                        );
-                      } catch {}
-                    } catch (err) {
-                      const backendMsg = err?.response?.data;
-                      const msg =
-                        typeof backendMsg === 'object'
-                          ? Object.entries(backendMsg)
-                              .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
-                              .join(' | ')
-                          : backendMsg || err.message || 'No se pudo quitar del carrito';
-                      setAddMsg(msg);
-                    } finally {
-                      setAddLoading(false);
-                    }
-                  }}
+                  onClick={handleRemoveFromCart}
                 >
                   ✕
                 </button>
               )}
             </div>
-            {addMsg && (
-              <div
-                style={{
-                  marginTop: 8,
-                  color: addMsg.startsWith('¡') ? '#43a047' : '#e53935',
-                  fontWeight: 700,
-                }}
-              >
-                {addMsg}
-              </div>
-            )}
           </div>
 
           {/* Compartir */}
-          <div
-            style={{
-              background: '#fff',
-              border: '1px solid #eee',
-              borderRadius: 12,
-              padding: '1rem',
-            }}
-          >
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>Compartir</div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <div className="bg-white border border-gray-200 rounded-xl p-4">
+            <div className="font-semibold mb-1">Compartir</div>
+            <div className="flex gap-2 flex-wrap">
               <button
                 type="button"
                 onClick={() => {
                   navigator.clipboard.writeText(shareLink);
+                  toast.success('Enlace copiado al portapapeles');
                 }}
-                style={{
-                  padding: '0.5rem 0.8rem',
-                  borderRadius: 10,
-                  border: '1px solid #ddd',
-                  background: '#fafafa',
-                  cursor: 'pointer',
-                }}
+                className="px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 cursor-pointer hover:bg-gray-100"
               >
                 Copiar enlace
               </button>
@@ -749,13 +602,7 @@ export default function VerProducto() {
                 onClick={() => {
                   window.open(`https://wa.me/?text=${encodeURIComponent(shareLink)}`, '_blank');
                 }}
-                style={{
-                  padding: '0.5rem 0.8rem',
-                  borderRadius: 10,
-                  border: '1px solid #ddd',
-                  background: '#fafafa',
-                  cursor: 'pointer',
-                }}
+                className="px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 cursor-pointer hover:bg-gray-100"
               >
                 WhatsApp
               </button>
@@ -767,13 +614,7 @@ export default function VerProducto() {
                     '_blank'
                   );
                 }}
-                style={{
-                  padding: '0.5rem 0.8rem',
-                  borderRadius: 10,
-                  border: '1px solid #ddd',
-                  background: '#fafafa',
-                  cursor: 'pointer',
-                }}
+                className="px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 cursor-pointer hover:bg-gray-100"
               >
                 Facebook
               </button>
@@ -784,13 +625,7 @@ export default function VerProducto() {
                     `Producto: ${producto.nombre}`
                   )}&body=${encodeURIComponent(`Mira este producto: ${shareLink}`)}`;
                 }}
-                style={{
-                  padding: '0.5rem 0.8rem',
-                  borderRadius: 10,
-                  border: '1px solid #ddd',
-                  background: '#fafafa',
-                  cursor: 'pointer',
-                }}
+                className="px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 cursor-pointer hover:bg-gray-100"
               >
                 Email
               </button>
@@ -803,42 +638,24 @@ export default function VerProducto() {
       {isModalOpen && allImages.length > 0 && (
         <div
           onClick={() => setIsModalOpen(false)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.9)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 16,
-          }}
+          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            style={{ position: 'relative', maxWidth: 1200, width: '100%', maxHeight: '90vh' }}
+            className="relative max-w-6xl w-full max-h-[90vh]"
           >
             <button
               onClick={() => setIsModalOpen(false)}
-              style={{
-                position: 'absolute',
-                right: 0,
-                top: -40,
-                color: '#fff',
-                fontSize: 28,
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-              }}
+              className="absolute -top-10 right-0 text-white text-2xl bg-transparent border-none cursor-pointer"
             >
               ✕
             </button>
 
-            <div style={{ position: 'relative', width: '100%', height: '70vh' }}>
+            <div className="relative w-full h-[70vh]">
               <img
                 src={allImages[currentImageIndex]}
                 alt={producto.nombre}
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                className="w-full h-full object-contain"
               />
             </div>
 
@@ -849,18 +666,7 @@ export default function VerProducto() {
                 setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length)
               }
               disabled={allImages.length <= 1}
-              style={{
-                position: 'absolute',
-                left: 12,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'rgba(255,255,255,0.6)',
-                border: 'none',
-                borderRadius: '50%',
-                width: 40,
-                height: 40,
-                cursor: 'pointer',
-              }}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-60 border-none rounded-full w-10 h-10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Anterior"
             >
               ‹
@@ -869,36 +675,13 @@ export default function VerProducto() {
               type="button"
               onClick={() => setCurrentImageIndex((prev) => (prev + 1) % allImages.length)}
               disabled={allImages.length <= 1}
-              style={{
-                position: 'absolute',
-                right: 12,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'rgba(255,255,255,0.6)',
-                border: 'none',
-                borderRadius: '50%',
-                width: 40,
-                height: 40,
-                cursor: 'pointer',
-              }}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-60 border-none rounded-full w-10 h-10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Siguiente"
             >
               ›
             </button>
 
-            <div
-              style={{
-                position: 'absolute',
-                bottom: 12,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                color: '#fff',
-                background: 'rgba(0,0,0,0.4)',
-                padding: '4px 10px',
-                borderRadius: 999,
-                fontWeight: 700,
-              }}
-            >
+            <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-40 px-3 py-1 rounded-full font-semibold">
               {currentImageIndex + 1} / {allImages.length}
             </div>
           </div>

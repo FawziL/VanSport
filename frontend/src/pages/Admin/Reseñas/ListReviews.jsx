@@ -13,6 +13,7 @@ import {
   TableCell,
   ActionButton
 } from '@/components/ui/Table';
+import { toast } from 'react-toastify';
 
 export default function ListReviews() {
   const [items, setItems] = useState([]);
@@ -37,7 +38,10 @@ export default function ListReviews() {
         setPages(totalPages);
         setPage((prev) => Math.min(prev, totalPages));
       })
-      .catch(() => setError('No se pudieron cargar las reseñas'))
+      .catch(() => {
+        setError('No se pudieron cargar las reseñas');
+        toast.error('No se pudieron cargar las reseñas');
+      })
       .finally(() => setLoading(false));
     // eslint-disable-next-line
   }, [pageSize]);
@@ -82,8 +86,11 @@ export default function ListReviews() {
     try {
       await adminService.reseñas.remove(deleteId);
       setItems((prev) => prev.filter((x) => x.resena_id !== deleteId));
-    } catch {
-      setError('No se pudo eliminar la reseña');
+      toast.success('Reseña eliminada correctamente');
+    } catch (err) {
+      const msg = err?.response?.data?.detail || 'No se pudo eliminar la reseña';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setDeleteId(null);
       setModalOpen(false);

@@ -13,6 +13,7 @@ import {
   TableCell,
   ActionButton
 } from '@/components/ui/Table';
+import { toast } from 'react-toastify';
 
 export default function ListNotifications() {
   const [items, setItems] = useState([]);
@@ -37,7 +38,10 @@ export default function ListNotifications() {
         setPages(totalPages);
         setPage((prev) => Math.min(prev, totalPages));
       })
-      .catch(() => setError('No se pudieron cargar las notificaciones'))
+      .catch(() => {
+        setError('No se pudieron cargar las notificaciones');
+        toast.error('No se pudieron cargar las notificaciones');
+      })
       .finally(() => setLoading(false));
     // eslint-disable-next-line
   }, [pageSize]);
@@ -75,8 +79,11 @@ export default function ListNotifications() {
     try {
       await adminService.notificaciones.remove(deleteId);
       setItems((prev) => prev.filter((x) => x.notificacion_id !== deleteId));
-    } catch {
-      setError('No se pudo eliminar la notificación');
+      toast.success('Notificación eliminada correctamente');
+    } catch (err) {
+      const msg = err?.response?.data?.detail || 'No se pudo eliminar la notificación';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setDeleteId(null);
       setModalOpen(false);

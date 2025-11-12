@@ -16,6 +16,7 @@ import {
   ActionButton,
   FavoriteButton
 } from '@/components/ui/Table';
+import { toast } from 'react-toastify';
 
 export default function ListCategory() {
   const [categorias, setCategorias] = useState([]);
@@ -42,7 +43,10 @@ export default function ListCategory() {
         setPages(Math.max(1, Math.ceil(items.length / pageSize)));
         setPage((prev) => Math.min(prev, Math.max(1, Math.ceil(items.length / pageSize))));
       })
-      .catch(() => setError('No se pudieron cargar las categorías'))
+      .catch(() => {
+        setError('No se pudieron cargar las categorías');
+        toast.error('No se pudieron cargar las categorías');
+      })
       .finally(() => setLoading(false));
     // eslint-disable-next-line
   }, [pageSize]);
@@ -61,8 +65,11 @@ export default function ListCategory() {
       setCategorias((prev) => prev.filter((c) => c.categoria_id !== deleteId));
       setModalOpen(false);
       setDeleteId(null);
-    } catch {
-      setError('No se pudo eliminar la categoría');
+      toast.success('Categoría eliminada correctamente');
+    } catch (err) {
+      const msg = err?.response?.data?.detail || 'No se pudo eliminar la categoría';
+      setError(msg);
+      toast.error(msg);
     }
   };
 
@@ -74,14 +81,30 @@ export default function ListCategory() {
   const toggleDestacado = async (cat) => {
     try {
       setTogglingId(cat.categoria_id);
-      await adminService.categorias.partialUpdate(cat.categoria_id, { destacado: !cat.destacado });
+      
+      // Actualización optimista
       setCategorias((prev) =>
         prev.map((c) =>
           c.categoria_id === cat.categoria_id ? { ...c, destacado: !cat.destacado } : c
         )
       );
-    } catch (e) {
-      setError('No se pudo actualizar destacado');
+      
+      await adminService.categorias.partialUpdate(cat.categoria_id, { destacado: !cat.destacado });
+      
+      toast.success(
+        `Categoría ${!cat.destacado ? 'destacada' : 'quitada de destacados'} correctamente`
+      );
+    } catch (err) {
+      // Revertir cambio en caso de error
+      setCategorias((prev) =>
+        prev.map((c) =>
+          c.categoria_id === cat.categoria_id ? { ...c, destacado: cat.destacado } : c
+        )
+      );
+      
+      const msg = err?.response?.data?.detail || 'No se pudo actualizar destacado';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setTogglingId(null);
     }

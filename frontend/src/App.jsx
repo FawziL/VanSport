@@ -48,6 +48,8 @@ import Footer from '@/components/Footer';
 import ListPaymentMethods from '@/pages/Admin/MetodosPago/ListPaymentMethods';
 import CreatePaymentMethod from '@/pages/Admin/MetodosPago/CreatePaymentMethod';
 import EditPaymentMethod from '@/pages/Admin/MetodosPago/EditPaymentMethod';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AppShell() {
   const location = useLocation();
@@ -283,6 +285,17 @@ function AppShell() {
         </Routes>
       </main>
       {!isAdminRoute && <Footer />}
+      {/* Toast container global */}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        pauseOnFocusLoss
+      />
     </div>
   );
 }

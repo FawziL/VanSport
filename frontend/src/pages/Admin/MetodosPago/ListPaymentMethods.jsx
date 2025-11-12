@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/Table';
 import Pagination from '@/components/Pagination';
 import ConfirmModal from '@/components/ConfirmModal';
+import { toast } from 'react-toastify';
 
 export default function ListPaymentMethods() {
   const [items, setItems] = useState([]);
@@ -30,7 +31,10 @@ export default function ListPaymentMethods() {
     adminService.pagos
       .list({})
       .then((data) => setItems(Array.isArray(data) ? data : data.results || []))
-      .catch(() => setError('No se pudieron cargar los métodos de pago'))
+      .catch(() => {
+        setError('No se pudieron cargar los métodos de pago');
+        toast.error('No se pudieron cargar los métodos de pago');
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -42,22 +46,39 @@ export default function ListPaymentMethods() {
   const toggleActivo = async (m) => {
     try {
       setTogglingId(m.id);
-      await adminService.pagos.partialUpdate(m.id, { activo: !m.activo });
+      
+      // Actualización optimista
       setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, activo: !m.activo } : it)));
-    } catch {
-      setError('No se pudo actualizar el estado');
+      
+      await adminService.pagos.partialUpdate(m.id, { activo: !m.activo });
+      
+      toast.success(
+        `Método de pago ${!m.activo ? 'activado' : 'desactivado'} correctamente`
+      );
+    } catch (err) {
+      // Revertir cambio en caso de error
+      setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, activo: m.activo } : it)));
+      
+      const msg = err?.response?.data?.detail || 'No se pudo actualizar el estado';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setTogglingId(null);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('¿Eliminar este método de pago?')) return;
+  const handleDelete = async () => {
+    if (!deleteId) return;
     try {
-      await adminService.pagos.remove(id);
-      setItems((prev) => prev.filter((it) => it.id !== id));
-    } catch {
-      setError('No se pudo eliminar el método');
+      await adminService.pagos.remove(deleteId);
+      setItems((prev) => prev.filter((it) => it.id !== deleteId));
+      setModalOpen(false);
+      setDeleteId(null);
+      toast.success('Método de pago eliminado correctamente');
+    } catch (err) {
+      const msg = err?.response?.data?.detail || 'No se pudo eliminar el método';
+      setError(msg);
+      toast.error(msg);
     }
   };
 
