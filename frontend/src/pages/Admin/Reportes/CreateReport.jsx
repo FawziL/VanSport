@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { appService } from '@/services/auth';
 import { CATEGORIAS_FALLA } from '@/utils/categorias';
+import { Link } from 'react-router-dom';
 
-export default function NuevoReporte() {
+export default function CreateReport() {
   const [form, setForm] = useState({ categoria: 'ui', titulo: '', descripcion: '', seccion: '' });
   const [imagen, setImagen] = useState(null);
   const [video, setVideo] = useState(null);
@@ -19,7 +20,7 @@ export default function NuevoReporte() {
       if (imagen) fd.append('imagen', imagen);
       if (video) fd.append('video', video);
       await appService.reportes.create(fd);
-      navigate('/reportes');
+      navigate('/admin/reportes');
     } finally {
       setLoading(false);
     }
@@ -30,14 +31,17 @@ export default function NuevoReporte() {
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-8">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              Reportar una Falla
-            </h1>
-            <p className="text-gray-600">
-              Describe el problema que encontraste para que podamos solucionarlo
-            </p>
-          </div>
+        <div className="flex justify-between items-center mb-6">
+           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Reportar una Falla</h1>
+
+          <Link 
+            to="/admin/reportes" 
+            className="px-4 py-2 bg-gray-600 text-white! font-bold rounded-lg hover:bg-gray-700 transition-colors no-underline"
+          >
+            Volver a Reportes
+          </Link>
+        </div>
+
 
           <form onSubmit={onSubmit} className="space-y-6">
             {/* Categoría */}

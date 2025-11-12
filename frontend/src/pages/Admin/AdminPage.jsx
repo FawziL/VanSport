@@ -22,7 +22,6 @@ export default function AdminPage({ children }) {
       <AdminSidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
       <main
         style={{
-          padding: '1.25rem',
           flex: '1 1 auto', // el main ocupa el resto del espacio y se ajusta
           transition: 'padding 1.5s cubic-bezier(.4,2,.6,1)',
         }}
@@ -34,7 +33,7 @@ export default function AdminPage({ children }) {
         {`
           @media (max-width: 900px) {
             main {
-              padding: 1rem;
+              padding: 0px;
             }
           }
         `}

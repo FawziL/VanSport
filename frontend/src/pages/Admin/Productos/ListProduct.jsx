@@ -5,6 +5,17 @@ import { resolveImageUrl } from '@/utils/resolveUrl';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
 import ConfirmModal from '@/components/ConfirmModal';
+import {
+  Table,
+  TableHead,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+  ProductImage,
+  ActionButton,
+  FavoriteButton
+} from '@/components/ui/Table';
 
 export default function ListProduct() {
   const [productos, setProductos] = useState([]);
@@ -58,7 +69,7 @@ export default function ListProduct() {
   const handleExportExcel = async () => {
     try {
       setExporting(true);
-      const data = await adminService.productos.export(); // ArrayBuffer
+      const data = await adminService.productos.export();
       const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -105,35 +116,34 @@ export default function ListProduct() {
   };
 
   return (
-    <div style={{ maxWidth: 1100, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Productos</h1>
-        <div style={{ display: 'flex', gap: 8 }}>
+    <div className="max-w-[1100px] mx-auto my-10 px-4">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-extrabold">Productos</h1>
+        <div className="flex gap-2">
           <button
             type="button"
             onClick={handleExportExcel}
             disabled={exporting || loading}
             title="Descargar Excel de productos"
-            style={{
-              padding: '0.6rem 1rem',
-              borderRadius: 8,
-              border: '1px solid #cfe3fb',
-              background: exporting ? '#e3f2fd' : '#f5faff',
-              color: '#1e88e5',
-              fontWeight: 800,
-              cursor: exporting || loading ? 'not-allowed' : 'pointer',
-            }}
+            className={`px-4 py-2 rounded-lg border font-bold transition-colors ${
+              exporting || loading
+                ? 'bg-blue-50 border-blue-200 text-blue-400 cursor-not-allowed'
+                : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 cursor-pointer'
+            }`}
           >
             {exporting ? 'Exportando…' : 'Exportar Excel'}
           </button>
-
-          <Link to="/admin/productos/crear" style={{ padding: '0.6rem 1.2rem', borderRadius: 8, background: '#1e88e5', color: '#fff', fontWeight: 800, textDecoration: 'none' }}>
+            
+          <Link 
+            to="/admin/productos/crear" 
+           className="px-4 py-2 rounded-lg bg-blue-600 !text-white font-bold no-underline hover:bg-blue-700 transition-colors"
+          >
             + Crear producto
           </Link>
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+      <div className="flex justify-end mb-3">
         <PageSizeSelector
           value={pageSize}
           onChange={setPageSize}
@@ -142,139 +152,72 @@ export default function ListProduct() {
         />
       </div>
 
-      {error && <div style={{ color: '#d32f2f', marginBottom: 12, fontWeight: 700 }}>{error}</div>}
+      {error && <div className="text-red-700 font-bold mb-3">{error}</div>}
 
-      <div
-        style={{
-          overflowX: 'auto',
-          background: '#fff',
-          borderRadius: 10,
-          boxShadow: '0 2px 12px #0001',
-        }}
-      >
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 950 }}>
-          <thead>
-            <tr style={{ background: '#f3f4f6', color: '#000000ff' }}>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>ID</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Nombre</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Categoría</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Imagen</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Precio</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Stock</th>
-              <th style={{ padding: '12px 8px', textAlign: 'center' }}>Destacar</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Estado</th>
-              <th style={{ padding: '12px 8px', textAlign: 'center' }}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={8} style={{ textAlign: 'center', padding: 24 }}>
-                  Cargando...
-                </td>
-              </tr>
-            ) : productosPage.length === 0 ? (
-              <tr>
-                <td colSpan={8} style={{ textAlign: 'center', padding: 24, color: '#888' }}>
-                  No hay productos.
-                </td>
-              </tr>
-            ) : (
-              productosPage.map((p) => (
-                <tr key={p.producto_id} style={{ color: '#444' }}>
-                  <td style={{ padding: '10px 8px' }}>{p.producto_id}</td>
-                  <td style={{ padding: '10px 8px' }}>{p.nombre}</td>
-                  <td style={{ padding: '10px 8px' }}>{p.categoria?.nombre ?? '-'}</td>
-                  <td style={{ padding: '10px 8px' }}>
-                    {p.imagen_url ? (
-                      <img
-                        src={resolveImageUrl(p.imagen_url)}
-                        alt={p.nombre || 'Producto'}
-                        style={{
-                          width: 56,
-                          height: 56,
-                          objectFit: 'cover',
-                          borderRadius: 6,
-                          border: '1px solid #eee',
-                        }}
-                        loading="lazy"
-                      />
-                    ) : (
-                      <span style={{ color: '#999' }}>Sin imagen</span>
-                    )}
-                  </td>
-                  <td style={{ padding: '10px 8px' }}>{fmtPrecio(p.precio)}</td>
-                  <td style={{ padding: '10px 8px' }}>{p.stock}</td>
-                  <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                    <button
-                      onClick={() => toggleDestacado(p)}
-                      aria-label={p.destacado ? 'Quitar destacado' : 'Marcar como destacado'}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: 20,
-                        color: p.destacado ? '#e53935' : '#bbb',
-                        opacity: togglingId === p.producto_id ? 0.6 : 1,
-                      }}
-                      disabled={togglingId === p.producto_id}
-                    >
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill={p.destacado ? '#e53935' : 'none'}
-                        stroke={p.destacado ? '#e53935' : '#bbb'}
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden
-                      >
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                      </svg>
-                    </button>
-                  </td>
-                  <td style={{ padding: '10px 8px' }}>{p.activo ? 'Activo' : 'Inactivo'}</td>
-                  <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                    <button
-                      onClick={() => navigate(`/admin/productos/editar/${p.producto_id}`)}
-                      style={{
-                        marginRight: 8,
-                        padding: '0.4rem 0.8rem',
-                        borderRadius: 6,
-                        border: 'none',
-                        background: '#1e88e5',
-                        color: '#fff',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDeleteId(p.producto_id);
-                        setModalOpen(true);
-                      }}
-                      style={{
-                        padding: '0.4rem 0.8rem',
-                        borderRadius: 6,
-                        border: 'none',
-                        background: '#e53935',
-                        color: '#fff',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      <Table>
+        <TableHead>
+          <TableHeader>ID</TableHeader>
+          <TableHeader>Nombre</TableHeader>
+          <TableHeader>Categoría</TableHeader>
+          <TableHeader>Imagen</TableHeader>
+          <TableHeader>Precio</TableHeader>
+          <TableHeader>Stock</TableHeader>
+          <TableHeader align="center">Destacar</TableHeader>
+          <TableHeader>Estado</TableHeader>
+          <TableHeader align="center">Acciones</TableHeader>
+        </TableHead>
+        
+        <TableBody 
+          loading={loading} 
+          empty={productosPage.length === 0}
+          colSpan={9}
+          loadingText="Cargando productos..."
+          emptyText="No hay productos."
+        >
+          {productosPage.map((p) => (
+            <TableRow key={p.producto_id}>
+              <TableCell>{p.producto_id}</TableCell>
+              <TableCell>{p.nombre}</TableCell>
+              <TableCell>{p.categoria?.nombre ?? '-'}</TableCell>
+              <TableCell>
+                <ProductImage 
+                  src={p.imagen_url ? resolveImageUrl(p.imagen_url) : undefined}
+                  alt={p.nombre || 'Producto'}
+                />
+              </TableCell>
+              <TableCell>{fmtPrecio(p.precio)}</TableCell>
+              <TableCell>{p.stock}</TableCell>
+              <TableCell align="center">
+                <FavoriteButton
+                  isFavorite={p.destacado}
+                  onClick={() => toggleDestacado(p)}
+                  disabled={togglingId === p.producto_id}
+                />
+              </TableCell>
+              <TableCell>{p.activo ? 'Activo' : 'Inactivo'}</TableCell>
+              <TableCell align="center">
+                <div className="flex justify-center gap-2">
+                  <ActionButton
+                    variant="edit"
+                    onClick={() => navigate(`/admin/productos/editar/${p.producto_id}`)}
+                  >
+                    Editar
+                  </ActionButton>
+                  <ActionButton
+                    variant="delete"
+                    onClick={() => {
+                      setDeleteId(p.producto_id);
+                      setModalOpen(true);
+                    }}
+                  >
+                    Eliminar
+                  </ActionButton>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
       <Pagination page={page} pages={pages} onChange={setPage} showNumbers />
 

@@ -41,9 +41,10 @@ import EditShipment from '@/pages/Admin/Envíos/EditShipment';
 import NuevoReporte from '@/pages/App/Reportes/NuevoReporte';
 import MisReportes from '@/pages/App/Reportes/MisReportes';
 import VerReporte from '@/pages/App/Reportes/VerReporte';
-import ListReportes from '@/pages/Admin/Reportes/ListReport';
-import EditReporte from '@/pages/Admin/Reportes/EditReport';
-import Footer from '@/components/Footer'; // importa el componente
+import ListReports from '@/pages/Admin/Reportes/ListReport';
+import CreateReport from '@/pages/Admin/Reportes/CreateReport';
+import EditReport from '@/pages/Admin/Reportes/EditReport';
+import Footer from '@/components/Footer';
 import ListPaymentMethods from '@/pages/Admin/MetodosPago/ListPaymentMethods';
 import CreatePaymentMethod from '@/pages/Admin/MetodosPago/CreatePaymentMethod';
 import EditPaymentMethod from '@/pages/Admin/MetodosPago/EditPaymentMethod';
@@ -269,8 +270,9 @@ function AppShell() {
           />
 
           {/* Reportes Admin */}
-          <Route path="/admin/reportes" element={<AdminPage><ListReportes /></AdminPage>} />
-          <Route path="/admin/reportes/:id" element={<AdminPage><EditReporte /></AdminPage>} />
+          <Route path="/admin/reportes" element={<AdminPage><ListReports /></AdminPage>} />
+          <Route path="/admin/reportes/crear" element={<AdminPage><CreateReport /></AdminPage>} />
+          <Route path="/admin/reportes/:id" element={<AdminPage><EditReport /></AdminPage>} />
 
           {/* Pagos Admin */}
           <Route path="/admin/metodos-pago" element={<AdminPage><ListPaymentMethods /></AdminPage>} />
