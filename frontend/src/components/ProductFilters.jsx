@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ListCategories from '@/components/ListCategories';
 
 export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 12, 24, 48] }) {
@@ -7,7 +7,7 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
     categoria_id: value?.categoria_id ?? '',
     min_price: value?.min_price ?? '',
     max_price: value?.max_price ?? '',
-    oferta: value?.oferta ?? '', // '' | '1' | '0'
+    oferta: value?.oferta ?? '',
     pageSize: value?.pageSize ?? pageSizeOptions[0],
   }));
 
@@ -41,119 +41,125 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
   });
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        marginBottom: 24,
-        gap: 12,
-        flexWrap: 'wrap',
-      }}
-    >
-      <div style={{ minWidth: 200 }}>
-        <ListCategories
-          value={local.categoria_id}
-          onChange={(val) => setLocal((p) => ({ ...p, categoria_id: val }))}
-          placeholder="Todas las categorías"
-        />
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-fit sticky top-6">
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-200">
+        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+        </svg>
+        <h3 className="text-lg font-semibold text-gray-900">Filtros</h3>
       </div>
 
-      <input
-        type="number"
-        placeholder="Precio mínimo"
-        value={local.min_price}
-        onChange={(e) => setLocal((p) => ({ ...p, min_price: e.target.value }))}
-        style={{
-          padding: '0.6rem 1rem',
-          borderRadius: 8,
-          border: '1px solid #ccc',
-          width: 160,
-          fontSize: 16,
-        }}
-        min="0"
-        step="0.01"
-      />
-      <input
-        type="number"
-        placeholder="Precio máximo"
-        value={local.max_price}
-        onChange={(e) => setLocal((p) => ({ ...p, max_price: e.target.value }))}
-        style={{
-          padding: '0.6rem 1rem',
-          borderRadius: 8,
-          border: '1px solid #ccc',
-          width: 160,
-          fontSize: 16,
-        }}
-        min="0"
-        step="0.01"
-      />
+      {/* Filters Stack */}
+      <div className="space-y-6">
+        {/* Búsqueda */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Buscar producto
+          </label>
+          <input
+            type="text"
+            placeholder="Nombre del producto..."
+            value={local.q}
+            onChange={(e) => setLocal((p) => ({ ...p, q: e.target.value }))}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+        </div>
 
-      <select
-        value={local.oferta}
-        onChange={(e) => setLocal((p) => ({ ...p, oferta: e.target.value }))}
-        style={{
-          padding: '0.6rem 1rem',
-          borderRadius: 8,
-          border: '1px solid #ccc',
-          width: 180,
-          fontSize: 16,
-        }}
-      >
-        <option value="">Todos</option>
-        <option value="1">Solo en oferta</option>
-      </select>
+        {/* Categoría */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Categoría
+          </label>
+          <ListCategories
+            value={local.categoria_id}
+            onChange={(val) => setLocal((p) => ({ ...p, categoria_id: val }))}
+            placeholder="Todas las categorías"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+        </div>
 
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-        <button
-          onClick={apply}
-          style={{
-            padding: '0.6rem 1rem',
-            borderRadius: 8,
-            border: 'none',
-            background: '#1e88e5',
-            color: '#fff',
-            fontWeight: 700,
-            cursor: 'pointer',
-          }}
-        >
-          Aplicar
-        </button>
+        {/* Rango de Precio */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Rango de Precio
+          </label>
+          <div className="space-y-3">
+            <div className="relative flex">
+              <input
+                type="number"
+                placeholder="Mínimo"
+                value={local.min_price}
+                onChange={(e) => setLocal((p) => ({ ...p, min_price: e.target.value }))}
+                className="w-1/2 pl-8 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                min="0"
+                step="0.01"
+              />
+              <input
+                type="number"
+                placeholder="Máximo"
+                value={local.max_price}
+                onChange={(e) => setLocal((p) => ({ ...p, max_price: e.target.value }))}
+                className="w-1/2 pl-8 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                min="0"
+                step="0.01"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Oferta */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Oferta
+          </label>
+          <select
+            value={local.oferta}
+            onChange={(e) => setLocal((p) => ({ ...p, oferta: e.target.value }))}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-sm"
+          >
+            <option value="">Todos los productos</option>
+            <option value="1">Solo en oferta</option>
+          </select>
+        </div>
+
+        {/* Items por página */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Productos por página
+          </label>
+          <select
+            value={local.pageSize}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              setLocal((p) => ({ ...p, pageSize: val }));
+              onChange?.(normalize({ ...local, pageSize: val }));
+            }}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-sm"
+          >
+            {pageSizeOptions.map((n) => (
+              <option key={n} value={n}>
+                {n} productos
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-3 pt-6 mt-6 border-t border-gray-200">
         <button
           onClick={reset}
-          style={{
-            padding: '0.6rem 1rem',
-            borderRadius: 8,
-            border: '1px solid #ccc',
-            background: '#fff',
-            color: '#333',
-            fontWeight: 700,
-            cursor: 'pointer',
-          }}
+          className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors text-sm active:bg-blue-800 active:scale-95 transition-all cursor-pointer"
         >
           Limpiar
         </button>
-        <select
-          value={local.pageSize}
-          onChange={(e) => {
-            const val = Number(e.target.value);
-            setLocal((p) => ({ ...p, pageSize: val }));
-            onChange?.(normalize({ ...local, pageSize: val }));
-          }}
-          style={{
-            padding: '0.6rem 1rem',
-            borderRadius: 8,
-            border: '1px solid #ccc',
-            fontSize: 16,
-          }}
-          aria-label="Por página"
+        <button
+          onClick={apply}
+          className="flex-1 px-4 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-sm active:bg-gray-200 active:scale-95 transition-all cursor-pointer"
         >
-          {pageSizeOptions.map((n) => (
-            <option key={n} value={n}>
-              {n} por página
-            </option>
-          ))}
-        </select>
+          Aplicar
+        </button>
       </div>
     </div>
   );
