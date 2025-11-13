@@ -166,8 +166,8 @@ export default function EditOrder() {
             >
               <option value="">Seleccionar estado</option>
               <option value="pendiente">Pendiente</option>
-              <option value="confirmado">Confirmado</option>
-              <option value="en_camino">En camino</option>
+              <option value="pagado">Pagado</option>
+              <option value="en_transito">En transito</option>
               <option value="entregado">Entregado</option>
               <option value="cancelado">Cancelado</option>
             </select>
