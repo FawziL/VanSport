@@ -278,7 +278,7 @@ export default function VerPedido() {
                   await appService.transacciones.pay({
                     pedido_id: id,
                     // enviar el código del método seleccionado
-                    metodo_pago: metodoSel?.codigo || metodoPago,
+                    metodo_pago: metodoSel?.nombre || metodoPago,
                     // si no se requiere, enviamos vacío
                     codigo_transaccion: requiereReferencia ? referencia : '',
                     monto: pedido.total,

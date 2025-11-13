@@ -130,7 +130,6 @@ class Transaccion(models.Model):
 	estado = models.CharField(max_length=50)
 	fecha_transaccion = models.DateTimeField(db_column='fecha_transaccion')
 	codigo_transaccion = models.CharField(max_length=100)
-	metodo_pago_codigo = models.SlugField(max_length=50)      # snapshot del método seleccionado
 	referencia = models.CharField(max_length=100, blank=True, default='')
 	comprobante = models.ImageField(upload_to='transacciones/', blank=True, null=True)
 	notas_pago = models.TextField(blank=True, default='')
