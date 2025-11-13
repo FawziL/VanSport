@@ -20,7 +20,10 @@ export default function Dashboard() {
   const [bcv, setBcv] = useState(null);
 
   useEffect(() => {
-    appService.utils.dolarBcvHoy().then(setBcv).catch(() => setBcv(null));
+    appService.utils
+      .dolarBcvHoy()
+      .then(setBcv)
+      .catch(() => setBcv(null));
   }, []);
 
   useEffect(() => {
@@ -111,38 +114,28 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggleButton />
-          <span className="text-gray-500 text-sm">
-            {new Date().toLocaleDateString('es-ES')}
-          </span>
+          <span className="text-gray-500 text-sm">{new Date().toLocaleDateString('es-ES')}</span>
         </div>
       </div>
 
       {/* Quick stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2">
-        <StatCard 
-          title="Dólar (BCV hoy)" 
-          value={bcv ? `Bs ${Number(bcv.valor).toFixed(2)}` : '—'} 
-          note={bcv?.fecha} 
+        <StatCard
+          title="Dólar (BCV hoy)"
+          value={bcv ? `Bs ${Number(bcv.valor).toFixed(2)}` : '—'}
+          note={bcv?.fecha}
         />
-        <StatCard 
-          title="Pagos pendientes" 
-          value={pendingCount} 
-          to="/admin/ventas/pendientes" 
+        <StatCard title="Pagos pendientes" value={pendingCount} to="/admin/ventas/pendientes" />
+        <StatCard title="Productos" value={stats.productos} to="/admin/productos" />
+        <StatCard
+          title="Ventas totales"
+          value={stats.ventasMes}
+          note={stats.ventasDesde ? `desde ${stats.ventasDesde}` : ''}
         />
-        <StatCard 
-          title="Productos" 
-          value={stats.productos} 
-          to="/admin/productos" 
-        />
-        <StatCard 
-          title="Ventas totales" 
-          value={stats.ventasMes} 
-          note={stats.ventasDesde ? `desde ${stats.ventasDesde}` : ''} 
-        />
-        <StatCard 
-          title="Usuarios Registrados" 
-          value={stats.usuariosTotal} 
-          note={stats.usuariosMes ? `${stats.usuariosMes} desde ${stats.ventasDesde}` : ''} 
+        <StatCard
+          title="Usuarios Registrados"
+          value={stats.usuariosTotal}
+          note={stats.usuariosMes ? `${stats.usuariosMes} desde ${stats.ventasDesde}` : ''}
         />
       </div>
 

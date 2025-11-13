@@ -14,7 +14,7 @@ import {
   TableCell,
   ProductImage,
   ActionButton,
-  FavoriteButton
+  FavoriteButton,
 } from '@/components/ui/Table';
 import { toast } from 'react-toastify';
 
@@ -81,16 +81,16 @@ export default function ListCategory() {
   const toggleDestacado = async (cat) => {
     try {
       setTogglingId(cat.categoria_id);
-      
+
       // Actualización optimista
       setCategorias((prev) =>
         prev.map((c) =>
           c.categoria_id === cat.categoria_id ? { ...c, destacado: !cat.destacado } : c
         )
       );
-      
+
       await adminService.categorias.partialUpdate(cat.categoria_id, { destacado: !cat.destacado });
-      
+
       toast.success(
         `Categoría ${!cat.destacado ? 'destacada' : 'quitada de destacados'} correctamente`
       );
@@ -101,7 +101,7 @@ export default function ListCategory() {
           c.categoria_id === cat.categoria_id ? { ...c, destacado: cat.destacado } : c
         )
       );
-      
+
       const msg = err?.response?.data?.detail || 'No se pudo actualizar destacado';
       setError(msg);
       toast.error(msg);
@@ -146,9 +146,9 @@ export default function ListCategory() {
           <TableHeader align="center">Destacar</TableHeader>
           <TableHeader align="center">Acciones</TableHeader>
         </TableHead>
-        
-        <TableBody 
-          loading={loading} 
+
+        <TableBody
+          loading={loading}
           empty={categoriasPage.length === 0}
           colSpan={6}
           loadingText="Cargando categorías..."
@@ -159,7 +159,7 @@ export default function ListCategory() {
               <TableCell>{cat.categoria_id}</TableCell>
               <TableCell>
                 {cat.imagen_url ? (
-                  <ProductImage 
+                  <ProductImage
                     src={resolveImageUrl(cat.imagen_url)}
                     alt={cat.nombre}
                     className="w-12 h-12"

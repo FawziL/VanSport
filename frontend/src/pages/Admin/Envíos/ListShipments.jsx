@@ -10,7 +10,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  ActionButton
+  ActionButton,
 } from '@/components/ui/Table';
 import StatusBadge from '@/components/StatusBadge';
 
@@ -56,10 +56,13 @@ export default function ListShipments() {
   const pageItems = items.slice(start, end);
 
   const fmt = {
-    date: (s) => (s ? new Date(s).toLocaleString('es-ES', {
-      dateStyle: 'short',
-      timeStyle: 'short'
-    }) : '-'),
+    date: (s) =>
+      s
+        ? new Date(s).toLocaleString('es-ES', {
+            dateStyle: 'short',
+            timeStyle: 'short',
+          })
+        : '-',
     money: (n) => (n != null ? `$${Number(n).toFixed(2)}` : '-'),
   };
 
@@ -86,7 +89,7 @@ export default function ListShipments() {
       });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `envios_${new Date().toISOString().slice(0,10)}.xlsx`;
+      a.download = `envios_${new Date().toISOString().slice(0, 10)}.xlsx`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -104,40 +107,40 @@ export default function ListShipments() {
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-extrabold">Envíos</h1>
-              <div className="flex flex-col sm:flex-row gap-4 items-end mb-4">
-        <div className="flex flex-col sm:flex-row gap-4 flex-1">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Desde</label>
-            <input 
-              type="date" 
-              value={startDate} 
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+        <div className="flex flex-col sm:flex-row gap-4 items-end mb-4">
+          <div className="flex flex-col sm:flex-row gap-4 flex-1">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Desde</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Hasta</label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Hasta</label>
-            <input 
-              type="date" 
-              value={endDate} 
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+          <button
+            onClick={handleExportExcel}
+            disabled={exporting}
+            className={`px-4 py-2 rounded-lg border font-bold transition-colors ${
+              exporting
+                ? 'bg-blue-50 border-blue-200 text-blue-400 cursor-not-allowed'
+                : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 cursor-pointer'
+            }`}
+            title="Exportar envíos a Excel"
+          >
+            {exporting ? 'Exportando…' : 'Exportar Excel'}
+          </button>
         </div>
-        <button
-          onClick={handleExportExcel}
-          disabled={exporting}
-          className={`px-4 py-2 rounded-lg border font-bold transition-colors ${
-            exporting
-              ? 'bg-blue-50 border-blue-200 text-blue-400 cursor-not-allowed'
-              : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 cursor-pointer'
-          }`}
-          title="Exportar envíos a Excel"
-        >
-          {exporting ? 'Exportando…' : 'Exportar Excel'}
-        </button>
-      </div>
       </div>
 
       {/* Error Message */}
@@ -163,11 +166,13 @@ export default function ListShipments() {
           <TableHeader width="14%">Estado</TableHeader>
           <TableHeader width="10%">Costo</TableHeader>
           <TableHeader width="15%">Fecha envío</TableHeader>
-          <TableHeader width="10%" align="center">Acciones</TableHeader>
+          <TableHeader width="10%" align="center">
+            Acciones
+          </TableHeader>
         </TableHead>
-        
-        <TableBody 
-          loading={loading} 
+
+        <TableBody
+          loading={loading}
           empty={pageItems.length === 0}
           colSpan={8}
           loadingText="Cargando envíos..."
@@ -180,7 +185,7 @@ export default function ListShipments() {
               <TableCell className="break-words">{getUserLabel(e)}</TableCell>
               <TableCell className="break-words">{e.metodo_envio}</TableCell>
               <TableCell className="break-words">
-                 <StatusBadge estado={e.estado} variant="order" />
+                <StatusBadge estado={e.estado} variant="order" />
               </TableCell>
               <TableCell className="whitespace-nowrap">{fmt.money(e.costo_envio)}</TableCell>
               <TableCell className="whitespace-nowrap">{fmt.date(e.fecha_envio)}</TableCell>

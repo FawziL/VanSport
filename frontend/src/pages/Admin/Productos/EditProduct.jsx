@@ -19,7 +19,7 @@ export default function EditProduct() {
     nombre: '',
     descripcion: '',
     precio: '',
-    precio_oferta: '',        // <-- nuevo
+    precio_oferta: '', // <-- nuevo
     stock: '',
     categoria_id: '',
     activo: true,
@@ -45,7 +45,9 @@ export default function EditProduct() {
           activo: !!data?.activo,
           imagen_url: data?.imagen_url ?? '',
         });
-        setExistingExtras(Array.isArray(data?.imagenes_adicionales) ? data.imagenes_adicionales : []);
+        setExistingExtras(
+          Array.isArray(data?.imagenes_adicionales) ? data.imagenes_adicionales : []
+        );
       } catch (err) {
         setError(err?.response?.data?.detail || err?.message || 'No se pudo cargar el producto');
       } finally {
@@ -120,15 +122,16 @@ export default function EditProduct() {
     }
   };
 
-  if (loading) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Cargando producto...</p>
+  if (loading)
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando producto...</p>
+        </div>
       </div>
-    </div>
-  );
-  
+    );
+
   return (
     <div className="p-4 max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-4">
@@ -169,7 +172,9 @@ export default function EditProduct() {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> {/* <-- cambia a 3 columnas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {' '}
+          {/* <-- cambia a 3 columnas */}
           <div>
             <label htmlFor="precio" className="block text-sm font-medium mb-1">
               Precio
@@ -186,8 +191,9 @@ export default function EditProduct() {
               className="border rounded px-3 py-2 w-full"
             />
           </div>
-
-          <div> {/* <-- nuevo: precio oferta */}
+          <div>
+            {' '}
+            {/* <-- nuevo: precio oferta */}
             <label htmlFor="precio_oferta" className="block text-sm font-medium mb-1">
               Precio oferta (opcional)
             </label>
@@ -202,7 +208,6 @@ export default function EditProduct() {
               className="border rounded px-3 py-2 w-full"
             />
           </div>
-
           <div>
             <label htmlFor="stock" className="block text-sm font-medium mb-1">
               Stock
@@ -238,15 +243,18 @@ export default function EditProduct() {
           <label htmlFor="imagen" className="block text-sm font-medium mb-1">
             Imagen principal (opcional)
           </label>
-          {form.imagen_url && <div className="mb-2 text-sm text-gray-600">                
-            <div className="w-28 h-20 rounded overflow-hidden border">
-                  <img
-                    src={resolveImageUrl(form.imagen_url)}
-                    alt={form.imagen_url}
-                    className="w-full h-full object-cover"
-                  />
-                </div></div>}
-          
+          {form.imagen_url && (
+            <div className="mb-2 text-sm text-gray-600">
+              <div className="w-28 h-20 rounded overflow-hidden border">
+                <img
+                  src={resolveImageUrl(form.imagen_url)}
+                  alt={form.imagen_url}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          )}
+
           <input
             id="imagen"
             name="imagen"
@@ -302,7 +310,8 @@ export default function EditProduct() {
               ))}
             </div>
             <div className="text-xs text-gray-500 mt-1">
-              Reordena con ↑/↓ y elimina con “Eliminar”. Las nuevas imágenes que agregues se añadirán al final.
+              Reordena con ↑/↓ y elimina con “Eliminar”. Las nuevas imágenes que agregues se
+              añadirán al final.
             </div>
           </div>
         )}

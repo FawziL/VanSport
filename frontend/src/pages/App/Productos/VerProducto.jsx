@@ -52,7 +52,12 @@ export default function VerProducto() {
             if (Array.isArray(parsed)) extras = parsed;
           } catch {
             // fallback CSV
-            extras = s ? s.split(',').map((p) => p.trim()).filter(Boolean) : [];
+            extras = s
+              ? s
+                  .split(',')
+                  .map((p) => p.trim())
+                  .filter(Boolean)
+              : [];
           }
         }
 
@@ -92,7 +97,9 @@ export default function VerProducto() {
       }
     }
     if (id) load();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [id]);
 
   const allImages = useMemo(() => {
@@ -235,13 +242,8 @@ export default function VerProducto() {
       try {
         const data = await appService.carrito.list();
         const items = Array.isArray(data) ? data : data?.results || [];
-        const totalQty = items.reduce(
-          (acc, it) => acc + (Number(it?.cantidad) || 1),
-          0
-        );
-        window.dispatchEvent(
-          new CustomEvent('cart:updated', { detail: { count: totalQty } })
-        );
+        const totalQty = items.reduce((acc, it) => acc + (Number(it?.cantidad) || 1), 0);
+        window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: totalQty } }));
       } catch {}
     } catch (err) {
       const backendMsg = err?.response?.data;
@@ -274,13 +276,8 @@ export default function VerProducto() {
       try {
         const data = await appService.carrito.list();
         const items = Array.isArray(data) ? data : data?.results || [];
-        const totalQty = items.reduce(
-          (acc, it) => acc + (Number(it?.cantidad) || 1),
-          0
-        );
-        window.dispatchEvent(
-          new CustomEvent('cart:updated', { detail: { count: totalQty } })
-        );
+        const totalQty = items.reduce((acc, it) => acc + (Number(it?.cantidad) || 1), 0);
+        window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: totalQty } }));
       } catch {}
     } catch (err) {
       const backendMsg = err?.response?.data;
@@ -322,11 +319,12 @@ export default function VerProducto() {
   if (errMsg) {
     return (
       <div className="max-w-4xl mx-auto my-8 px-4">
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">
-          {errMsg}
-        </div>
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">{errMsg}</div>
         <div className="mt-3">
-          <Link to="/productos" className="text-blue-600 font-bold no-underline hover:text-blue-800">
+          <Link
+            to="/productos"
+            className="text-blue-600 font-bold no-underline hover:text-blue-800"
+          >
             Volver a productos
           </Link>
         </div>
@@ -339,7 +337,10 @@ export default function VerProducto() {
       <div className="max-w-4xl mx-auto my-8 px-4 text-center">
         No se encontró el producto.
         <div className="mt-3">
-          <Link to="/productos" className="text-blue-600 font-bold no-underline hover:text-blue-800">
+          <Link
+            to="/productos"
+            className="text-blue-600 font-bold no-underline hover:text-blue-800"
+          >
             Volver a productos
           </Link>
         </div>
@@ -367,7 +368,10 @@ export default function VerProducto() {
           Inicio
         </Link>
         <span className="text-gray-500">/</span>
-        <Link to="/productos" className="text-blue-600 font-semibold no-underline hover:text-blue-800">
+        <Link
+          to="/productos"
+          className="text-blue-600 font-semibold no-underline hover:text-blue-800"
+        >
           Productos
         </Link>
         <span className="text-gray-500">/</span>
@@ -376,7 +380,7 @@ export default function VerProducto() {
 
       <div className="flex justify-between gap-6">
         {/* Galería */}
-        <div className='w-full'>
+        <div className="w-full">
           <div className="relative">
             {discountPct !== null && (
               <span className="absolute top-3 right-3 bg-red-600 text-white font-bold text-sm rounded-lg px-2 py-1 z-10">
@@ -431,10 +435,7 @@ export default function VerProducto() {
                 <h3 className="text-lg font-semibold mb-2">Detalles</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {Object.entries(producto.atributos).map(([label, value]) => (
-                    <div
-                      key={label}
-                      className="bg-gray-50 border border-gray-200 rounded-lg p-3"
-                    >
+                    <div key={label} className="bg-gray-50 border border-gray-200 rounded-lg p-3">
                       <div className="text-gray-600 text-sm">{label}</div>
                       <div className="font-semibold">{String(value)}</div>
                     </div>
@@ -451,7 +452,7 @@ export default function VerProducto() {
         </div>
 
         {/* Sidebar: precio, stock, acciones */}
-        <div className='w-1/2'>
+        <div className="w-1/2">
           <h1 className="text-2xl font-bold mb-2">{producto.nombre}</h1>
           <div className="text-gray-600 mb-2">{producto.categoria || 'Categoría'}</div>
 
@@ -469,9 +470,7 @@ export default function VerProducto() {
             {producto.precio_oferta ? (
               <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-gray-500 line-through">
-                    {formatPrice(producto.precio)}
-                  </span>
+                  <span className="text-gray-500 line-through">{formatPrice(producto.precio)}</span>
                   <span className="text-red-600 font-bold text-xl">
                     {formatPrice(producto.precio_oferta)}
                   </span>
@@ -483,14 +482,14 @@ export default function VerProducto() {
                 )}
               </div>
             ) : (
-              <div className="text-blue-600 font-bold text-xl">
-                {formatPrice(producto.precio)}
-              </div>
+              <div className="text-blue-600 font-bold text-xl">{formatPrice(producto.precio)}</div>
             )}
 
-            <div className={`mt-2 font-semibold ${
-              producto.stock > 0 ? 'text-green-600' : 'text-red-600'
-            }`}>
+            <div
+              className={`mt-2 font-semibold ${
+                producto.stock > 0 ? 'text-green-600' : 'text-red-600'
+              }`}
+            >
               {producto.stock > 0 ? 'En stock' : 'Agotado'}
             </div>
 
@@ -552,11 +551,9 @@ export default function VerProducto() {
                   noChangeDisabled
                     ? 'border-2 border-dashed border-blue-300 bg-blue-50 text-blue-600'
                     : producto.stock > 0
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-gray-400 text-white'
-                } ${
-                  isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
-                }`}
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      : 'bg-gray-400 text-white'
+                } ${isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                 title={noChangeDisabled ? 'Sin cambios' : undefined}
                 disabled={isDisabled}
                 onClick={handleCartAction}
@@ -588,7 +585,9 @@ export default function VerProducto() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-sm font-semibold text-gray-900">Compartir</div>
-                <div className="text-xs text-gray-500">Comparte este producto con tus clientes o amigos</div>
+                <div className="text-xs text-gray-500">
+                  Comparte este producto con tus clientes o amigos
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
@@ -597,20 +596,46 @@ export default function VerProducto() {
                   <button
                     type="button"
                     onClick={() =>
-                      navigator.share({
-                        title: `Producto: ${producto.nombre}`,
-                        text: `Mira este producto: ${producto.nombre}`,
-                        url: shareLink,
-                      }).catch(() => {})
+                      navigator
+                        .share({
+                          title: `Producto: ${producto.nombre}`,
+                          text: `Mira este producto: ${producto.nombre}`,
+                          url: shareLink,
+                        })
+                        .catch(() => {})
                     }
                     title="Compartir (nativo)"
                     className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
                     aria-label="Compartir"
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                      <path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M16 6l-4-4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M12 2v14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden
+                    >
+                      <path
+                        d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M16 6l-4-4-4 4"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M12 2v14"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                     Compartir
                   </button>
@@ -629,36 +654,91 @@ export default function VerProducto() {
                 className="flex items-center gap-2 justify-center px-3 py-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-gray-100 transition text-sm"
                 aria-label="Copiar enlace"
               >
-                <svg className="w-4 h-4 text-gray-700" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                  <path d="M8 7h8a1 1 0 011 1v10a1 1 0 01-1 1H8a1 1 0 01-1-1V8a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M16 7V5a2 2 0 00-2-2H6a2 2 0 00-2 2v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg
+                  className="w-4 h-4 text-gray-700"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden
+                >
+                  <path
+                    d="M8 7h8a1 1 0 011 1v10a1 1 0 01-1 1H8a1 1 0 01-1-1V8a1 1 0 011-1z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M16 7V5a2 2 0 00-2-2H6a2 2 0 00-2 2v10"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
                 Copiar
               </button>
 
               <button
                 type="button"
-                onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(shareLink)}`, '_blank')}
+                onClick={() =>
+                  window.open(`https://wa.me/?text=${encodeURIComponent(shareLink)}`, '_blank')
+                }
                 title="Compartir por WhatsApp"
                 className="flex items-center gap-2 justify-center px-3 py-2 rounded-lg border border-gray-100 bg-green-50 hover:bg-green-100 transition text-sm text-green-700"
                 aria-label="WhatsApp"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                  <path d="M21 12.08A9 9 0 1111.92 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M21 21l-5.2-1.4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden
+                >
+                  <path
+                    d="M21 12.08A9 9 0 1111.92 3"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M21 21l-5.2-1.4"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
                 WhatsApp
               </button>
 
               <button
                 type="button"
-                onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`, '_blank')}
+                onClick={() =>
+                  window.open(
+                    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`,
+                    '_blank'
+                  )
+                }
                 title="Compartir en Facebook"
                 className="flex items-center gap-2 justify-center px-3 py-2 rounded-lg border border-gray-100 bg-blue-50 hover:bg-blue-100 transition text-sm text-blue-700"
                 aria-label="Facebook"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                  <path d="M18 2h-3a4 4 0 00-4 4v3H8v3h3v7h3v-7h2.5L18 9h-2.5V6.5A1.5 1.5 0 0117 5h1V2z" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden
+                >
+                  <path
+                    d="M18 2h-3a4 4 0 00-4 4v3H8v3h3v7h3v-7h2.5L18 9h-2.5V6.5A1.5 1.5 0 0117 5h1V2z"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
                 Facebook
               </button>
@@ -672,9 +752,27 @@ export default function VerProducto() {
                 className="flex items-center gap-2 justify-center px-3 py-2 rounded-lg border border-gray-100 bg-indigo-50 hover:bg-indigo-100 transition text-sm text-indigo-700"
                 aria-label="Email"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                  <path d="M3 8l9 6 9-6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M21 8v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden
+                >
+                  <path
+                    d="M3 8l9 6 9-6"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M21 8v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
                 Email
               </button>

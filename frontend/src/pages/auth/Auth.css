@@ -15,7 +15,9 @@
   width: 100%;
   max-width: 500px;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .register-card:hover {
@@ -141,8 +143,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-message {
@@ -188,11 +194,11 @@
   .register-container {
     padding: 10px;
   }
-  
+
   .register-form {
     padding: 1.5rem;
   }
-  
+
   .form-row {
     flex-direction: column;
     gap: 0;

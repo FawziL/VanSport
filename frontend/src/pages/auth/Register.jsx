@@ -77,7 +77,7 @@ function Register() {
           <h2>Crear Cuenta</h2>
           <p>Completa tus datos para comenzar</p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="register-form">
           <div className="form-section">
             <h3 className="section-title">Información Personal</h3>
@@ -107,7 +107,7 @@ function Register() {
                 />
               </div>
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="email">Correo Electrónico</label>
               <input
@@ -120,7 +120,7 @@ function Register() {
                 required
               />
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="telefono">Teléfono</label>
               <input
@@ -133,7 +133,7 @@ function Register() {
               />
             </div>
           </div>
-          
+
           <div className="form-section">
             <h3 className="section-title">Seguridad</h3>
             <div className="form-group">
@@ -150,7 +150,7 @@ function Register() {
               />
               <div className="password-hint">La contraseña debe tener al menos 8 caracteres</div>
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="confirmPassword">Confirmar Contraseña</label>
               <input
@@ -165,7 +165,7 @@ function Register() {
               />
             </div>
           </div>
-          
+
           <button
             type="submit"
             disabled={submitting}
@@ -184,9 +184,14 @@ function Register() {
           {error && <div className="error-message">{error}</div>}
           {success && <div className="success-message">¡Registro exitoso! Redirigiendo...</div>}
         </form>
-        
+
         <div className="register-footer">
-          <p>¿Ya tienes una cuenta? <a href="/login" className="login-link">Inicia Sesión</a></p>
+          <p>
+            ¿Ya tienes una cuenta?{' '}
+            <a href="/login" className="login-link">
+              Inicia Sesión
+            </a>
+          </p>
         </div>
       </div>
     </div>

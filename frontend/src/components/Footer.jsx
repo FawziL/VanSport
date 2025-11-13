@@ -72,9 +72,7 @@ export default function Footer({
       { label: 'Inicio', to: '/' },
       { label: 'Productos', to: '/productos' },
     ],
-    soporte: [
-      { label: 'Reporte de fallas', to: '/reportes' },
-    ],
+    soporte: [{ label: 'Reporte de fallas', to: '/reportes' }],
   },
   externalLinks = {
     empresa: [
@@ -87,7 +85,11 @@ export default function Footer({
     ],
   },
   socials = [
-    { type: 'instagram', href: 'https://www.instagram.com/distribuidoravansport/', label: 'Instagram' },
+    {
+      type: 'instagram',
+      href: 'https://www.instagram.com/distribuidoravansport/',
+      label: 'Instagram',
+    },
     { type: 'facebook', href: 'https://facebook.com/', label: 'Facebook' },
     { type: 'tiktok', href: 'https://tiktok.com/@', label: 'TikTok' },
     { type: 'whatsapp', href: 'https://wa.me/584122511076', label: 'WhatsApp' },
@@ -102,31 +104,27 @@ export default function Footer({
   const year = new Date().getFullYear();
 
   const colTitle = (text) => (
-    <div className="text-slate-100 font-bold mb-3 tracking-wide text-sm uppercase">
-      {text}
-    </div>
+    <div className="text-slate-100 font-bold mb-3 tracking-wide text-sm uppercase">{text}</div>
   );
 
-  const linkStyle = "text-slate-300 no-underline inline-flex items-center gap-2 py-1 transition-colors duration-200 hover:text-white";
+  const linkStyle =
+    'text-slate-300 no-underline inline-flex items-center gap-2 py-1 transition-colors duration-200 hover:text-white';
 
   return (
     <footer className="bg-slate-900 text-slate-200 border-t border-slate-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-          
           {/* Brand + Socials */}
           <div className="lg:col-span-2">
             <div className="flex items-baseline gap-2 mb-2">
               <div className="text-2xl font-bold text-white">{brand.name}</div>
-              {brand.slogan && (
-                <div className="text-slate-400 text-sm">· {brand.slogan}</div>
-              )}
+              {brand.slogan && <div className="text-slate-400 text-sm">· {brand.slogan}</div>}
             </div>
             <p className="text-slate-400 mb-4 max-w-md">
-              Artículos del hogar, electrónicos y lo último en tendencias. 
-              Calidad y servicio en cada compra.
+              Artículos del hogar, electrónicos y lo último en tendencias. Calidad y servicio en
+              cada compra.
             </p>
-            
+
             {/* Social Icons */}
             <div className="flex gap-3 mb-6">
               {socials.map((s, i) => (
@@ -146,8 +144,8 @@ export default function Footer({
               {address.email && (
                 <div>
                   Email:{' '}
-                  <a 
-                    href={`mailto:${address.email}`} 
+                  <a
+                    href={`mailto:${address.email}`}
                     className="text-blue-400 hover:text-blue-300 transition-colors"
                   >
                     {address.email}
@@ -162,11 +160,7 @@ export default function Footer({
             {colTitle('Tienda')}
             <nav className="space-y-2">
               {internalLinks.tienda?.map((l, i) => (
-                <Link 
-                  key={i} 
-                  to={l.to} 
-                  className={linkStyle}
-                >
+                <Link key={i} to={l.to} className={linkStyle}>
                   <span className="text-blue-400">›</span>
                   <span>{l.label}</span>
                 </Link>
@@ -179,11 +173,7 @@ export default function Footer({
             {colTitle('Soporte')}
             <nav className="space-y-2">
               {internalLinks.soporte?.map((l, i) => (
-                <Link 
-                  key={i} 
-                  to={l.to} 
-                  className={linkStyle}
-                >
+                <Link key={i} to={l.to} className={linkStyle}>
                   <span className="text-blue-400">›</span>
                   <span>{l.label}</span>
                 </Link>
@@ -197,13 +187,7 @@ export default function Footer({
               {colTitle('Empresa')}
               <nav className="space-y-2">
                 {externalLinks.empresa?.map((l, i) => (
-                  <a 
-                    key={i} 
-                    href={l.href} 
-                    target="_blank" 
-                    rel="noreferrer" 
-                    className={linkStyle}
-                  >
+                  <a key={i} href={l.href} target="_blank" rel="noreferrer" className={linkStyle}>
                     <span className="text-green-400">↗</span>
                     <span>{l.label}</span>
                   </a>
@@ -215,13 +199,7 @@ export default function Footer({
               {colTitle('Legal')}
               <nav className="space-y-2">
                 {externalLinks.legal?.map((l, i) => (
-                  <a 
-                    key={i} 
-                    href={l.href} 
-                    target="_blank" 
-                    rel="noreferrer" 
-                    className={linkStyle}
-                  >
+                  <a key={i} href={l.href} target="_blank" rel="noreferrer" className={linkStyle}>
                     <span className="text-green-400">↗</span>
                     <span>{l.label}</span>
                   </a>
@@ -241,11 +219,11 @@ export default function Footer({
             </div>
             <div className="flex gap-6">
               {externalLinks.legal?.map((l, i) => (
-                <a 
-                  key={i} 
-                  href={l.href} 
-                  target="_blank" 
-                  rel="noreferrer" 
+                <a
+                  key={i}
+                  href={l.href}
+                  target="_blank"
+                  rel="noreferrer"
                   className="text-slate-300 hover:text-white transition-colors"
                 >
                   {l.label}

@@ -114,9 +114,7 @@ export default function Productos() {
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-          Nuestros Productos
-        </h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Nuestros Productos</h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Descubre nuestra amplia selección de productos de calidad
         </p>
@@ -141,14 +139,19 @@ export default function Productos() {
           {/* Resultados y estadísticas */}
           <div className="flex justify-between items-center mb-6">
             <div className="text-sm text-gray-600">
-              Mostrando <span className="font-semibold text-gray-900">{productos.length}</span> productos
+              Mostrando <span className="font-semibold text-gray-900">{productos.length}</span>{' '}
+              productos
               {filters.q && (
-                <span> para "<span className="font-semibold text-gray-900">{filters.q}</span>"</span>
+                <span>
+                  {' '}
+                  para "<span className="font-semibold text-gray-900">{filters.q}</span>"
+                </span>
               )}
             </div>
             {pages > 1 && (
               <div className="text-sm text-gray-600">
-                Página <span className="font-semibold text-gray-900">{page}</span> de <span className="font-semibold text-gray-900">{pages}</span>
+                Página <span className="font-semibold text-gray-900">{page}</span> de{' '}
+                <span className="font-semibold text-gray-900">{pages}</span>
               </div>
             )}
           </div>
@@ -158,7 +161,12 @@ export default function Productos() {
             <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-center">
               <div className="flex items-center justify-center gap-2 text-red-800 font-semibold">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 {error}
               </div>
@@ -169,16 +177,36 @@ export default function Productos() {
           {productos.length === 0 && !error ? (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center">
               <div className="max-w-md mx-auto">
-                <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m8-8V4a1 1 0 00-1-1h-2a1 1 0 00-1 1v1M9 7h6" />
+                <svg
+                  className="w-16 h-16 text-gray-300 mx-auto mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1}
+                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m8-8V4a1 1 0 00-1-1h-2a1 1 0 00-1 1v1M9 7h6"
+                  />
                 </svg>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No se encontraron productos</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  No se encontraron productos
+                </h3>
                 <p className="text-gray-600 mb-6">
-                  {filters.q || filters.categoria_id || filters.min_price || filters.max_price || filters.oferta
-                    ? "Intenta ajustar los filtros para ver más resultados."
-                    : "Pronto agregaremos nuevos productos a nuestro catálogo."}
+                  {filters.q ||
+                  filters.categoria_id ||
+                  filters.min_price ||
+                  filters.max_price ||
+                  filters.oferta
+                    ? 'Intenta ajustar los filtros para ver más resultados.'
+                    : 'Pronto agregaremos nuevos productos a nuestro catálogo.'}
                 </p>
-                {(filters.q || filters.categoria_id || filters.min_price || filters.max_price || filters.oferta) && (
+                {(filters.q ||
+                  filters.categoria_id ||
+                  filters.min_price ||
+                  filters.max_price ||
+                  filters.oferta) && (
                   <button
                     onClick={() => {
                       setFilters({

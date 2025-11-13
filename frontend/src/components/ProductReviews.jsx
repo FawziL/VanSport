@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { appService } from '@/services/auth';
 import { useAuth } from '@/context/AuthContext';
-import {StarRow, StarInput} from '@/utils/reviews';
+import { StarRow, StarInput } from '@/utils/reviews';
 
 export default function ProductReviews({ productoId, nombre }) {
   const { isAuthenticated } = useAuth ? useAuth() : { isAuthenticated: false };
@@ -71,11 +71,12 @@ export default function ProductReviews({ productoId, nombre }) {
       setComentario('');
     } catch (e) {
       const data = e?.response?.data;
-      const msg = data && typeof data === 'object'
-        ? Object.entries(data)
-            .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : String(v)}`)
-            .join(' | ')
-        : e?.message || 'No se pudo enviar la reseña';
+      const msg =
+        data && typeof data === 'object'
+          ? Object.entries(data)
+              .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : String(v)}`)
+              .join(' | ')
+          : e?.message || 'No se pudo enviar la reseña';
       setErr(msg);
     } finally {
       setSubmitting(false);
@@ -110,11 +111,11 @@ export default function ProductReviews({ productoId, nombre }) {
                 size={28}
               />
               <div>
-              {displayed > 0 && (
-                <span style={{ marginLeft: 8, color: '#555', fontWeight: 700 }}>
-                  {displayed.toFixed(1)} / 5
-                </span>
-              )}
+                {displayed > 0 && (
+                  <span style={{ marginLeft: 8, color: '#555', fontWeight: 700 }}>
+                    {displayed.toFixed(1)} / 5
+                  </span>
+                )}
               </div>
               <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>
                 Puedes seleccionar medias estrellas; por ahora se guardará como entero.
@@ -130,11 +131,7 @@ export default function ProductReviews({ productoId, nombre }) {
                 style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: 10 }}
               />
             </div>
-            {err && (
-              <div style={{ color: '#e53935', fontWeight: 700 }}>
-                {err}
-              </div>
-            )}
+            {err && <div style={{ color: '#e53935', fontWeight: 700 }}>{err}</div>}
             <div>
               <button
                 type="button"
@@ -173,7 +170,7 @@ export default function ProductReviews({ productoId, nombre }) {
       </div>
 
       {/* Listado de reseñas */}
-      <div style={{ display: 'grid', gap: 10, textAlign:"start" }}>
+      <div style={{ display: 'grid', gap: 10, textAlign: 'start' }}>
         {loading ? (
           <div style={{ color: '#999' }}>Cargando reseñas…</div>
         ) : items.length === 0 ? (
@@ -195,7 +192,7 @@ export default function ProductReviews({ productoId, nombre }) {
                   {new Date(r.fecha_creacion).toLocaleDateString()}
                 </span>
               </div>
-              <div style={{ color: '#555', marginTop: 16, fontSize: 10  }}>
+              <div style={{ color: '#555', marginTop: 16, fontSize: 10 }}>
                 {r.usuario_nombre || ''} {r.usuario_apellido || ''}{' '}
               </div>
               <div style={{ color: '#111', marginTop: 1, whiteSpace: 'pre-wrap' }}>

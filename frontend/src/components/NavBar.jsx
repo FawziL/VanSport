@@ -93,7 +93,7 @@ export default function NavBar() {
             <div className="flex items-center gap-2">
               <NavLink
                 to="/productos"
-                className={({ isActive }) => 
+                className={({ isActive }) =>
                   `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
                     isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
                   }`
@@ -107,7 +107,7 @@ export default function NavBar() {
             <div className="flex items-center gap-2">
               <NavLink
                 to="/carrito"
-                className={({ isActive }) => 
+                className={({ isActive }) =>
                   `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
                     isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
                   }`
@@ -130,9 +130,11 @@ export default function NavBar() {
                 <>
                   <NavLink
                     to="/register"
-                    className={({ isActive }) => 
+                    className={({ isActive }) =>
                       `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                        isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                        isActive
+                          ? 'bg-gray-800 bg-opacity-10'
+                          : 'hover:bg-gray-800 hover:bg-opacity-10'
                       }`
                     }
                   >
@@ -140,9 +142,11 @@ export default function NavBar() {
                   </NavLink>
                   <NavLink
                     to="/login"
-                    className={({ isActive }) => 
+                    className={({ isActive }) =>
                       `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                        isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                        isActive
+                          ? 'bg-gray-800 bg-opacity-10'
+                          : 'hover:bg-gray-800 hover:bg-opacity-10'
                       }`
                     }
                   >
@@ -257,7 +261,7 @@ export default function NavBar() {
           <div className="md:hidden grid gap-2 px-4 py-3 border-t border-gray-800 bg-gray-950">
             <NavLink
               to="/productos"
-              className={({ isActive }) => 
+              className={({ isActive }) =>
                 `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
                   isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
                 }`
@@ -269,7 +273,7 @@ export default function NavBar() {
 
             <NavLink
               to="/carrito"
-              className={({ isActive }) => 
+              className={({ isActive }) =>
                 `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
                   isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
                 }`
@@ -294,9 +298,11 @@ export default function NavBar() {
               <>
                 <NavLink
                   to="/login"
-                  className={({ isActive }) => 
+                  className={({ isActive }) =>
                     `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                      isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                      isActive
+                        ? 'bg-gray-800 bg-opacity-10'
+                        : 'hover:bg-gray-800 hover:bg-opacity-10'
                     }`
                   }
                   onClick={() => setMobileOpen(false)}
@@ -305,9 +311,11 @@ export default function NavBar() {
                 </NavLink>
                 <NavLink
                   to="/register"
-                  className={({ isActive }) => 
+                  className={({ isActive }) =>
                     `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                      isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                      isActive
+                        ? 'bg-gray-800 bg-opacity-10'
+                        : 'hover:bg-gray-800 hover:bg-opacity-10'
                     }`
                   }
                   onClick={() => setMobileOpen(false)}
@@ -319,9 +327,11 @@ export default function NavBar() {
               <>
                 <NavLink
                   to="/perfil"
-                  className={({ isActive }) => 
+                  className={({ isActive }) =>
                     `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                      isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                      isActive
+                        ? 'bg-gray-800 bg-opacity-10'
+                        : 'hover:bg-gray-800 hover:bg-opacity-10'
                     }`
                   }
                   onClick={() => setMobileOpen(false)}
@@ -330,9 +340,11 @@ export default function NavBar() {
                 </NavLink>
                 <NavLink
                   to="/pedidos"
-                  className={({ isActive }) => 
+                  className={({ isActive }) =>
                     `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                      isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                      isActive
+                        ? 'bg-gray-800 bg-opacity-10'
+                        : 'hover:bg-gray-800 hover:bg-opacity-10'
                     }`
                   }
                   onClick={() => setMobileOpen(false)}
@@ -341,9 +353,11 @@ export default function NavBar() {
                 </NavLink>
                 <NavLink
                   to="/reportes"
-                  className={({ isActive }) => 
+                  className={({ isActive }) =>
                     `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                      isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                      isActive
+                        ? 'bg-gray-800 bg-opacity-10'
+                        : 'hover:bg-gray-800 hover:bg-opacity-10'
                     }`
                   }
                   onClick={() => setMobileOpen(false)}
@@ -353,9 +367,11 @@ export default function NavBar() {
                 {user?.is_staff && (
                   <NavLink
                     to="/admin/dashboard"
-                    className={({ isActive }) => 
+                    className={({ isActive }) =>
                       `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                        isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                        isActive
+                          ? 'bg-gray-800 bg-opacity-10'
+                          : 'hover:bg-gray-800 hover:bg-opacity-10'
                       }`
                     }
                     onClick={() => setMobileOpen(false)}

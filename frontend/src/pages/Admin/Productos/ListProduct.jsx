@@ -14,7 +14,7 @@ import {
   TableCell,
   ProductImage,
   ActionButton,
-  FavoriteButton
+  FavoriteButton,
 } from '@/components/ui/Table';
 import { toast } from 'react-toastify';
 
@@ -78,10 +78,12 @@ export default function ListProduct() {
     try {
       setExporting(true);
       const data = await adminService.productos.export();
-      const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const blob = new Blob([data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `productos_${new Date().toISOString().slice(0,10)}.xlsx`;
+      a.download = `productos_${new Date().toISOString().slice(0, 10)}.xlsx`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -105,16 +107,16 @@ export default function ListProduct() {
   const toggleDestacado = async (p) => {
     try {
       setTogglingId(p.producto_id);
-      
+
       // Actualización optimista
       setProductos((prev) =>
         prev.map((it) =>
           it.producto_id === p.producto_id ? { ...it, destacado: !p.destacado } : it
         )
       );
-      
+
       await adminService.productos.partialUpdate(p.producto_id, { destacado: !p.destacado });
-      
+
       toast.success(
         `Producto ${!p.destacado ? 'destacado' : 'quitado de destacados'} correctamente`
       );
@@ -125,7 +127,7 @@ export default function ListProduct() {
           it.producto_id === p.producto_id ? { ...it, destacado: p.destacado } : it
         )
       );
-      
+
       const msg = err?.response?.data?.detail || 'No se pudo actualizar destacado';
       setError(msg);
       toast.error(msg);
@@ -137,27 +139,21 @@ export default function ListProduct() {
   const toggleActivoProduct = async (p) => {
     try {
       setTogglingActivoId(p.producto_id);
-      
+
       // Actualización optimista
-      setProductos((prev) => 
-        prev.map((it) => 
-          it.producto_id === p.producto_id ? { ...it, activo: !p.activo } : it
-        )
+      setProductos((prev) =>
+        prev.map((it) => (it.producto_id === p.producto_id ? { ...it, activo: !p.activo } : it))
       );
-      
+
       await adminService.productos.partialUpdate(p.producto_id, { activo: !p.activo });
-      
-      toast.success(
-        `Producto ${!p.activo ? 'activado' : 'desactivado'} correctamente`
-      );
+
+      toast.success(`Producto ${!p.activo ? 'activado' : 'desactivado'} correctamente`);
     } catch (err) {
       // Revertir cambio en caso de error
-      setProductos((prev) => 
-        prev.map((it) => 
-          it.producto_id === p.producto_id ? { ...it, activo: p.activo } : it
-        )
+      setProductos((prev) =>
+        prev.map((it) => (it.producto_id === p.producto_id ? { ...it, activo: p.activo } : it))
       );
-      
+
       const msg = err?.response?.data?.detail || 'No se pudo actualizar el estado';
       setError(msg);
       toast.error(msg);
@@ -165,7 +161,7 @@ export default function ListProduct() {
       setTogglingActivoId(null);
     }
   };
-  
+
   // Render helpers
   const fmtPrecio = (v) => {
     if (v == null || v === '') return '-';
@@ -192,10 +188,10 @@ export default function ListProduct() {
           >
             {exporting ? 'Exportando…' : 'Exportar Excel'}
           </button>
-            
-          <Link 
-            to="/admin/productos/crear" 
-           className="px-4 py-2 rounded-lg bg-blue-600 !text-white font-bold no-underline hover:bg-blue-700 transition-colors"
+
+          <Link
+            to="/admin/productos/crear"
+            className="px-4 py-2 rounded-lg bg-blue-600 !text-white font-bold no-underline hover:bg-blue-700 transition-colors"
           >
             + Crear producto
           </Link>
@@ -225,9 +221,9 @@ export default function ListProduct() {
           <TableHeader>Estado</TableHeader>
           <TableHeader align="center">Acciones</TableHeader>
         </TableHead>
-        
-        <TableBody 
-          loading={loading} 
+
+        <TableBody
+          loading={loading}
           empty={productosPage.length === 0}
           colSpan={9}
           loadingText="Cargando productos..."
@@ -239,7 +235,7 @@ export default function ListProduct() {
               <TableCell>{p.nombre}</TableCell>
               <TableCell>{p.categoria?.nombre ?? '-'}</TableCell>
               <TableCell>
-                <ProductImage 
+                <ProductImage
                   src={p.imagen_url ? resolveImageUrl(p.imagen_url) : undefined}
                   alt={p.nombre || 'Producto'}
                 />

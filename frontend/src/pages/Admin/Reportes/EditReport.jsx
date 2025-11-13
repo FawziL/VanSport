@@ -68,17 +68,19 @@ export default function EditReporte() {
     }
   };
 
-  if (!item) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Cargando reporte...</p>
+  if (!item)
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando reporte...</p>
+        </div>
       </div>
-    </div>
-  );
+    );
 
   const isCompleted = item.estado === 'finalizado';
-  const categoriaLabel = CATEGORIAS_FALLA.find((c) => c.value === item.categoria)?.label || item.categoria;
+  const categoriaLabel =
+    CATEGORIAS_FALLA.find((c) => c.value === item.categoria)?.label || item.categoria;
 
   return (
     <div className="min-h-screen bg-gray-50 py-6 px-4">
@@ -89,8 +91,8 @@ export default function EditReporte() {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Reporte de Falla</h1>
             <p className="text-gray-600 mt-1">Gestión y seguimiento del reporte</p>
           </div>
-          <Link 
-            to="/admin/reportes" 
+          <Link
+            to="/admin/reportes"
             className="px-4 py-2 bg-gray-600 text-white! font-bold rounded-lg hover:bg-gray-700 transition-colors no-underline"
           >
             Volver a Reportes
@@ -145,20 +147,17 @@ export default function EditReporte() {
                     {new Date(item.fecha_creacion).toLocaleString('es-ES')}
                   </div>
                   <div>
-                    <span className="font-semibold">Usuario:</span>{' '}
-                    {item.usuario_nombre} {item.usuario_apellido}
+                    <span className="font-semibold">Usuario:</span> {item.usuario_nombre}{' '}
+                    {item.usuario_apellido}
                   </div>
                   <div>
-                    <span className="font-semibold">Email:</span>{' '}
-                    {item.usuario_email}
+                    <span className="font-semibold">Email:</span> {item.usuario_email}
                   </div>
                   <div>
-                    <span className="font-semibold">Categoría:</span>{' '}
-                    {categoriaLabel}
+                    <span className="font-semibold">Categoría:</span> {categoriaLabel}
                   </div>
                   <div>
-                    <span className="font-semibold">Sección:</span>{' '}
-                    {item.seccion}
+                    <span className="font-semibold">Sección:</span> {item.seccion}
                   </div>
                 </div>
               </div>
@@ -191,9 +190,9 @@ export default function EditReporte() {
                   <div>
                     <h3 className="font-semibold text-gray-700 mb-2">Video adjunto</h3>
                     <div className="flex justify-center">
-                      <video 
-                        src={resolveImageUrl(item.video_url)} 
-                        controls 
+                      <video
+                        src={resolveImageUrl(item.video_url)}
+                        controls
                         className="max-w-full rounded-lg border border-gray-200"
                       />
                     </div>
@@ -208,12 +207,16 @@ export default function EditReporte() {
             {/* Historial de mensajes */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Historial de Mensajes</h3>
-              
+
               {isCompleted && (
                 <div className="bg-orange-50 border border-orange-200 text-orange-800 px-4 py-3 rounded-lg mb-4">
                   <div className="flex items-center">
                     <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     Este reporte está finalizado. No se pueden enviar nuevos mensajes.
                   </div>
@@ -236,21 +239,27 @@ export default function EditReporte() {
                         }`}
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <span className={`text-xs font-semibold mr-2 ${
-                            isSupport ? 'text-blue-700' : 'text-gray-700'
-                          }`}>
-                            {isSupport ? 'Soporte' : `${item.usuario_nombre} ${item.usuario_apellido}`}
+                          <span
+                            className={`text-xs font-semibold mr-2 ${
+                              isSupport ? 'text-blue-700' : 'text-gray-700'
+                            }`}
+                          >
+                            {isSupport
+                              ? 'Soporte'
+                              : `${item.usuario_nombre} ${item.usuario_apellido}`}
                           </span>
                           <span className="text-xs text-gray-500">
                             {new Date(m.fecha_creacion).toLocaleString('es-ES', {
                               dateStyle: 'short',
-                              timeStyle: 'short'
+                              timeStyle: 'short',
                             })}
                           </span>
                         </div>
                         {m.mensaje && (
-                          <div className={`text-gray-800 whitespace-pre-wrap 
-                          ${isSupport ? 'text-end' : 'text-start'}`}>
+                          <div
+                            className={`text-gray-800 whitespace-pre-wrap 
+                          ${isSupport ? 'text-end' : 'text-start'}`}
+                          >
                             {m.mensaje}
                           </div>
                         )}
@@ -267,8 +276,18 @@ export default function EditReporte() {
                 })}
                 {!item.followups?.length && (
                   <div className="text-center text-gray-500 py-8">
-                    <svg className="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    <svg
+                      className="w-12 h-12 mx-auto text-gray-300 mb-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
                     </svg>
                     Aún no hay mensajes en este reporte.
                   </div>
@@ -300,16 +319,31 @@ export default function EditReporte() {
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 disabled:bg-gray-100"
                   />
                 </div>
-                <button 
-                  onClick={onSendFU} 
+                <button
+                  onClick={onSendFU}
                   disabled={isCompleted || sending || (!nuevoMensaje && !img)}
                   className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {sending ? (
                     <div className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Enviando...
                     </div>

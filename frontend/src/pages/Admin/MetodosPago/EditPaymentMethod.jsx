@@ -67,11 +67,7 @@ export default function EditPaymentMethod() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[50vh] text-gray-600">
-        Cargando…
-      </div>
-    );
+    return <div className="flex items-center justify-center h-[50vh] text-gray-600">Cargando…</div>;
   }
 
   if (error && !form) {
@@ -95,8 +91,20 @@ export default function EditPaymentMethod() {
             className="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
             aria-label="Volver"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#111827" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 12H5M5 12L12 19M5 12L12 5"
+                stroke="#111827"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
           <h1 className="text-xl font-extrabold text-gray-900">Editar método de pago #{id}</h1>
@@ -104,8 +112,19 @@ export default function EditPaymentMethod() {
 
         {error && (
           <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 flex items-start gap-3">
-            <svg className="w-5 h-5 mt-0.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="#b91c1c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              className="w-5 h-5 mt-0.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+                stroke="#b91c1c"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
             <div className="text-sm">{error}</div>
           </div>
@@ -157,7 +176,9 @@ export default function EditPaymentMethod() {
               onChange={(e) => onChange('activo', e.target.checked)}
               className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-300"
             />
-            <label htmlFor="activo" className="text-sm font-medium text-gray-700">Activo</label>
+            <label htmlFor="activo" className="text-sm font-medium text-gray-700">
+              Activo
+            </label>
           </div>
 
           <div>

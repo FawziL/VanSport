@@ -64,7 +64,9 @@ export default function Checkout() {
         if (alive) setLoading(false);
       }
     });
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [isAuthenticated]);
 
   const total = useMemo(() => {
@@ -75,7 +77,10 @@ export default function Checkout() {
     }, 0);
   }, [items]);
 
-  const canSubmit = items.length > 0 && (entrega === 'retiro' || (entrega === 'envio' && direccion.trim())) && !placing;
+  const canSubmit =
+    items.length > 0 &&
+    (entrega === 'retiro' || (entrega === 'envio' && direccion.trim())) &&
+    !placing;
 
   // Loader que solicitaste
   if (loading) {
@@ -102,7 +107,7 @@ export default function Checkout() {
       {items.length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <p>Tu carrito está vacío.</p>
-          <button 
+          <button
             onClick={() => navigate('/productos')}
             className="ml-2 bg-blue-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-blue-700 transition-colors"
           >
@@ -118,22 +123,22 @@ export default function Checkout() {
               <div className="font-bold mb-3">Método de entrega</div>
               <div className="flex flex-col sm:flex-row gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    name="entrega" 
-                    value="envio" 
-                    checked={entrega === 'envio'} 
+                  <input
+                    type="radio"
+                    name="entrega"
+                    value="envio"
+                    checked={entrega === 'envio'}
                     onChange={() => setEntrega('envio')}
                     className="text-blue-600 focus:ring-blue-500"
                   />
                   Envío a domicilio
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    name="entrega" 
-                    value="retiro" 
-                    checked={entrega === 'retiro'} 
+                  <input
+                    type="radio"
+                    name="entrega"
+                    value="retiro"
+                    checked={entrega === 'retiro'}
                     onChange={() => setEntrega('retiro')}
                     className="text-blue-600 focus:ring-blue-500"
                   />
@@ -148,7 +153,7 @@ export default function Checkout() {
                 <label htmlFor="direccion" className="block font-bold mb-2">
                   Dirección de envío
                 </label>
-                <textarea 
+                <textarea
                   id="direccion"
                   rows={3}
                   value={direccion}
@@ -164,7 +169,7 @@ export default function Checkout() {
               <label htmlFor="notas" className="block font-bold mb-2">
                 Notas (opcional)
               </label>
-              <textarea 
+              <textarea
                 id="notas"
                 rows={2}
                 value={notas}
@@ -180,15 +185,11 @@ export default function Checkout() {
             <div className="space-y-4 mb-6">
               <div className="flex justify-between">
                 <span className="text-gray-600">Productos</span>
-                <span className="font-bold">
-                  {items.reduce((a, it) => a + it.cantidad, 0)}
-                </span>
+                <span className="font-bold">{items.reduce((a, it) => a + it.cantidad, 0)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Total</span>
-                <span className="font-bold text-lg">
-                  {formatPrice(total)}
-                </span>
+                <span className="font-bold text-lg">{formatPrice(total)}</span>
               </div>
             </div>
 
@@ -211,7 +212,8 @@ export default function Checkout() {
 
                   navigate(pid ? `/pedidos/${pid}` : '/pedidos');
                 } catch (e) {
-                  const msg = e?.response?.data?.error || e?.message || 'No se pudo finalizar el pedido';
+                  const msg =
+                    e?.response?.data?.error || e?.message || 'No se pudo finalizar el pedido';
                   setErrMsg(msg);
                 } finally {
                   setPlacing(false);
@@ -219,9 +221,10 @@ export default function Checkout() {
               }}
               className={`
                 w-full py-4 px-6 rounded-xl font-bold transition-all duration-200
-                ${canSubmit 
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' 
-                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                ${
+                  canSubmit
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                    : 'bg-gray-400 text-gray-200 cursor-not-allowed'
                 }
               `}
             >

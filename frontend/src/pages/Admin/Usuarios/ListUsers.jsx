@@ -10,7 +10,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  ActionButton
+  ActionButton,
 } from '@/components/ui/Table';
 import { toast } from 'react-toastify';
 
@@ -109,9 +109,9 @@ export default function ListUsers() {
           <TableHeader>Rol</TableHeader>
           <TableHeader align="center">Acciones</TableHeader>
         </TableHead>
-        
-        <TableBody 
-          loading={loading} 
+
+        <TableBody
+          loading={loading}
           empty={usuariosPage.length === 0}
           colSpan={7}
           loadingText="Cargando usuarios..."
@@ -126,20 +126,20 @@ export default function ListUsers() {
               <TableCell>{u.email}</TableCell>
               <TableCell>{u.telefono || '-'}</TableCell>
               <TableCell>
-                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
-                  u.is_active 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
+                <span
+                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
+                    u.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}
+                >
                   {u.is_active ? 'Sí' : 'No'}
                 </span>
               </TableCell>
               <TableCell>
-                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
-                  u.is_staff 
-                    ? 'bg-purple-100 text-purple-800' 
-                    : 'bg-blue-100 text-blue-800'
-                }`}>
+                <span
+                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
+                    u.is_staff ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                  }`}
+                >
                   {u.is_staff ? 'Admin' : 'Cliente'}
                 </span>
               </TableCell>
@@ -154,8 +154,8 @@ export default function ListUsers() {
                   <button
                     onClick={() => toggleActivo(u)}
                     className={`px-3 py-1 rounded font-bold text-white transition-colors ${
-                      u.is_active 
-                        ? 'bg-orange-600 hover:bg-orange-700' 
+                      u.is_active
+                        ? 'bg-orange-600 hover:bg-orange-700'
                         : 'bg-green-600 hover:bg-green-700'
                     }`}
                   >

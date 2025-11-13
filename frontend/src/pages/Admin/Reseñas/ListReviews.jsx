@@ -11,7 +11,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  ActionButton
+  ActionButton,
 } from '@/components/ui/Table';
 import { toast } from 'react-toastify';
 
@@ -58,10 +58,13 @@ export default function ListReviews() {
   const pageItems = items.slice(start, end);
 
   const fmt = {
-    date: (s) => (s ? new Date(s).toLocaleString('es-ES', {
-      dateStyle: 'short',
-      timeStyle: 'short'
-    }) : '-'),
+    date: (s) =>
+      s
+        ? new Date(s).toLocaleString('es-ES', {
+            dateStyle: 'short',
+            timeStyle: 'short',
+          })
+        : '-',
   };
 
   const truncateWords = (text, maxWords = 12) => {
@@ -126,11 +129,13 @@ export default function ListReviews() {
           <TableHeader width="20%">Comentario</TableHeader>
           <TableHeader width="10%">Calif.</TableHeader>
           <TableHeader width="10%">Fecha</TableHeader>
-          <TableHeader width="10%" align="center">Acciones</TableHeader>
+          <TableHeader width="10%" align="center">
+            Acciones
+          </TableHeader>
         </TableHead>
-        
-        <TableBody 
-          loading={loading} 
+
+        <TableBody
+          loading={loading}
           empty={pageItems.length === 0}
           colSpan={7}
           loadingText="Cargando reseñas..."
@@ -141,10 +146,7 @@ export default function ListReviews() {
               <TableCell className="whitespace-nowrap">{r.resena_id}</TableCell>
               <TableCell className="break-words">{r.producto ?? '-'}</TableCell>
               <TableCell className="break-words">{getUserLabel(r)}</TableCell>
-              <TableCell 
-                className="break-words" 
-                title={r.comentario || ''}
-              >
+              <TableCell className="break-words" title={r.comentario || ''}>
                 {truncateWords(r.comentario, 12)}
               </TableCell>
               <TableCell className="whitespace-nowrap">{r.calificacion}</TableCell>

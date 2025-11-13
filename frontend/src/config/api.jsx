@@ -49,7 +49,8 @@ async function request(method, path, { body, headers = {}, params, signal, respo
     // Normalizar 401 con mensaje amigable
     if (res.status === 401) {
       err.response.data = err.response.data || {};
-      if (!err.response.data.detail) err.response.data.detail = 'No autorizado. Por favor inicia sesión.';
+      if (!err.response.data.detail)
+        err.response.data.detail = 'No autorizado. Por favor inicia sesión.';
     }
     throw err;
   }

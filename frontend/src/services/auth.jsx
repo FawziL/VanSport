@@ -5,7 +5,8 @@ export const authService = {
   register: (payload) => http.post('/auth/register/', payload),
   me: () => http.get('/auth/me/'),
   passwordReset: (email) => http.post('/auth/password-reset/', { email }),
-  passwordResetConfirm: (token, password) => http.post('/auth/password-reset/confirm/', { token, password }), // <-- nuevo
+  passwordResetConfirm: (token, password) =>
+    http.post('/auth/password-reset/confirm/', { token, password }), // <-- nuevo
 };
 
 export const appService = {
@@ -88,10 +89,11 @@ export const adminService = {
     update: (id, data) => http.put(`/admin/productos/${encodeURIComponent(id)}/`, data),
     partialUpdate: (id, data) => http.patch(`/admin/productos/${encodeURIComponent(id)}/`, data),
     remove: (id) => http.delete(`/admin/productos/${encodeURIComponent(id)}/`),
-    export: (params) => http.get('/admin/productos/export/', {
-      params,
-      responseType: 'arraybuffer',
-    }),
+    export: (params) =>
+      http.get('/admin/productos/export/', {
+        params,
+        responseType: 'arraybuffer',
+      }),
   },
   usuarios: {
     list: (params) => http.get(`/admin/usuarios/${qs(params)}`),
@@ -152,7 +154,8 @@ export const adminService = {
     partialUpdate: (id, data) =>
       http.patch(`/admin/transacciones/${encodeURIComponent(id)}/`, data),
     remove: (id) => http.delete(`/admin/transacciones/${encodeURIComponent(id)}/`),
-    export: (params) => http.get('/admin/transacciones/export/', { params, responseType: 'arraybuffer' }), // <-- nuevo
+    export: (params) =>
+      http.get('/admin/transacciones/export/', { params, responseType: 'arraybuffer' }), // <-- nuevo
   },
   envios: {
     list: (params) => http.get(`/admin/envios/${qs(params)}`),

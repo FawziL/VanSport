@@ -11,7 +11,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  ActionButton
+  ActionButton,
 } from '@/components/ui/Table';
 import { toast } from 'react-toastify';
 
@@ -58,10 +58,13 @@ export default function ListNotifications() {
   const pageItems = items.slice(start, end);
 
   const fmt = {
-    date: (s) => (s ? new Date(s).toLocaleString('es-ES', {
-      dateStyle: 'short',
-      timeStyle: 'short'
-    }) : '-'),
+    date: (s) =>
+      s
+        ? new Date(s).toLocaleString('es-ES', {
+            dateStyle: 'short',
+            timeStyle: 'short',
+          })
+        : '-',
   };
 
   const getUserLabel = (n) => {
@@ -125,11 +128,13 @@ export default function ListNotifications() {
           <TableHeader width="12%">Tipo</TableHeader>
           <TableHeader width="15%">Fecha</TableHeader>
           <TableHeader width="17%">Expira</TableHeader>
-          <TableHeader width="10%" align="center">Acciones</TableHeader>
+          <TableHeader width="10%" align="center">
+            Acciones
+          </TableHeader>
         </TableHead>
-        
-        <TableBody 
-          loading={loading} 
+
+        <TableBody
+          loading={loading}
           empty={pageItems.length === 0}
           colSpan={7}
           loadingText="Cargando notificaciones..."

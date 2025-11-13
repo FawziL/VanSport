@@ -15,7 +15,9 @@ export default function PasswordReset() {
     setSubmitting(true);
     try {
       await authService.passwordReset(email);
-      setOkMsg('Si el correo existe en el sistema, te enviaremos las instrucciones para restablecer tu contraseña.');
+      setOkMsg(
+        'Si el correo existe en el sistema, te enviaremos las instrucciones para restablecer tu contraseña.'
+      );
     } catch (err) {
       const data = err?.response?.data;
       const msg =
@@ -43,7 +45,14 @@ export default function PasswordReset() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ display: 'block', width: '100%', marginBottom: 12, padding: 8, border: '1px solid #ddd', borderRadius: 8 }}
+          style={{
+            display: 'block',
+            width: '100%',
+            marginBottom: 12,
+            padding: 8,
+            border: '1px solid #ddd',
+            borderRadius: 8,
+          }}
         />
         <button
           type="submit"

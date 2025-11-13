@@ -44,8 +44,18 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-fit sticky top-6">
       {/* Header */}
       <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-200">
-        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+        <svg
+          className="w-5 h-5 text-gray-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+          />
         </svg>
         <h3 className="text-lg font-semibold text-gray-900">Filtros</h3>
       </div>
@@ -54,9 +64,7 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
       <div className="space-y-6">
         {/* Búsqueda */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Buscar producto
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Buscar producto</label>
           <input
             type="text"
             placeholder="Nombre del producto..."
@@ -68,9 +76,7 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
 
         {/* Categoría */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Categoría
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
           <ListCategories
             value={local.categoria_id}
             onChange={(val) => setLocal((p) => ({ ...p, categoria_id: val }))}
@@ -81,9 +87,7 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
 
         {/* Rango de Precio */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
-            Rango de Precio
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-3">Rango de Precio</label>
           <div className="space-y-3">
             <div className="relative flex">
               <input
@@ -110,9 +114,7 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
 
         {/* Oferta */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Oferta
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Oferta</label>
           <select
             value={local.oferta}
             onChange={(e) => setLocal((p) => ({ ...p, oferta: e.target.value }))}

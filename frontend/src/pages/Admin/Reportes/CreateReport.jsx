@@ -31,24 +31,21 @@ export default function CreateReport() {
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-8">
           {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Reportar una Falla</h1>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Reportar una Falla</h1>
 
-          <Link 
-            to="/admin/reportes" 
-            className="px-4 py-2 bg-gray-600 text-white! font-bold rounded-lg hover:bg-gray-700 transition-colors no-underline"
-          >
-            Volver a Reportes
-          </Link>
-        </div>
-
+            <Link
+              to="/admin/reportes"
+              className="px-4 py-2 bg-gray-600 text-white! font-bold rounded-lg hover:bg-gray-700 transition-colors no-underline"
+            >
+              Volver a Reportes
+            </Link>
+          </div>
 
           <form onSubmit={onSubmit} className="space-y-6">
             {/* Categoría */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Categoría *
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Categoría *</label>
               <select
                 value={form.categoria}
                 onChange={(e) => setForm((f) => ({ ...f, categoria: e.target.value }))}
@@ -65,9 +62,7 @@ export default function CreateReport() {
 
             {/* Título */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Título *
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Título *</label>
               <input
                 type="text"
                 value={form.titulo}
@@ -146,9 +141,25 @@ export default function CreateReport() {
               >
                 {loading ? (
                   <div className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Enviando reporte...
                   </div>

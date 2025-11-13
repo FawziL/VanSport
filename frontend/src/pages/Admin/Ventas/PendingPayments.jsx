@@ -10,7 +10,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  ActionButton
+  ActionButton,
 } from '@/components/ui/Table';
 import StatusBadge from '@/components/StatusBadge';
 
@@ -53,10 +53,13 @@ export default function PendingPayments() {
   const pageItems = items.slice(start, end);
 
   const fmt = {
-    date: (s) => (s ? new Date(s).toLocaleString('es-ES', {
-      dateStyle: 'short',
-      timeStyle: 'short'
-    }) : '-'),
+    date: (s) =>
+      s
+        ? new Date(s).toLocaleString('es-ES', {
+            dateStyle: 'short',
+            timeStyle: 'short',
+          })
+        : '-',
     money: (n) => (n != null ? `$${Number(n).toFixed(2)}` : '-'),
   };
 
@@ -79,11 +82,11 @@ export default function PendingPayments() {
 
       {/* Page Size Selector */}
       <div className="flex justify-end mb-3">
-        <PageSizeSelector 
-          value={pageSize} 
-          onChange={setPageSize} 
-          options={[5, 10, 20, 50]} 
-          label="Por página" 
+        <PageSizeSelector
+          value={pageSize}
+          onChange={setPageSize}
+          options={[5, 10, 20, 50]}
+          label="Por página"
         />
       </div>
 
@@ -100,11 +103,13 @@ export default function PendingPayments() {
           <TableHeader width="14%">Método</TableHeader>
           <TableHeader width="12%">Estado</TableHeader>
           <TableHeader width="10%">Fecha</TableHeader>
-          <TableHeader width="10%" align="center">Acciones</TableHeader>
+          <TableHeader width="10%" align="center">
+            Acciones
+          </TableHeader>
         </TableHead>
-        
-        <TableBody 
-          loading={loading} 
+
+        <TableBody
+          loading={loading}
           empty={pageItems.length === 0}
           colSpan={8}
           loadingText="Cargando pagos pendientes..."

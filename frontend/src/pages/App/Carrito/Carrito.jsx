@@ -100,14 +100,14 @@ export default function Carrito() {
         producto_id: item.producto?.producto_id ?? item.producto_id,
         cantidad: nuevaCantidad,
       });
-      
+
       // Éxito: mostrar toast
       if (delta > 0) {
         toast.success('Cantidad aumentada');
       } else {
         toast.success('Cantidad reducida');
       }
-      
+
       const newCount = items.reduce((acc, i) => acc + (i === item ? nuevaCantidad : i.cantidad), 0);
       window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: newCount } }));
     } catch (err) {
@@ -205,9 +205,7 @@ export default function Carrito() {
     <div className="max-w-7xl mx-auto my-10 px-4">
       <div className="mb-5">
         <h1 className="text-3xl font-black text-gray-900 mb-2">Mi carrito</h1>
-        <p className="text-gray-600">
-          Revisa tu selección antes de finalizar la compra.
-        </p>
+        <p className="text-gray-600">Revisa tu selección antes de finalizar la compra.</p>
       </div>
 
       {errMsg && (
@@ -218,18 +216,14 @@ export default function Carrito() {
 
       {items.length === 0 ? (
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center">
-          <div className="text-xl font-black text-gray-900 mb-2">
-            Tu carrito está vacío
-          </div>
-          <p className="text-gray-600 mb-4">
-            Explora los productos y añade tus favoritos.
-          </p>
-<Link
-  to="/productos"
-  className="inline-block px-5 py-3 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
->
-  Ver productos
-</Link>
+          <div className="text-xl font-black text-gray-900 mb-2">Tu carrito está vacío</div>
+          <p className="text-gray-600 mb-4">Explora los productos y añade tus favoritos.</p>
+          <Link
+            to="/productos"
+            className="inline-block px-5 py-3 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
+          >
+            Ver productos
+          </Link>
         </div>
       ) : (
         <div className="flex gap-6">
@@ -267,9 +261,7 @@ export default function Carrito() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-gray-900 font-black">
-                          {formatPrice(precioUnit)}
-                        </div>
+                        <div className="text-gray-900 font-black">{formatPrice(precioUnit)}</div>
                         <div className="text-gray-600 text-xs">Precio unitario</div>
                       </div>
                     </div>
@@ -296,9 +288,7 @@ export default function Carrito() {
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <div className="font-black text-gray-900">
-                          {formatPrice(subtotal)}
-                        </div>
+                        <div className="font-black text-gray-900">{formatPrice(subtotal)}</div>
                         <button
                           onClick={() => handleRemove(item)}
                           disabled={updating}

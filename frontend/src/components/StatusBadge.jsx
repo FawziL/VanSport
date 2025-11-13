@@ -6,34 +6,36 @@ export default function StatusBadge({ estado, className = '', variant = 'default
         bg: 'bg-yellow-100',
         text: 'text-yellow-800',
         icon: '⏳',
-        label: 'Pendiente'
+        label: 'Pendiente',
       },
       en_revision: {
         bg: 'bg-blue-100',
         text: 'text-blue-800',
         icon: '🔍',
-        label: 'En revisión'
+        label: 'En revisión',
       },
       finalizado: {
         bg: 'bg-green-100',
         text: 'text-green-800',
         icon: '✅',
-        label: 'Finalizado'
+        label: 'Finalizado',
       },
       completado: {
         bg: 'bg-green-100',
         text: 'text-green-800',
         icon: '✅',
-        label: 'Completado'
+        label: 'Completado',
+      },
+    };
+
+    return (
+      config[estado] || {
+        bg: 'bg-gray-100',
+        text: 'text-gray-800',
+        icon: '❓',
+        label: estado,
       }
-    };
-    
-    return config[estado] || {
-      bg: 'bg-gray-100',
-      text: 'text-gray-800',
-      icon: '❓',
-      label: estado
-    };
+    );
   };
 
   // Configuración para pedidos
@@ -44,46 +46,48 @@ export default function StatusBadge({ estado, className = '', variant = 'default
         bg: 'bg-yellow-100',
         text: 'text-yellow-800',
         icon: '⏳',
-        label: 'Pendiente'
+        label: 'Pendiente',
       },
       completado: {
         bg: 'bg-green-100',
         text: 'text-green-800',
         icon: '✅',
-        label: 'Completado'
+        label: 'Completado',
       },
       cancelado: {
         bg: 'bg-red-100',
         text: 'text-red-800',
         icon: '❌',
-        label: 'Cancelado'
+        label: 'Cancelado',
       },
       en_transito: {
         bg: 'bg-blue-100',
         text: 'text-blue-800',
         icon: '🔄',
-        label: 'En tránsito'
+        label: 'En tránsito',
       },
       pagado: {
         bg: 'bg-purple-100',
         text: 'text-purple-800',
         icon: '🚚',
-        label: 'Pagado'
+        label: 'Pagado',
       },
       entregado: {
         bg: 'bg-green-100',
         text: 'text-green-800',
         icon: '📦',
-        label: 'Entregado'
+        label: 'Entregado',
+      },
+    };
+
+    return (
+      config[estadoLower] || {
+        bg: 'bg-gray-100',
+        text: 'text-gray-800',
+        icon: '❓',
+        label: estado,
       }
-    };
-    
-    return config[estadoLower] || {
-      bg: 'bg-gray-100',
-      text: 'text-gray-800',
-      icon: '❓',
-      label: estado
-    };
+    );
   };
 
   // Seleccionar la configuración según la variante
@@ -97,7 +101,9 @@ export default function StatusBadge({ estado, className = '', variant = 'default
   const status = getStatusConfig(estado);
 
   return (
-    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${status.bg} ${status.text} ${className}`}>
+    <span
+      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${status.bg} ${status.text} ${className}`}
+    >
       {status.icon} {status.label}
     </span>
   );

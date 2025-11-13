@@ -52,7 +52,10 @@ export default function PasswordResetConfirm() {
           Falta el token de recuperación. Vuelve a solicitar el enlace.
         </div>
         <div style={{ marginTop: 12 }}>
-          <Link to="/password-reset" style={{ color: '#1e88e5', fontWeight: 700, textDecoration: 'none' }}>
+          <Link
+            to="/password-reset"
+            style={{ color: '#1e88e5', fontWeight: 700, textDecoration: 'none' }}
+          >
             Ir a recuperar contraseña
           </Link>
         </div>
@@ -72,7 +75,14 @@ export default function PasswordResetConfirm() {
           onChange={(e) => setPassword(e.target.value)}
           minLength={8}
           required
-          style={{ display: 'block', width: '100%', marginBottom: 12, padding: 8, border: '1px solid #ddd', borderRadius: 8 }}
+          style={{
+            display: 'block',
+            width: '100%',
+            marginBottom: 12,
+            padding: 8,
+            border: '1px solid #ddd',
+            borderRadius: 8,
+          }}
         />
         <label style={{ display: 'block', marginBottom: 6 }}>Repetir contraseña</label>
         <input
@@ -82,7 +92,14 @@ export default function PasswordResetConfirm() {
           onChange={(e) => setPassword2(e.target.value)}
           minLength={8}
           required
-          style={{ display: 'block', width: '100%', marginBottom: 12, padding: 8, border: '1px solid #ddd', borderRadius: 8 }}
+          style={{
+            display: 'block',
+            width: '100%',
+            marginBottom: 12,
+            padding: 8,
+            border: '1px solid #ddd',
+            borderRadius: 8,
+          }}
         />
         {password && password2 && password !== password2 && (
           <div style={{ color: '#c62828', marginBottom: 8, fontWeight: 700 }}>

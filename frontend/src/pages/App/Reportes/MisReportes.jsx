@@ -8,7 +8,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  ActionButton
+  ActionButton,
 } from '@/components/ui/Table';
 import StatusBadge from '@/components/StatusBadge';
 import { useNavigate } from 'react-router-dom';
@@ -21,12 +21,15 @@ export default function MisReportes() {
   useEffect(() => {
     let alive = true;
     setLoading(true);
-    appService.reportes.list().then((data) => {
-      const arr = Array.isArray(data) ? data : data.results || [];
-      if (alive) setItems(arr);
-    }).finally(() => {
-      if (alive) setLoading(false);
-    });
+    appService.reportes
+      .list()
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : data.results || [];
+        if (alive) setItems(arr);
+      })
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
     return () => {
       alive = false;
     };
@@ -37,7 +40,9 @@ export default function MisReportes() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">⚙️ Mis Reportes de Fallas</h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">
+            ⚙️ Mis Reportes de Fallas
+          </h1>
           <p className="text-gray-600 mt-1">Seguimiento de todos tus reportes enviados</p>
         </div>
         <Link
@@ -54,11 +59,13 @@ export default function MisReportes() {
           <TableHeader width="40%">Título</TableHeader>
           <TableHeader width="20%">Estado</TableHeader>
           <TableHeader width="25%">Fecha</TableHeader>
-          <TableHeader width="15%" align="center">Acciones</TableHeader>
+          <TableHeader width="15%" align="center">
+            Acciones
+          </TableHeader>
         </TableHead>
-        
-        <TableBody 
-          loading={loading} 
+
+        <TableBody
+          loading={loading}
           empty={items.length === 0}
           colSpan={4}
           loadingText="Cargando tus reportes..."
@@ -73,7 +80,7 @@ export default function MisReportes() {
               <TableCell>
                 {new Date(r.fecha_creacion).toLocaleString('es-ES', {
                   dateStyle: 'short',
-                  timeStyle: 'short'
+                  timeStyle: 'short',
                 })}
               </TableCell>
               <TableCell align="center">

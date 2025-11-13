@@ -9,7 +9,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  ActionButton
+  ActionButton,
 } from '@/components/ui/Table';
 import StatusBadge from '@/components/StatusBadge';
 import { useNavigate } from 'react-router-dom';
@@ -28,20 +28,26 @@ export default function ListReportes() {
     let alive = true;
     setLoading(true);
     setError('');
-    
-    adminService.reportes.list().then((data) => {
-      const arr = Array.isArray(data) ? data : data.results || [];
-      if (alive) {
-        setItems(arr);
-        setPages(Math.max(1, Math.ceil(arr.length / pageSize)));
-      }
-    }).catch(() => {
-      if (alive) setError('No se pudieron cargar los reportes');
-    }).finally(() => {
-      if (alive) setLoading(false);
-    });
-    
-    return () => { alive = false; };
+
+    adminService.reportes
+      .list()
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : data.results || [];
+        if (alive) {
+          setItems(arr);
+          setPages(Math.max(1, Math.ceil(arr.length / pageSize)));
+        }
+      })
+      .catch(() => {
+        if (alive) setError('No se pudieron cargar los reportes');
+      })
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
+
+    return () => {
+      alive = false;
+    };
   }, [pageSize]);
 
   // Actualiza páginas si cambia el tamaño o el listado
@@ -65,8 +71,8 @@ export default function ListReportes() {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-extrabold">Reportes de Fallas</h1>
         <div className="flex gap-2">
-          <Link 
-            to="/admin/reportes/crear" 
+          <Link
+            to="/admin/reportes/crear"
             className="px-4 py-2 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
           >
             + Crear Reporte
@@ -93,9 +99,9 @@ export default function ListReportes() {
           <TableHeader>Fecha</TableHeader>
           <TableHeader align="center">Acciones</TableHeader>
         </TableHead>
-        
-        <TableBody 
-          loading={loading} 
+
+        <TableBody
+          loading={loading}
           empty={itemsPage.length === 0}
           colSpan={6}
           loadingText="Cargando reportes..."
@@ -105,7 +111,7 @@ export default function ListReportes() {
             <TableRow key={report.id}>
               <TableCell className="font-medium">{report.titulo}</TableCell>
               <TableCell>
-                {report.usuario_nombre} {report.usuario_apellido} 
+                {report.usuario_nombre} {report.usuario_apellido}
                 <br />
                 <span className="text-sm text-gray-500">({report.usuario_email})</span>
               </TableCell>

@@ -272,14 +272,56 @@ function AppShell() {
           />
 
           {/* Reportes Admin */}
-          <Route path="/admin/reportes" element={<AdminPage><ListReports /></AdminPage>} />
-          <Route path="/admin/reportes/crear" element={<AdminPage><CreateReport /></AdminPage>} />
-          <Route path="/admin/reportes/:id" element={<AdminPage><EditReport /></AdminPage>} />
+          <Route
+            path="/admin/reportes"
+            element={
+              <AdminPage>
+                <ListReports />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/reportes/crear"
+            element={
+              <AdminPage>
+                <CreateReport />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/reportes/:id"
+            element={
+              <AdminPage>
+                <EditReport />
+              </AdminPage>
+            }
+          />
 
           {/* Pagos Admin */}
-          <Route path="/admin/metodos-pago" element={<AdminPage><ListPaymentMethods /></AdminPage>} />
-          <Route path="/admin/metodos-pago/crear" element={<AdminPage><CreatePaymentMethod /></AdminPage>} />
-          <Route path="/admin/metodos-pago/editar/:id" element={<AdminPage><EditPaymentMethod /></AdminPage>} />
+          <Route
+            path="/admin/metodos-pago"
+            element={
+              <AdminPage>
+                <ListPaymentMethods />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/metodos-pago/crear"
+            element={
+              <AdminPage>
+                <CreatePaymentMethod />
+              </AdminPage>
+            }
+          />
+          <Route
+            path="/admin/metodos-pago/editar/:id"
+            element={
+              <AdminPage>
+                <EditPaymentMethod />
+              </AdminPage>
+            }
+          />
 
           <Route path="*" element={<NotFound />} />
         </Routes>

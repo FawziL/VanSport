@@ -9,7 +9,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  ActionButton
+  ActionButton,
 } from '@/components/ui/Table';
 import StatusBadge from '@/components/StatusBadge';
 
@@ -25,7 +25,7 @@ function formatDate(d) {
     if (isNaN(dt)) return String(d ?? '');
     return dt.toLocaleString('es-ES', {
       dateStyle: 'short',
-      timeStyle: 'short'
+      timeStyle: 'short',
     });
   } catch {
     return String(d ?? '');
@@ -64,7 +64,9 @@ export default function MisPedidos() {
         if (alive) setLoading(false);
       }
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [isAuthenticated]);
 
   return (
@@ -85,8 +87,8 @@ export default function MisPedidos() {
       ) : items.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
           <p className="text-gray-600 mb-4">Aún no tienes pedidos.</p>
-          <button 
-            onClick={() => navigate('/productos')} 
+          <button
+            onClick={() => navigate('/productos')}
             className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
           >
             Ver Productos
@@ -98,15 +100,15 @@ export default function MisPedidos() {
             <TableHeader width="15%">#</TableHeader>
             <TableHeader width="25%">Fecha</TableHeader>
             <TableHeader width="20%">Estado</TableHeader>
-            <TableHeader width="20%" align="right">Total</TableHeader>
-            <TableHeader width="20%" align="center">Acciones</TableHeader>
+            <TableHeader width="20%" align="right">
+              Total
+            </TableHeader>
+            <TableHeader width="20%" align="center">
+              Acciones
+            </TableHeader>
           </TableHead>
-          
-          <TableBody 
-            loading={false} 
-            empty={false}
-            colSpan={5}
-          >
+
+          <TableBody loading={false} empty={false} colSpan={5}>
             {items.map((p) => (
               <TableRow key={p.pedido_id}>
                 <TableCell className="font-semibold">#{p.pedido_id}</TableCell>
@@ -118,10 +120,7 @@ export default function MisPedidos() {
                   {formatPrice(p.total)}
                 </TableCell>
                 <TableCell align="center">
-                  <ActionButton
-                    variant="edit"
-                    onClick={() => navigate(`/pedidos/${p.pedido_id}`)}
-                  >
+                  <ActionButton variant="edit" onClick={() => navigate(`/pedidos/${p.pedido_id}`)}>
                     Ver Detalles
                   </ActionButton>
                 </TableCell>

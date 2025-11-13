@@ -8,7 +8,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  ActionButton
+  ActionButton,
 } from '@/components/ui/Table';
 import Pagination from '@/components/Pagination';
 import ConfirmModal from '@/components/ConfirmModal';
@@ -46,19 +46,17 @@ export default function ListPaymentMethods() {
   const toggleActivo = async (m) => {
     try {
       setTogglingId(m.id);
-      
+
       // Actualización optimista
       setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, activo: !m.activo } : it)));
-      
+
       await adminService.pagos.partialUpdate(m.id, { activo: !m.activo });
-      
-      toast.success(
-        `Método de pago ${!m.activo ? 'activado' : 'desactivado'} correctamente`
-      );
+
+      toast.success(`Método de pago ${!m.activo ? 'activado' : 'desactivado'} correctamente`);
     } catch (err) {
       // Revertir cambio en caso de error
       setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, activo: m.activo } : it)));
-      
+
       const msg = err?.response?.data?.detail || 'No se pudo actualizar el estado';
       setError(msg);
       toast.error(msg);
@@ -87,8 +85,8 @@ export default function ListPaymentMethods() {
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-extrabold">Métodos de Pago</h1>
-        <Link 
-          to="/admin/metodos-pago/crear" 
+        <Link
+          to="/admin/metodos-pago/crear"
           className="px-4 py-2 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
         >
           + Crear Método
@@ -99,13 +97,18 @@ export default function ListPaymentMethods() {
       <div className="flex justify-end mb-3">
         <label className="flex items-center gap-2 text-gray-700">
           Por página:
-          <select 
-            value={pageSize} 
-            onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
+          <select
+            value={pageSize}
+            onChange={(e) => {
+              setPageSize(Number(e.target.value));
+              setPage(1);
+            }}
             className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             {[5, 10, 20, 50].map((n) => (
-              <option key={n} value={n}>{n}</option>
+              <option key={n} value={n}>
+                {n}
+              </option>
             ))}
           </select>
         </label>
@@ -126,9 +129,9 @@ export default function ListPaymentMethods() {
           <TableHeader>Actualizado</TableHeader>
           <TableHeader align="center">Acciones</TableHeader>
         </TableHead>
-        
-        <TableBody 
-          loading={loading} 
+
+        <TableBody
+          loading={loading}
           empty={pageItems.length === 0}
           colSpan={8}
           loadingText="Cargando métodos de pago..."
@@ -146,8 +149,8 @@ export default function ListPaymentMethods() {
                   onClick={() => toggleActivo(m)}
                   disabled={togglingId === m.id}
                   className={`border rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                    m.activo 
-                      ? 'bg-green-100 border-green-300 text-green-800 hover:bg-green-200' 
+                    m.activo
+                      ? 'bg-green-100 border-green-300 text-green-800 hover:bg-green-200'
                       : 'bg-red-100 border-red-300 text-red-800 hover:bg-red-200'
                   } ${togglingId === m.id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >
@@ -155,10 +158,12 @@ export default function ListPaymentMethods() {
                 </button>
               </TableCell>
               <TableCell>
-                {m.actualizado ? new Date(m.actualizado).toLocaleString('es-ES', {
-                  dateStyle: 'short',
-                  timeStyle: 'short'
-                }) : '-'}
+                {m.actualizado
+                  ? new Date(m.actualizado).toLocaleString('es-ES', {
+                      dateStyle: 'short',
+                      timeStyle: 'short',
+                    })
+                  : '-'}
               </TableCell>
               <TableCell align="center">
                 <div className="flex justify-center gap-2">

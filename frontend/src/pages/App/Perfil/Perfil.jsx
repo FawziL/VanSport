@@ -151,7 +151,11 @@ export default function Perfil() {
       {error && (
         <div className="alert alert-error">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+              clipRule="evenodd"
+            />
           </svg>
           {error}
         </div>
@@ -159,7 +163,11 @@ export default function Perfil() {
       {success && (
         <div className="alert alert-success">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L7.28 10.22a.75.75 0 00-1.06 1.04l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L7.28 10.22a.75.75 0 00-1.06 1.04l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+              clipRule="evenodd"
+            />
           </svg>
           {success}
         </div>
@@ -226,15 +234,19 @@ export default function Perfil() {
         </div>
 
         <div className="form-actions">
-          <button
-            type="submit"
-            disabled={saving}
-            className="btn btn-primary"
-          >
+          <button type="submit" disabled={saving} className="btn btn-primary">
             {saving ? (
               <>
                 <svg className="spinner" width="16" height="16" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="15.85 15.85" />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeDasharray="15.85 15.85"
+                  />
                 </svg>
                 Guardando...
               </>
@@ -242,11 +254,7 @@ export default function Perfil() {
               'Guardar cambios'
             )}
           </button>
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            className="btn btn-secondary"
-          >
+          <button type="button" onClick={() => navigate('/')} className="btn btn-secondary">
             Volver al inicio
           </button>
         </div>
@@ -356,7 +364,7 @@ export default function Perfil() {
             grid-template-columns: 1fr;
             gap: 1rem;
           }
-          
+
           .profile-header {
             flex-direction: column;
             text-align: center;
@@ -451,8 +459,12 @@ export default function Perfil() {
         }
 
         @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
         }
 
         /* Estilos para el skeleton loading */
@@ -501,8 +513,12 @@ export default function Perfil() {
         }
 
         @keyframes loading {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
+          0% {
+            background-position: 200% 0;
+          }
+          100% {
+            background-position: -200% 0;
+          }
         }
       `}</style>
     </div>

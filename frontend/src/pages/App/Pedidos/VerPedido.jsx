@@ -36,7 +36,12 @@ export default function VerPedido() {
     const num = Number(n);
     if (Number.isNaN(num)) return '-';
     try {
-      return num.toLocaleString('es-VE', { style: 'currency', currency: 'VES', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return num.toLocaleString('es-VE', {
+        style: 'currency',
+        currency: 'VES',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     } catch {
       return `Bs ${num.toFixed(2)}`;
     }
@@ -82,17 +87,28 @@ export default function VerPedido() {
           }
         }
       })
-      .catch(() => { if (alive) setMetodos([]); });
+      .catch(() => {
+        if (alive) setMetodos([]);
+      });
 
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [id, isAuthenticated]);
 
-  const enRevision = !!pedido?.ultima_transaccion && pedido?.ultima_transaccion?.estado === 'pendiente';
+  const enRevision =
+    !!pedido?.ultima_transaccion && pedido?.ultima_transaccion?.estado === 'pendiente';
   const mostrarFormulario = !!pedido && pedido.estado === 'pendiente' && !enRevision;
 
   // NUEVO: referencia requerida solo si el método lo pide (por convención en config o por tipo)
-  const requiereReferencia = !!(metodoSel?.config?.requiere_referencia || metodoSel?.tipo === 'pago_movil');
-  const canPay = mostrarFormulario && !paying && !!metodoSel && (!requiereReferencia || referencia.trim().length > 0);
+  const requiereReferencia = !!(
+    metodoSel?.config?.requiere_referencia || metodoSel?.tipo === 'pago_movil'
+  );
+  const canPay =
+    mostrarFormulario &&
+    !paying &&
+    !!metodoSel &&
+    (!requiereReferencia || referencia.trim().length > 0);
 
   // NUEVO: cuando el método es Pago Móvil, obtener BCV y calcular total en Bs
   useEffect(() => {
@@ -142,8 +158,8 @@ export default function VerPedido() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
         <h1 className="text-3xl font-bold">Pedido #{id}</h1>
-        <Link 
-          to="/pedidos" 
+        <Link
+          to="/pedidos"
           className="text-blue-600 font-semibold hover:text-blue-700 transition-colors"
         >
           Volver a mis pedidos
@@ -168,11 +184,13 @@ export default function VerPedido() {
             {/* Información del pedido */}
             <div className="space-y-3 mb-6">
               <div className="text-gray-600">
-                Estado: <span className="text-gray-900 font-semibold capitalize">{pedido.estado}</span>
+                Estado:{' '}
+                <span className="text-gray-900 font-semibold capitalize">{pedido.estado}</span>
               </div>
               {pedido.transaccion_id && (
                 <div className="text-gray-600">
-                  Transacción: <span className="text-gray-900 font-semibold">#{pedido.transaccion_id}</span>
+                  Transacción:{' '}
+                  <span className="text-gray-900 font-semibold">#{pedido.transaccion_id}</span>
                 </div>
               )}
               {pedido.direccion_envio && (
@@ -205,8 +223,12 @@ export default function VerPedido() {
                     const price = d.precio_unitario ?? 0;
                     const subtotal = d.subtotal ?? Number(price) * Number(d.cantidad || 0);
                     return (
-                      <tr 
-                        key={d.detalle_id || d.detalle_pedido_id || `${d.producto_id || d.producto}-${idx}`}
+                      <tr
+                        key={
+                          d.detalle_id ||
+                          d.detalle_pedido_id ||
+                          `${d.producto_id || d.producto}-${idx}`
+                        }
                         className="border-t border-gray-200"
                       >
                         <td className="p-3">{name}</td>
@@ -237,7 +259,7 @@ export default function VerPedido() {
                     Total en Bs (BCV hoy{bcv?.desactualizado ? ' – anterior' : ''})
                   </span>
                   <span className="font-bold">
-                    {bcvLoading ? 'Calculando…' : (bcvErr ? '—' : formatBs(totalBs))}
+                    {bcvLoading ? 'Calculando…' : bcvErr ? '—' : formatBs(totalBs)}
                   </span>
                 </div>
                 {bcv?.fecha && (
@@ -245,9 +267,7 @@ export default function VerPedido() {
                     Tasa: {Number(bcv.valor).toFixed(2)} Bs/USD · Fecha: {bcv.fecha}
                   </div>
                 )}
-                {bcvErr && (
-                  <div className="text-red-500 text-xs">{bcvErr}</div>
-                )}
+                {bcvErr && <div className="text-red-500 text-xs">{bcvErr}</div>}
               </div>
             )}
 
@@ -257,13 +277,22 @@ export default function VerPedido() {
                 <div className="font-bold mb-2">Último pago</div>
                 <div className="space-y-1 text-sm">
                   <div className="text-gray-600">
-                    Método: <span className="text-gray-900 capitalize">{pedido.ultima_transaccion.metodo_pago}</span>
+                    Método:{' '}
+                    <span className="text-gray-900 capitalize">
+                      {pedido.ultima_transaccion.metodo_pago}
+                    </span>
                   </div>
                   <div className="text-gray-600">
-                    Referencia: <span className="text-gray-900">{pedido.ultima_transaccion.codigo_transaccion || '-'}</span>
+                    Referencia:{' '}
+                    <span className="text-gray-900">
+                      {pedido.ultima_transaccion.codigo_transaccion || '-'}
+                    </span>
                   </div>
                   <div className="text-gray-600">
-                    Estado: <span className="text-gray-900 capitalize">{pedido.ultima_transaccion.estado}</span>
+                    Estado:{' '}
+                    <span className="text-gray-900 capitalize">
+                      {pedido.ultima_transaccion.estado}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -283,7 +312,7 @@ export default function VerPedido() {
                   {metodos.length > 0 && (
                     <div className="space-y-3">
                       {metodos.map((m) => (
-                        <label 
+                        <label
                           key={m.codigo}
                           className="flex gap-3 p-3 border border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors"
                         >
@@ -292,12 +321,16 @@ export default function VerPedido() {
                             name="metodo_pago"
                             value={m.codigo}
                             checked={metodoSel?.codigo === m.codigo}
-                            onChange={() => { setMetodoSel(m); setMetodoPago(m.codigo); }}
+                            onChange={() => {
+                              setMetodoSel(m);
+                              setMetodoPago(m.codigo);
+                            }}
                             className="text-blue-600 focus:ring-blue-500 mt-1"
                           />
                           <div className="flex-1">
                             <div className="font-semibold">
-                              {m.nombre} <span className="text-gray-600 font-normal">({m.descripcion})</span>
+                              {m.nombre}{' '}
+                              <span className="text-gray-600 font-normal">({m.descripcion})</span>
                             </div>
                             {m.instrucciones && (
                               <div className="text-gray-600 text-sm mt-1 whitespace-pre-wrap">
@@ -348,7 +381,8 @@ export default function VerPedido() {
                   const p = await appService.pedidos.retrieve(id);
                   setPedido(p);
                 } catch (e) {
-                  const msg = e?.response?.data?.error || e?.message || 'No se pudo procesar el pago';
+                  const msg =
+                    e?.response?.data?.error || e?.message || 'No se pudo procesar el pago';
                   setErrMsg(msg);
                 } finally {
                   setPaying(false);
@@ -356,21 +390,24 @@ export default function VerPedido() {
               }}
               className={`
                 w-full py-4 px-6 rounded-xl font-bold transition-all duration-200
-                ${canPay 
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' 
-                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                ${
+                  canPay
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                    : 'bg-gray-400 text-gray-200 cursor-not-allowed'
                 }
               `}
             >
               {paying
                 ? 'Enviando pago…'
                 : pedido.estado === 'completado'
-                ? 'Completado'
-                : pedido.estado === 'pagado'
-                ? 'Pagado'
-                : enRevision
-                ? 'Pago en revisión'
-                : (metodoSel?.tipo === 'paypal' ? 'Registrar pago (PayPal)' : 'Enviar comprobante')}
+                  ? 'Completado'
+                  : pedido.estado === 'pagado'
+                    ? 'Pagado'
+                    : enRevision
+                      ? 'Pago en revisión'
+                      : metodoSel?.tipo === 'paypal'
+                        ? 'Registrar pago (PayPal)'
+                        : 'Enviar comprobante'}
             </button>
           </div>
         </div>

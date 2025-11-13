@@ -6,15 +6,20 @@ function resolveCta(n) {
   const t = String(n?.relacion_tipo || '').toLowerCase();
   const id = n?.relacion_id;
   if (t === 'producto' && id != null) return { to: `/productos/${id}`, label: 'Ver producto' };
-  if (t === 'categoria' && id != null) return { to: `/productos?categoria_id=${id}`, label: 'Ver categoría' };
+  if (t === 'categoria' && id != null)
+    return { to: `/productos?categoria_id=${id}`, label: 'Ver categoría' };
   if (t === 'url' && typeof id === 'string') return { href: id, label: 'Ver más' };
   return null;
 }
 
 function formatDuration(ms) {
   const total = Math.max(0, Math.floor(ms / 1000));
-  const h = Math.floor(total / 3600).toString().padStart(2, '0');
-  const m = Math.floor((total % 3600) / 60).toString().padStart(2, '0');
+  const h = Math.floor(total / 3600)
+    .toString()
+    .padStart(2, '0');
+  const m = Math.floor((total % 3600) / 60)
+    .toString()
+    .padStart(2, '0');
   const s = (total % 60).toString().padStart(2, '0');
   return `${h}:${m}:${s}`;
 }
@@ -48,7 +53,9 @@ export default function HomeBanner() {
       if (localStorage.getItem(key)) return;
       if (alive) setBanner(n);
     });
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
 
   // Tick solo si hay expira o es oferta
@@ -79,10 +86,10 @@ export default function HomeBanner() {
 
     // Pequeño delay para asegurar que el DOM se ha renderizado
     const timeoutId = setTimeout(checkAnimation, 100);
-    
+
     // También verificar en resize
     window.addEventListener('resize', checkAnimation);
-    
+
     return () => {
       clearTimeout(timeoutId);
       window.removeEventListener('resize', checkAnimation);
@@ -126,7 +133,7 @@ export default function HomeBanner() {
           alignItems: 'center',
         }}
       >
-        <div 
+        <div
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -136,32 +143,33 @@ export default function HomeBanner() {
           }}
         >
           {/* Múltiples repeticiones para efecto continuo */}
-          
-            <div style={{ display: 'inline-flex', gap: 10, alignItems: 'center' }}>
-              <strong style={{ fontWeight: 900 }}>{banner.titulo}</strong>
-              <span style={{ opacity: 0.9 }}>{banner.mensaje}</span>
-              {remainingMs !== null && remainingMs > 0 && (
-                <span
-                  style={{
-                    background: '#e53935',
-                    color: '#fff',
-                    padding: '4px 8px',
-                    borderRadius: 8,
-                    fontWeight: 800,
-                  }}
-                >
-                  Termina en {formatDuration(remainingMs)}
-                </span>
-              )}
-              <span style={{ opacity: 0.5 }}>•</span>
-            </div>
-          
+
+          <div style={{ display: 'inline-flex', gap: 10, alignItems: 'center' }}>
+            <strong style={{ fontWeight: 900 }}>{banner.titulo}</strong>
+            <span style={{ opacity: 0.9 }}>{banner.mensaje}</span>
+            {remainingMs !== null && remainingMs > 0 && (
+              <span
+                style={{
+                  background: '#e53935',
+                  color: '#fff',
+                  padding: '4px 8px',
+                  borderRadius: 8,
+                  fontWeight: 800,
+                }}
+              >
+                Termina en {formatDuration(remainingMs)}
+              </span>
+            )}
+            <span style={{ opacity: 0.5 }}>•</span>
+          </div>
         </div>
 
-        <div style={{ 
-          marginLeft: 20,
-          flexShrink: 0 
-        }}>
+        <div
+          style={{
+            marginLeft: 20,
+            flexShrink: 0,
+          }}
+        >
           {cta && cta.to && (
             <Link
               to={cta.to}

@@ -1,9 +1,7 @@
 export function Table({ children, minWidth = 'min-w-[950px]' }) {
   return (
     <div className="overflow-x-auto bg-white rounded-xl shadow-sm">
-      <table className={`w-full border-collapse ${minWidth}`}>
-        {children}
-      </table>
+      <table className={`w-full border-collapse ${minWidth}`}>{children}</table>
     </div>
   );
 }
@@ -11,9 +9,7 @@ export function Table({ children, minWidth = 'min-w-[950px]' }) {
 export function TableHead({ children }) {
   return (
     <thead>
-      <tr className="bg-blue-100 text-black">
-        {children}
-      </tr>
+      <tr className="bg-blue-100 text-black">{children}</tr>
     </thead>
   );
 }
@@ -22,23 +18,19 @@ export function TableHeader({ children, align = 'left', className = '' }) {
   const alignment = {
     left: 'text-left',
     center: 'text-center',
-    right: 'text-right'
+    right: 'text-right',
   }[align];
 
-  return (
-    <th className={`p-3 ${alignment} ${className}`}>
-      {children}
-    </th>
-  );
+  return <th className={`p-3 ${alignment} ${className}`}>{children}</th>;
 }
 
-export function TableBody({ 
-  children, 
-  loading = false, 
-  empty = false, 
+export function TableBody({
+  children,
+  loading = false,
+  empty = false,
   colSpan = 1,
   loadingText = 'Cargando...',
-  emptyText = 'No hay datos.'
+  emptyText = 'No hay datos.',
 }) {
   if (loading) {
     return (
@@ -69,9 +61,7 @@ export function TableBody({
 
 export function TableRow({ children, hover = true, className = '' }) {
   return (
-    <tr className={`text-gray-700 ${hover ? 'hover:bg-gray-50' : ''} ${className}`}>
-      {children}
-    </tr>
+    <tr className={`text-gray-700 ${hover ? 'hover:bg-gray-50' : ''} ${className}`}>{children}</tr>
   );
 }
 
@@ -79,14 +69,10 @@ export function TableCell({ children, align = 'left', className = '' }) {
   const alignment = {
     left: 'text-left',
     center: 'text-center',
-    right: 'text-right'
+    right: 'text-right',
   }[align];
 
-  return (
-    <td className={`p-2 ${alignment} ${className}`}>
-      {children}
-    </td>
-  );
+  return <td className={`p-2 ${alignment} ${className}`}>{children}</td>;
 }
 
 // Componente para imágenes de producto
@@ -106,20 +92,14 @@ export function ProductImage({ src, alt, className = '' }) {
 }
 
 // Componente para botones de acción
-export function ActionButton({ 
-  onClick, 
-  variant, 
-  children, 
-  disabled = false,
-  className = '' 
-}) {
-  const baseClasses = "px-3 py-1 rounded font-bold cursor-pointer transition-colors";
-  
+export function ActionButton({ onClick, variant, children, disabled = false, className = '' }) {
+  const baseClasses = 'px-3 py-1 rounded font-bold cursor-pointer transition-colors';
+
   const variants = {
-    edit: "bg-blue-600 text-white hover:bg-blue-700",
-    delete: "bg-red-600 text-white hover:bg-red-700",
-    primary: "bg-blue-600 text-white hover:bg-blue-700",
-    secondary: "bg-gray-600 text-white hover:bg-gray-700"
+    edit: 'bg-blue-600 text-white hover:bg-blue-700',
+    delete: 'bg-red-600 text-white hover:bg-red-700',
+    primary: 'bg-blue-600 text-white hover:bg-blue-700',
+    secondary: 'bg-gray-600 text-white hover:bg-gray-700',
   };
 
   return (
