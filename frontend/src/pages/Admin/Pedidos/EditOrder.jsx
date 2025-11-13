@@ -43,20 +43,14 @@ export default function EditOrder() {
     }
   };
 
-  if (loading || !form) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '50vh',
-        fontSize: '18px',
-        color: '#666'
-      }}>
-        Cargando datos del pedido...
+  if (loading) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Cargando pedido...</p>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
     <div style={{ 

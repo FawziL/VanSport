@@ -27,6 +27,7 @@ class TransaccionViewSetApi(viewsets.ModelViewSet):
         monto = request.data.get('monto')
         metodo_pago = request.data.get('metodo_pago', 'transferencia')
         codigo_transaccion = request.data.get('codigo_transaccion', '')
+        referencia = request.data.get('referencia', '')
 
         if not pedido_id:
             return Response({'error': 'pedido_id es requerido'}, status=status.HTTP_400_BAD_REQUEST)
@@ -50,6 +51,7 @@ class TransaccionViewSetApi(viewsets.ModelViewSet):
                 estado='pendiente',  # queda pendiente para revisión del admin
                 fecha_transaccion=timezone.now(),
                 codigo_transaccion=codigo_transaccion or '',
+                referencia=referencia or '',
             )
             # No cambiar estado del pedido aquí; el admin lo actualizará tras revisión
 

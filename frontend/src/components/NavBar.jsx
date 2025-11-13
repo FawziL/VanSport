@@ -28,8 +28,16 @@ export default function NavBar() {
       const n = Number(e?.detail?.count);
       if (!Number.isNaN(n)) setCartCount(n);
     };
+    const orderPlacedHandler = () => {
+      // cuando se coloca un pedido, limpiamos contador inmediatamente
+      setCartCount(0);
+    };
     window.addEventListener('cart:updated', handler);
-    return () => window.removeEventListener('cart:updated', handler);
+    window.addEventListener('order:placed', orderPlacedHandler);
+    return () => {
+      window.removeEventListener('cart:updated', handler);
+      window.removeEventListener('order:placed', orderPlacedHandler);
+    };
   }, []);
 
   // Cargar cantidad del carrito (sumando cantidades) cuando hay usuario y al recuperar foco

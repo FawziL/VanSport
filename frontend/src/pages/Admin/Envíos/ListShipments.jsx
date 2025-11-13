@@ -104,23 +104,7 @@ export default function ListShipments() {
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-extrabold">Envíos</h1>
-      </div>
-
-      {/* Page Size Selector */}
-      <div className="flex justify-end mb-3">
-        <PageSizeSelector
-          value={pageSize}
-          onChange={setPageSize}
-          options={[5, 10, 20, 50]}
-          label="Por página"
-        />
-      </div>
-
-      {/* Error Message */}
-      {error && <div className="text-red-700 font-bold mb-3">{error}</div>}
-
-      {/* Filters and Export */}
-      <div className="flex flex-col sm:flex-row gap-4 items-end mb-4">
+              <div className="flex flex-col sm:flex-row gap-4 items-end mb-4">
         <div className="flex flex-col sm:flex-row gap-4 flex-1">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Desde</label>
@@ -153,6 +137,20 @@ export default function ListShipments() {
         >
           {exporting ? 'Exportando…' : 'Exportar Excel'}
         </button>
+      </div>
+      </div>
+
+      {/* Error Message */}
+      {error && <div className="text-red-700 font-bold mb-3">{error}</div>}
+
+      {/* Page Size Selector */}
+      <div className="flex justify-end mb-3">
+        <PageSizeSelector
+          value={pageSize}
+          onChange={setPageSize}
+          options={[5, 10, 20, 50]}
+          label="Por página"
+        />
       </div>
 
       {/* Table */}

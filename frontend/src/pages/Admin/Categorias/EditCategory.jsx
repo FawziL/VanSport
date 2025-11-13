@@ -110,40 +110,14 @@ export default function EditCategory() {
     }
   };
 
-  if (loading) {
-    return (
-      <div style={{ maxWidth: 800, margin: '2rem auto', padding: '0 1rem' }}>
-        <div
-          style={{
-            width: '60%',
-            height: 20,
-            background: '#eee',
-            borderRadius: 8,
-            marginBottom: 12,
-          }}
-        />
-        <div
-          style={{
-            background: '#fff',
-            border: '1px solid #eee',
-            borderRadius: 12,
-            padding: '1rem',
-          }}
-        >
-          <div
-            style={{
-              width: '50%',
-              height: 18,
-              background: '#eee',
-              borderRadius: 8,
-              marginBottom: 12,
-            }}
-          />
-          <div style={{ width: '100%', height: 44, background: '#eee', borderRadius: 10 }} />
-        </div>
+  if (loading) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Cargando datos de categoría...</p>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', padding: '0 1rem' }}>

@@ -77,60 +77,121 @@ export default function Checkout() {
 
   const canSubmit = items.length > 0 && (entrega === 'retiro' || (entrega === 'envio' && direccion.trim())) && !placing;
 
+  // Loader que solicitaste
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando checkout...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ maxWidth: 1100, margin: '2rem auto', padding: '0 1rem', color: '#111827' }}>
-      <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 14 }}>Checkout</h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 text-gray-900">
+      <h1 className="text-3xl font-bold mb-4">Checkout</h1>
 
       {errMsg && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', borderRadius: 12, padding: '0.75rem 1rem', marginBottom: 16, fontWeight: 700 }}>{errMsg}</div>
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-4 font-semibold">
+          {errMsg}
+        </div>
       )}
 
-      {loading ? (
-        <div>Cargando…</div>
-      ) : items.length === 0 ? (
-        <div>
-          Tu carrito está vacío.
-          <button onClick={() => navigate('/productos')} style={{ marginLeft: 8, background: '#1e88e5', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 10px', fontWeight: 800 }}>Ver productos</button>
+      {items.length === 0 ? (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <p>Tu carrito está vacío.</p>
+          <button 
+            onClick={() => navigate('/productos')}
+            className="ml-2 bg-blue-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-blue-700 transition-colors"
+          >
+            Ver productos
+          </button>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
-          <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: 12, padding: '1rem' }}>
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontWeight: 800, marginBottom: 8 }}>Método de entrega</div>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <input type="radio" name="entrega" value="envio" checked={entrega === 'envio'} onChange={() => setEntrega('envio')} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Columna principal - Formulario */}
+          <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6">
+            {/* Método de entrega */}
+            <div className="mb-6">
+              <div className="font-bold mb-3">Método de entrega</div>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio" 
+                    name="entrega" 
+                    value="envio" 
+                    checked={entrega === 'envio'} 
+                    onChange={() => setEntrega('envio')}
+                    className="text-blue-600 focus:ring-blue-500"
+                  />
                   Envío a domicilio
                 </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <input type="radio" name="entrega" value="retiro" checked={entrega === 'retiro'} onChange={() => setEntrega('retiro')} />
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio" 
+                    name="entrega" 
+                    value="retiro" 
+                    checked={entrega === 'retiro'} 
+                    onChange={() => setEntrega('retiro')}
+                    className="text-blue-600 focus:ring-blue-500"
+                  />
                   Retiro en tienda
                 </label>
               </div>
             </div>
 
+            {/* Dirección de envío */}
             {entrega === 'envio' && (
-              <div style={{ marginBottom: 14 }}>
-                <label htmlFor="direccion" style={{ display: 'block', fontWeight: 800, marginBottom: 6 }}>Dirección de envío</label>
-                <textarea id="direccion" rows={3} value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Calle, número, ciudad, referencia…" style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: 10, padding: '0.6rem 0.8rem' }} />
+              <div className="mb-6">
+                <label htmlFor="direccion" className="block font-bold mb-2">
+                  Dirección de envío
+                </label>
+                <textarea 
+                  id="direccion"
+                  rows={3}
+                  value={direccion}
+                  onChange={(e) => setDireccion(e.target.value)}
+                  placeholder="Calle, número, ciudad, referencia…"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                />
               </div>
             )}
 
-            <div style={{ marginBottom: 14 }}>
-              <label htmlFor="notas" style={{ display: 'block', fontWeight: 800, marginBottom: 6 }}>Notas (opcional)</label>
-              <textarea id="notas" rows={2} value={notas} onChange={(e) => setNotas(e.target.value)} placeholder="Instrucciones para el envío…" style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: 10, padding: '0.6rem 0.8rem' }} />
+            {/* Notas */}
+            <div className="mb-6">
+              <label htmlFor="notas" className="block font-bold mb-2">
+                Notas (opcional)
+              </label>
+              <textarea 
+                id="notas"
+                rows={2}
+                value={notas}
+                onChange={(e) => setNotas(e.target.value)}
+                placeholder="Instrucciones para el envío…"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              />
             </div>
           </div>
 
-          <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: 12, padding: '1rem', alignSelf: 'start', position: 'sticky', top: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-              <span style={{ color: '#6b7280' }}>Productos</span>
-              <span style={{ fontWeight: 800 }}>{items.reduce((a, it) => a + it.cantidad, 0)}</span>
+          {/* Columna lateral - Resumen */}
+          <div className="h-50 bg-white border border-gray-200 rounded-xl p-6 lg:sticky lg:top-6">
+            <div className="space-y-4 mb-6">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Productos</span>
+                <span className="font-bold">
+                  {items.reduce((a, it) => a + it.cantidad, 0)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Total</span>
+                <span className="font-bold text-lg">
+                  {formatPrice(total)}
+                </span>
+              </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-              <span style={{ color: '#6b7280' }}>Total</span>
-              <span style={{ fontWeight: 900 }}>{formatPrice(total)}</span>
-            </div>
+
             <button
               disabled={!canSubmit}
               onClick={async () => {
@@ -142,8 +203,12 @@ export default function Checkout() {
                     notas: notas?.trim() || '',
                   };
                   const res = await appService.pedidos.checkout(payload);
+
+                  window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: 0 } }));
+                  window.dispatchEvent(new Event('order:placed'));
+
                   const pid = res?.pedido?.pedido_id || res?.pedido?.id;
-                  // Tras checkout, podrías dirigir a la pantalla de pago
+
                   navigate(pid ? `/pedidos/${pid}` : '/pedidos');
                 } catch (e) {
                   const msg = e?.response?.data?.error || e?.message || 'No se pudo finalizar el pedido';
@@ -152,7 +217,13 @@ export default function Checkout() {
                   setPlacing(false);
                 }
               }}
-              style={{ width: '100%', padding: '0.9rem 1.2rem', borderRadius: 10, border: 'none', background: '#1e88e5', color: '#fff', fontWeight: 900, cursor: canSubmit ? 'pointer' : 'not-allowed' }}
+              className={`
+                w-full py-4 px-6 rounded-xl font-bold transition-all duration-200
+                ${canSubmit 
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' 
+                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                }
+              `}
             >
               {placing ? 'Procesando…' : 'Confirmar pedido'}
             </button>

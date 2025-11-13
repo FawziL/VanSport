@@ -498,7 +498,7 @@ export default function VerProducto() {
             {producto.stock > 0 && (
               <div className="mt-3">
                 <div className="font-semibold mb-1">Cantidad</div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center gap-2">
                   <button
                     type="button"
                     onClick={() => setQty((q) => Math.max(1, Number(q) - 1))}
@@ -521,7 +521,7 @@ export default function VerProducto() {
                       const max = Number(producto.stock) || 1;
                       setQty(Math.min(Math.max(1, v), max));
                     }}
-                    className="w-16 h-9 rounded-lg border border-gray-300 text-center font-semibold"
+                    className="w-20 h-9 rounded-lg border border-gray-300 text-center font-semibold"
                   />
                   <button
                     type="button"
@@ -583,50 +583,99 @@ export default function VerProducto() {
             </div>
           </div>
 
-          {/* Compartir */}
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <div className="font-semibold mb-1">Compartir</div>
-            <div className="flex gap-2 flex-wrap">
+          {/* Compartir (mejor estilo) */}
+          <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-sm font-semibold text-gray-900">Compartir</div>
+                <div className="text-xs text-gray-500">Comparte este producto con tus clientes o amigos</div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Native share (si está disponible) */}
+                {typeof navigator !== 'undefined' && navigator.share ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigator.share({
+                        title: `Producto: ${producto.nombre}`,
+                        text: `Mira este producto: ${producto.nombre}`,
+                        url: shareLink,
+                      }).catch(() => {})
+                    }
+                    title="Compartir (nativo)"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
+                    aria-label="Compartir"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                      <path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M16 6l-4-4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M12 2v14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Compartir
+                  </button>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
                 type="button"
                 onClick={() => {
                   navigator.clipboard.writeText(shareLink);
                   toast.success('Enlace copiado al portapapeles');
                 }}
-                className="px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 cursor-pointer hover:bg-gray-100"
+                title="Copiar enlace"
+                className="flex items-center gap-2 justify-center px-3 py-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-gray-100 transition text-sm"
+                aria-label="Copiar enlace"
               >
-                Copiar enlace
+                <svg className="w-4 h-4 text-gray-700" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                  <path d="M8 7h8a1 1 0 011 1v10a1 1 0 01-1 1H8a1 1 0 01-1-1V8a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M16 7V5a2 2 0 00-2-2H6a2 2 0 00-2 2v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Copiar
               </button>
+
               <button
                 type="button"
-                onClick={() => {
-                  window.open(`https://wa.me/?text=${encodeURIComponent(shareLink)}`, '_blank');
-                }}
-                className="px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 cursor-pointer hover:bg-gray-100"
+                onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(shareLink)}`, '_blank')}
+                title="Compartir por WhatsApp"
+                className="flex items-center gap-2 justify-center px-3 py-2 rounded-lg border border-gray-100 bg-green-50 hover:bg-green-100 transition text-sm text-green-700"
+                aria-label="WhatsApp"
               >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                  <path d="M21 12.08A9 9 0 1111.92 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M21 21l-5.2-1.4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
                 WhatsApp
               </button>
+
               <button
                 type="button"
-                onClick={() => {
-                  window.open(
-                    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`,
-                    '_blank'
-                  );
-                }}
-                className="px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 cursor-pointer hover:bg-gray-100"
+                onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`, '_blank')}
+                title="Compartir en Facebook"
+                className="flex items-center gap-2 justify-center px-3 py-2 rounded-lg border border-gray-100 bg-blue-50 hover:bg-blue-100 transition text-sm text-blue-700"
+                aria-label="Facebook"
               >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                  <path d="M18 2h-3a4 4 0 00-4 4v3H8v3h3v7h3v-7h2.5L18 9h-2.5V6.5A1.5 1.5 0 0117 5h1V2z" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
                 Facebook
               </button>
+
               <button
                 type="button"
                 onClick={() => {
-                  window.location.href = `mailto:?subject=${encodeURIComponent(
-                    `Producto: ${producto.nombre}`
-                  )}&body=${encodeURIComponent(`Mira este producto: ${shareLink}`)}`;
+                  window.location.href = `mailto:?subject=${encodeURIComponent(`Producto: ${producto.nombre}`)}&body=${encodeURIComponent(`Mira este producto: ${shareLink}`)}`;
                 }}
-                className="px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 cursor-pointer hover:bg-gray-100"
+                title="Enviar por email"
+                className="flex items-center gap-2 justify-center px-3 py-2 rounded-lg border border-gray-100 bg-indigo-50 hover:bg-indigo-100 transition text-sm text-indigo-700"
+                aria-label="Email"
               >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                  <path d="M3 8l9 6 9-6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M21 8v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
                 Email
               </button>
             </div>

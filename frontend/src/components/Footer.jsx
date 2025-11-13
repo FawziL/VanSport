@@ -51,20 +51,14 @@ function SocialIcon({ type = 'facebook', href = '#', label, size = 22 }) {
       target="_blank"
       rel="noreferrer"
       aria-label={label || type}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 36,
-        height: 36,
-        borderRadius: 10,
-        color: '#e5e7eb',
-        background: 'rgba(255,255,255,0.08)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        transition: 'all .2s',
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.16)')}
-      onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+      className="
+        inline-flex items-center justify-center
+        w-9 h-9 rounded-lg
+        text-gray-300 bg-white/10 border border-white/20
+        transition-all duration-200 ease-in-out
+        hover:bg-white/20 hover:border-white/30 hover:scale-105
+        focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-slate-900
+      "
     >
       {icon}
     </a>
@@ -72,17 +66,14 @@ function SocialIcon({ type = 'facebook', href = '#', label, size = 22 }) {
 }
 
 export default function Footer({
-  brand = { name: 'VanSport', slogan: 'Tu tienda deportiva online' },
+  brand = { name: 'VanSport', slogan: 'Todo lo que necesitas para tu hogar, en un solo lugar.' },
   internalLinks = {
     tienda: [
       { label: 'Inicio', to: '/' },
       { label: 'Productos', to: '/productos' },
     ],
     soporte: [
-      // Puedes completar con rutas reales si existen
-      // { label: 'Ayuda', to: '/ayuda' },
-      // { label: 'Reportar falla', to: '/reportar-falla' },
-      { label: 'Iniciar sesión', to: '/login' },
+      { label: 'Reporte de fallas', to: '/reportes' },
     ],
   },
   externalLinks = {
@@ -96,163 +87,171 @@ export default function Footer({
     ],
   },
   socials = [
-    { type: 'instagram', href: 'https://instagram.com/', label: 'Instagram' },
+    { type: 'instagram', href: 'https://www.instagram.com/distribuidoravansport/', label: 'Instagram' },
     { type: 'facebook', href: 'https://facebook.com/', label: 'Facebook' },
     { type: 'tiktok', href: 'https://tiktok.com/@', label: 'TikTok' },
-    { type: 'whatsapp', href: 'https://wa.me/0000000000', label: 'WhatsApp' },
+    { type: 'whatsapp', href: 'https://wa.me/584122511076', label: 'WhatsApp' },
   ],
   address = {
-    line1: 'Calle y número',
-    city: 'Ciudad',
-    country: 'País',
-    phone: '+0 000 000 000',
+    city: 'Ctra Panamericana km16 CC La Casona 1 Piso 1 local N1-11',
+    country: 'San Antonio De Los Altos, Miranda, Venezuela 1204',
+    phone: '+584122511076',
     email: 'contacto@example.com',
   },
 }) {
   const year = new Date().getFullYear();
 
   const colTitle = (text) => (
-    <div style={{ color: '#f1f5f9', fontWeight: 900, marginBottom: 12, letterSpacing: 0.2 }}>
+    <div className="text-slate-100 font-bold mb-3 tracking-wide text-sm uppercase">
       {text}
     </div>
   );
 
-  const linkStyle = {
-    color: '#cbd5e1',
-    textDecoration: 'none',
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 8,
-    padding: '4px 0',
-  };
+  const linkStyle = "text-slate-300 no-underline inline-flex items-center gap-2 py-1 transition-colors duration-200 hover:text-white";
 
   return (
-    <footer style={{ background: '#0f172a', color: '#e2e8f0' }}>
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: '0 auto',
-          padding: '32px 16px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: 24,
-        }}
-      >
-        {/* Brand + Socials */}
-        <div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
-            <div style={{ fontSize: 22, fontWeight: 900 }}>{brand.name}</div>
-            {brand.slogan && <div style={{ color: '#94a3b8' }}>· {brand.slogan}</div>}
+    <footer className="bg-slate-900 text-slate-200 border-t border-slate-700">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+          
+          {/* Brand + Socials */}
+          <div className="lg:col-span-2">
+            <div className="flex items-baseline gap-2 mb-2">
+              <div className="text-2xl font-bold text-white">{brand.name}</div>
+              {brand.slogan && (
+                <div className="text-slate-400 text-sm">· {brand.slogan}</div>
+              )}
+            </div>
+            <p className="text-slate-400 mb-4 max-w-md">
+              Artículos del hogar, electrónicos y lo último en tendencias. 
+              Calidad y servicio en cada compra.
+            </p>
+            
+            {/* Social Icons */}
+            <div className="flex gap-3 mb-6">
+              {socials.map((s, i) => (
+                <SocialIcon key={i} type={s.type} href={s.href} label={s.label} />
+              ))}
+            </div>
+
+            {/* Contacto */}
+            <div className="text-slate-300 text-sm space-y-1">
+              {address.line1 && <div>{address.line1}</div>}
+              {(address.city || address.country) && (
+                <div>
+                  {address.city} {address.country ? `· ${address.country}` : ''}
+                </div>
+              )}
+              {address.phone && <div>Tel: {address.phone}</div>}
+              {address.email && (
+                <div>
+                  Email:{' '}
+                  <a 
+                    href={`mailto:${address.email}`} 
+                    className="text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    {address.email}
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
-          <div style={{ color: '#94a3b8', marginBottom: 12 }}>
-            Artículos deportivos, ofertas y lo último en tendencias.
+
+          {/* Tienda */}
+          <div>
+            {colTitle('Tienda')}
+            <nav className="space-y-2">
+              {internalLinks.tienda?.map((l, i) => (
+                <Link 
+                  key={i} 
+                  to={l.to} 
+                  className={linkStyle}
+                >
+                  <span className="text-blue-400">›</span>
+                  <span>{l.label}</span>
+                </Link>
+              ))}
+            </nav>
           </div>
-          <div style={{ display: 'flex', gap: 10, marginTop: 6, flexWrap: 'wrap' }}>
-            {socials.map((s, i) => (
-              <SocialIcon key={i} type={s.type} href={s.href} label={s.label} />
-            ))}
+
+          {/* Soporte */}
+          <div>
+            {colTitle('Soporte')}
+            <nav className="space-y-2">
+              {internalLinks.soporte?.map((l, i) => (
+                <Link 
+                  key={i} 
+                  to={l.to} 
+                  className={linkStyle}
+                >
+                  <span className="text-blue-400">›</span>
+                  <span>{l.label}</span>
+                </Link>
+              ))}
+            </nav>
           </div>
 
-          {/* Contacto */}
-          <div style={{ marginTop: 14, color: '#cbd5e1', fontSize: 14 }}>
-            {address.line1 && <div>{address.line1}</div>}
-            {(address.city || address.country) && (
-              <div>
-                {address.city} {address.country ? `· ${address.country}` : ''}
-              </div>
-            )}
-            {address.phone && <div>Tel: {address.phone}</div>}
-            {address.email && (
-              <div>
-                Email:{' '}
-                <a href={`mailto:${address.email}`} style={{ color: '#93c5fd' }}>
-                  {address.email}
-                </a>
-              </div>
-            )}
+          {/* Empresa & Legal */}
+          <div className="space-y-6">
+            <div>
+              {colTitle('Empresa')}
+              <nav className="space-y-2">
+                {externalLinks.empresa?.map((l, i) => (
+                  <a 
+                    key={i} 
+                    href={l.href} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className={linkStyle}
+                  >
+                    <span className="text-green-400">↗</span>
+                    <span>{l.label}</span>
+                  </a>
+                ))}
+              </nav>
+            </div>
+
+            <div>
+              {colTitle('Legal')}
+              <nav className="space-y-2">
+                {externalLinks.legal?.map((l, i) => (
+                  <a 
+                    key={i} 
+                    href={l.href} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className={linkStyle}
+                  >
+                    <span className="text-green-400">↗</span>
+                    <span>{l.label}</span>
+                  </a>
+                ))}
+              </nav>
+            </div>
           </div>
-        </div>
-
-        {/* Tienda */}
-        <div>
-          {colTitle('Tienda')}
-          <nav style={{ display: 'grid' }}>
-            {internalLinks.tienda?.map((l, i) => (
-              <Link key={i} to={l.to} style={linkStyle}>
-                <span>›</span>
-                <span>{l.label}</span>
-              </Link>
-            ))}
-          </nav>
-        </div>
-
-        {/* Soporte */}
-        <div>
-          {colTitle('Soporte')}
-          <nav style={{ display: 'grid' }}>
-            {internalLinks.soporte?.map((l, i) => (
-              <Link key={i} to={l.to} style={linkStyle}>
-                <span>›</span>
-                <span>{l.label}</span>
-              </Link>
-            ))}
-          </nav>
-        </div>
-
-        {/* Empresa */}
-        <div>
-          {colTitle('Empresa')}
-          <nav style={{ display: 'grid' }}>
-            {externalLinks.empresa?.map((l, i) => (
-              <a key={i} href={l.href} target="_blank" rel="noreferrer" style={linkStyle}>
-                <span>↗</span>
-                <span>{l.label}</span>
-              </a>
-            ))}
-          </nav>
-        </div>
-
-        {/* Legal */}
-        <div>
-          {colTitle('Legal')}
-          <nav style={{ display: 'grid' }}>
-            {externalLinks.legal?.map((l, i) => (
-              <a key={i} href={l.href} target="_blank" rel="noreferrer" style={linkStyle}>
-                <span>↗</span>
-                <span>{l.label}</span>
-              </a>
-            ))}
-          </nav>
         </div>
       </div>
 
       {/* Bottom bar */}
-      <div
-        style={{
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          padding: '12px 16px',
-          color: '#94a3b8',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: '0 auto',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            flexWrap: 'wrap',
-            fontSize: 13,
-          }}
-        >
-          <div>© {year} {brand.name}. Todos los derechos reservados.</div>
-          <div style={{ display: 'flex', gap: 12 }}>
-            {externalLinks.legal?.map((l, i) => (
-              <a key={i} href={l.href} target="_blank" rel="noreferrer" style={{ color: '#cbd5e1' }}>
-                {l.label}
-              </a>
-            ))}
+      <div className="border-t border-slate-800 bg-slate-800/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400">
+            <div>
+              © {year} {brand.name}. Todos los derechos reservados.
+            </div>
+            <div className="flex gap-6">
+              {externalLinks.legal?.map((l, i) => (
+                <a 
+                  key={i} 
+                  href={l.href} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="text-slate-300 hover:text-white transition-colors"
+                >
+                  {l.label}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </div>

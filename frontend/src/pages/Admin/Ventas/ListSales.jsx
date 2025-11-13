@@ -65,11 +65,9 @@ export default function ListSales() {
   const getUserLabel = (t) => {
     const nombre = t.usuario_nombre || '';
     const apellido = t.usuario_apellido || '';
-    const email = t.usuario_email || '';
     const base = `${nombre} ${apellido}`.trim();
     const id = t.usuario_id != null ? t.usuario_id : null;
-    const emailPart = email ? ` - ${email}` : '';
-    return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
+    return base || id != null ? `${base}${id != null ? ` (ID ${id})` : ''}` : '-';
   };
 
   const handleExportExcel = async () => {
@@ -103,19 +101,7 @@ export default function ListSales() {
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-extrabold">Ventas</h1>
-      </div>
-
-      {/* Page Size Selector */}
-      <div className="flex justify-end mb-3">
-        <PageSizeSelector
-          value={pageSize}
-          onChange={setPageSize}
-          options={[5, 10, 20, 50]}
-          label="Por página"
-        />
-      </div>
-
-      {/* Filters and Export */}
+              {/* Filters and Export */}
       <div className="flex flex-col sm:flex-row gap-4 items-end mb-4">
         <div className="flex flex-col sm:flex-row gap-4 flex-1">
           <div>
@@ -150,6 +136,17 @@ export default function ListSales() {
           {exporting ? 'Exportando…' : 'Exportar Excel'}
         </button>
       </div>
+      </div>
+
+      {/* Page Size Selector */}
+      <div className="flex justify-end mb-3">
+        <PageSizeSelector
+          value={pageSize}
+          onChange={setPageSize}
+          options={[5, 10, 20, 50]}
+          label="Por página"
+        />
+      </div>
 
       {/* Error Message */}
       {error && <div className="text-red-700 font-bold mb-3">{error}</div>}
@@ -162,6 +159,7 @@ export default function ListSales() {
           <TableHeader width="30%">Usuario</TableHeader>
           <TableHeader width="12%">Monto</TableHeader>
           <TableHeader width="14%">Método</TableHeader>
+          <TableHeader width="14%">Referencia</TableHeader>
           <TableHeader width="12%">Estado</TableHeader>
           <TableHeader width="10%">Fecha</TableHeader>
           <TableHeader width="10%" align="center">Acciones</TableHeader>
@@ -181,8 +179,9 @@ export default function ListSales() {
               <TableCell className="break-words">{getUserLabel(t)}</TableCell>
               <TableCell className="whitespace-nowrap font-medium">{fmt.money(t.monto)}</TableCell>
               <TableCell className="break-words">{t.metodo_pago}</TableCell>
+              <TableCell className="break-words">{t.referencia}</TableCell>
               <TableCell className="break-words">
-                <StatusBadge estado={t.estado} />
+                <StatusBadge estado={t.estado} variant="order" />
               </TableCell>
               <TableCell className="whitespace-nowrap">{fmt.date(t.fecha_transaccion)}</TableCell>
               <TableCell align="center">

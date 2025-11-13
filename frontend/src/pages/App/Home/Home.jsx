@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { appService } from '@/services/auth';
 import { resolveImageUrl } from '@/utils/resolveUrl';
 import HomeBanner from '@/components/HomeBanner';
+import { StarRow } from '@/utils/reviews';
 
 export default function Home() {
   const [cats, setCats] = useState([]);
@@ -26,7 +27,25 @@ export default function Home() {
           price: p.precio,
           img: resolveImageUrl(p.imagen_url || p.imagen),
         }));
-        if (alive) setFeatured(top3);
+
+        // Enriquecer cada producto con promedio y conteo de reseñas
+        const enriched = await Promise.all(
+          top3.map(async (p) => {
+            try {
+              const rev = await appService.reseñas.list({ producto_id: p.id });
+              const arr = Array.isArray(rev) ? rev : rev?.results || [];
+              if (arr.length > 0) {
+                const sum = arr.reduce((acc, r) => acc + (Number(r.calificacion) || 0), 0);
+                return { ...p, avgRating: sum / arr.length, reviewsCount: arr.length };
+              }
+              return { ...p, avgRating: 0, reviewsCount: 0 };
+            } catch {
+              return { ...p, avgRating: 0, reviewsCount: 0 };
+            }
+          })
+        );
+
+        if (alive) setFeatured(enriched);
       } catch (e) {
         if (alive) setError('No se pudieron cargar los destacados');
       } finally {
@@ -81,22 +100,19 @@ export default function Home() {
           
           <div className="max-w-4xl mx-auto px-4 relative z-10">
             <h1 className="text-5xl md:text-6xl font-black mb-6 tracking-tight">
-              ¡<span className="text-yellow-300">Equípate</span> para <span className="text-orange-400">ganar</span>!
+              ¡<span className="text-yellow-300">Van</span><span className="text-orange-400">Sport</span>!
             </h1>
             <p className="text-xl md:text-2xl text-gray-100 mb-8 font-medium">
-              Todo lo que necesitas para tu deporte favorito, en un solo lugar.
+              Todo lo que necesitas para tu hogar, en un solo lugar.
             </p>
             <Link
               to="/productos"
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-black py-4 px-12 rounded-full text-lg no-underline shadow-2xl shadow-orange-500/30 transition-all duration-300 inline-block hover:scale-105 hover:shadow-orange-500/50"
+              className="bg-gradient-to-r from-yellow-400 to-orange-500 !text-white font-black py-4 px-12 rounded-full text-lg no-underline shadow-2xl shadow-orange-500/30 transition-all duration-300 inline-block hover:scale-105 hover:shadow-orange-500/50"
             >
-              Explorar Productos 🏆
+              Explorar Productos
             </Link>
           </div>
         </section>
-
-        {/* Separador decorativo */}
-        <div className="bg-gradient-to-r from-blue-600 via-red-500 to-green-500 h-2 w-full"></div>
 
         {/* Categorías destacadas */}
         <section className="bg-gradient-to-b from-gray-50 to-white py-16">
@@ -117,7 +133,7 @@ export default function Home() {
               </div>
             )}
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-8">
+            <div className="flex justify-center gap-8">
               {(catsLoading ? Array.from({ length: 6 }) : cats).map((cat, idx) => (
                 <Link
                   to={cat ? `/productos?categoria_id=${encodeURIComponent(cat.id)}` : '#'}
@@ -125,18 +141,18 @@ export default function Home() {
                   className="group block bg-white rounded-2xl overflow-hidden shadow-lg shadow-gray-200/50 no-underline text-gray-800 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 border border-gray-100"
                 >
                   {catsLoading ? (
-                    <div className="w-full h-40 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />
+                    <div className="w-50 h-40 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />
                   ) : (
                     <div className="relative overflow-hidden">
                       <img
                         src={cat.img}
                         alt={cat.name}
-                        className="w-full h-40 object-cover block group-hover:scale-110 transition-transform duration-500"
+                        className="w-50 h-40 object-cover block group-hover:scale-110 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                     </div>
                   )}
-                  <div className="p-5 text-center">
+                  <div className="p-3 text-center">
                     {catsLoading ? (
                       <div className="h-6 bg-gray-200 rounded-lg animate-pulse" />
                     ) : (
@@ -151,18 +167,33 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Separador con patrón deportivo */}
-        <div className="bg-gray-900 py-3">
+        <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-red-600 text-white py-12">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="flex justify-center space-x-6 text-white text-sm">
-              <span className="flex items-center">⚽ Fútbol</span>
-              <span className="flex items-center">🏀 Baloncesto</span>
-              <span className="flex items-center">🎾 Tenis</span>
-              <span className="flex items-center">🏃 Atletismo</span>
-              <span className="flex items-center">🏊 Natación</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+              <div className="flex flex-col items-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-2xl">🚚</span>
+                </div>
+                <h3 className="text-xl font-black mb-2">Envío Rápido</h3>
+                <p className="text-blue-100">Entrega en 24-48 horas</p>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-2xl">✅</span>
+                </div>
+                <h3 className="text-xl font-black mb-2">Calidad Garantizada</h3>
+                <p className="text-blue-100">Productos de primeras marcas</p>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-2xl">💯</span>
+                </div>
+                <h3 className="text-xl font-black mb-2">Satisfacción</h3>
+                <p className="text-blue-100">30 días de devolución</p>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Productos destacados */}
         <section className="bg-gradient-to-b from-white to-gray-50 py-16">
@@ -222,9 +253,18 @@ export default function Home() {
                             currency: 'USD',
                           })}
                         </div>
-                        <div className="mt-4 flex items-center text-sm text-gray-500">
-                          <span className="text-yellow-400">★★★★★</span>
-                          <span className="ml-2">(128 reviews)</span>
+                        <div className="mt-4">
+                          {loading ? (
+                            <div className="h-4 bg-gray-200 rounded animate-pulse w-32" />
+                          ) : prod.reviewsCount > 0 ? (
+                            <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                              <StarRow value={prod.avgRating || 0} size={14} />
+                              <span className="text-gray-800 font-bold">{(prod.avgRating || 0).toFixed(1)}</span>
+                              <span className="ml-2">({prod.reviewsCount} Reseñas)</span>
+                            </div>
+                          ) : (
+                            <div className="mt-4 text-sm text-gray-500">Sin reseñas</div>
+                          )}
                         </div>
                       </>
                     )}
@@ -249,33 +289,7 @@ export default function Home() {
         </section>
 
         {/* Banner de características */}
-        <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-red-600 text-white py-12">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-2xl">🚚</span>
-                </div>
-                <h3 className="text-xl font-black mb-2">Envío Rápido</h3>
-                <p className="text-blue-100">Entrega en 24-48 horas</p>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-2xl">✅</span>
-                </div>
-                <h3 className="text-xl font-black mb-2">Calidad Garantizada</h3>
-                <p className="text-blue-100">Productos de primeras marcas</p>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-2xl">💯</span>
-                </div>
-                <h3 className="text-xl font-black mb-2">Satisfacción</h3>
-                <p className="text-blue-100">30 días de devolución</p>
-              </div>
-            </div>
-          </div>
-        </section>
+
 
         {/* CTA final */}
         <section className="bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white py-20 text-center relative overflow-hidden">
@@ -295,14 +309,13 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/productos"
-                className="bg-gradient-to-r from-green-500 to-green-600 text-white font-black py-4 px-10 rounded-full text-lg no-underline shadow-2xl shadow-green-500/30 transition-all duration-300 inline-flex items-center hover:scale-105 hover:shadow-green-500/50"
+                className="bg-gradient-to-r from-green-500 to-green-600 !text-white font-black py-4 px-10 rounded-full text-lg no-underline shadow-2xl shadow-green-500/30 transition-all duration-300 inline-flex items-center hover:scale-105 hover:shadow-green-500/50"
               >
                 Comprar Ahora 🏅
               </Link>
               <Link
-                to="/categorias"
-                to="/productos"
-                className="border-2 border-white text-white font-bold py-4 px-10 rounded-full text-lg no-underline transition-all duration-300 inline-flex items-center hover:bg-white hover:text-gray-900"
+                to="/productos?oferta=1&page_size=6"
+                className="border-2 border-white !text-white font-bold py-4 px-10 rounded-full text-lg no-underline transition-all duration-300 inline-flex items-center hover:bg-gray-800"
               >
                 Ver Ofertas
               </Link>

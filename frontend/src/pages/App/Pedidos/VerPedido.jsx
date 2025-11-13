@@ -125,42 +125,78 @@ export default function VerPedido() {
     };
   }, [metodoSel?.tipo, pedido?.total]);
 
+  // Loader que solicitaste
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando pedido...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ maxWidth: 1100, margin: '2rem auto', padding: '0 1rem', color: '#111827' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 900 }}>Pedido #{id}</h1>
-        <Link to="/pedidos" style={{ textDecoration: 'none', color: '#1e88e5', fontWeight: 800 }}>Volver a mis pedidos</Link>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 text-gray-900">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+        <h1 className="text-3xl font-bold">Pedido #{id}</h1>
+        <Link 
+          to="/pedidos" 
+          className="text-blue-600 font-semibold hover:text-blue-700 transition-colors"
+        >
+          Volver a mis pedidos
+        </Link>
       </div>
 
+      {/* Error Message */}
       {errMsg && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', borderRadius: 12, padding: '0.75rem 1rem', marginBottom: 16, fontWeight: 700 }}>{errMsg}</div>
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-6 font-semibold">
+          {errMsg}
+        </div>
       )}
 
-      {loading || !pedido ? (
-        <div>Cargando…</div>
+      {!pedido ? (
+        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+          <p>No se pudo cargar el pedido.</p>
+        </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
-          <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: 12, padding: '1rem' }}>
-            <div style={{ marginBottom: 12, color: '#6b7280' }}>Estado: <span style={{ textTransform: 'capitalize', color: '#111827', fontWeight: 800 }}>{pedido.estado}</span></div>
-            {pedido.transaccion_id && (
-              <div style={{ marginBottom: 12, color: '#6b7280' }}>Transacción: <span style={{ color: '#111827', fontWeight: 800 }}>#{pedido.transaccion_id}</span></div>
-            )}
-            {pedido.direccion_envio && (
-              <div style={{ marginBottom: 12, color: '#6b7280' }}>Dirección: <span style={{ color: '#111827' }}>{pedido.direccion_envio}</span></div>
-            )}
-            {pedido.notas && (
-              <div style={{ marginBottom: 12, color: '#6b7280' }}>Notas: <span style={{ color: '#111827' }}>{pedido.notas}</span></div>
-            )}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Columna principal - Detalles del pedido */}
+          <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6">
+            {/* Información del pedido */}
+            <div className="space-y-3 mb-6">
+              <div className="text-gray-600">
+                Estado: <span className="text-gray-900 font-semibold capitalize">{pedido.estado}</span>
+              </div>
+              {pedido.transaccion_id && (
+                <div className="text-gray-600">
+                  Transacción: <span className="text-gray-900 font-semibold">#{pedido.transaccion_id}</span>
+                </div>
+              )}
+              {pedido.direccion_envio && (
+                <div className="text-gray-600">
+                  Dirección: <span className="text-gray-900">{pedido.direccion_envio}</span>
+                </div>
+              )}
+              {pedido.notas && (
+                <div className="text-gray-600">
+                  Notas: <span className="text-gray-900">{pedido.notas}</span>
+                </div>
+              )}
+            </div>
 
-            <div style={{ marginTop: 8, fontWeight: 800, marginBottom: 8 }}>Artículos</div>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            {/* Artículos */}
+            <div className="font-bold text-lg mb-4">Artículos</div>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
                 <thead>
-                  <tr style={{ background: '#fafafa' }}>
-                    <th style={{ textAlign: 'left', padding: '10px' }}>Producto</th>
-                    <th style={{ textAlign: 'right', padding: '10px' }}>Precio</th>
-                    <th style={{ textAlign: 'right', padding: '10px' }}>Cant.</th>
-                    <th style={{ textAlign: 'right', padding: '10px' }}>Subtotal</th>
+                  <tr className="bg-gray-50">
+                    <th className="text-left p-3 font-semibold">Producto</th>
+                    <th className="text-right p-3 font-semibold">Precio</th>
+                    <th className="text-right p-3 font-semibold">Cant.</th>
+                    <th className="text-right p-3 font-semibold">Subtotal</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -169,11 +205,14 @@ export default function VerPedido() {
                     const price = d.precio_unitario ?? 0;
                     const subtotal = d.subtotal ?? Number(price) * Number(d.cantidad || 0);
                     return (
-                      <tr key={d.detalle_id || d.detalle_pedido_id || `${d.producto_id || d.producto}-${idx}`} style={{ borderTop: '1px solid #eee' }}>
-                        <td style={{ padding: '10px' }}>{name}</td>
-                        <td style={{ padding: '10px', textAlign: 'right' }}>{formatPrice(price)}</td>
-                        <td style={{ padding: '10px', textAlign: 'right' }}>{d.cantidad}</td>
-                        <td style={{ padding: '10px', textAlign: 'right', fontWeight: 800 }}>{formatPrice(subtotal)}</td>
+                      <tr 
+                        key={d.detalle_id || d.detalle_pedido_id || `${d.producto_id || d.producto}-${idx}`}
+                        className="border-t border-gray-200"
+                      >
+                        <td className="p-3">{name}</td>
+                        <td className="p-3 text-right">{formatPrice(price)}</td>
+                        <td className="p-3 text-right">{d.cantidad}</td>
+                        <td className="p-3 text-right font-semibold">{formatPrice(subtotal)}</td>
                       </tr>
                     );
                   })}
@@ -182,67 +221,88 @@ export default function VerPedido() {
             </div>
           </div>
 
-          <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: 12, padding: '1rem', alignSelf: 'start', position: 'sticky', top: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-              <span style={{ color: '#6b7280' }}>Total</span>
-              <span style={{ fontWeight: 900 }}>{formatPrice(pedido.total)}</span>
+          {/* Columna lateral - Resumen y pago */}
+          <div className="bg-white border border-gray-200 rounded-xl p-6 lg:sticky lg:top-6 space-y-6">
+            {/* Total */}
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Total</span>
+              <span className="text-xl font-bold">{formatPrice(pedido.total)}</span>
             </div>
 
-            {/* NUEVO: mostrar total en Bs solo si es Pago Móvil */}
+            {/* Total en Bs para Pago Móvil */}
             {metodoSel?.tipo === 'pago_movil' && (
-              <div style={{ marginBottom: 10 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#6b7280' }}>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600 text-sm">
                     Total en Bs (BCV hoy{bcv?.desactualizado ? ' – anterior' : ''})
                   </span>
-                  <span style={{ fontWeight: 900 }}>
+                  <span className="font-bold">
                     {bcvLoading ? 'Calculando…' : (bcvErr ? '—' : formatBs(totalBs))}
                   </span>
                 </div>
                 {bcv?.fecha && (
-                  <div style={{ color: '#9ca3af', fontSize: 12, marginTop: 4 }}>
+                  <div className="text-gray-500 text-xs">
                     Tasa: {Number(bcv.valor).toFixed(2)} Bs/USD · Fecha: {bcv.fecha}
                   </div>
                 )}
                 {bcvErr && (
-                  <div style={{ color: '#b91c1c', fontSize: 12, marginTop: 4 }}>{bcvErr}</div>
+                  <div className="text-red-500 text-xs">{bcvErr}</div>
                 )}
               </div>
             )}
 
+            {/* Último pago */}
             {pedido.ultima_transaccion && (
-              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 10, padding: '0.75rem 0.9rem', marginBottom: 12 }}>
-                <div style={{ fontWeight: 800, marginBottom: 6 }}>Último pago</div>
-                <div style={{ color: '#6b7280' }}>Método: <span style={{ color: '#111827', textTransform: 'capitalize' }}>{pedido.ultima_transaccion.metodo_pago}</span></div>
-                <div style={{ color: '#6b7280' }}>Referencia: <span style={{ color: '#111827' }}>{pedido.ultima_transaccion.codigo_transaccion || '-'}</span></div>
-                <div style={{ color: '#6b7280' }}>Estado: <span style={{ color: '#111827', textTransform: 'capitalize' }}>{pedido.ultima_transaccion.estado}</span></div>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div className="font-bold mb-2">Último pago</div>
+                <div className="space-y-1 text-sm">
+                  <div className="text-gray-600">
+                    Método: <span className="text-gray-900 capitalize">{pedido.ultima_transaccion.metodo_pago}</span>
+                  </div>
+                  <div className="text-gray-600">
+                    Referencia: <span className="text-gray-900">{pedido.ultima_transaccion.codigo_transaccion || '-'}</span>
+                  </div>
+                  <div className="text-gray-600">
+                    Estado: <span className="text-gray-900 capitalize">{pedido.ultima_transaccion.estado}</span>
+                  </div>
+                </div>
               </div>
             )}
+
+            {/* Formulario de pago */}
             {mostrarFormulario && (
-              <>
-                {/* NUEVO: métodos de pago dinámicos */}
-                <div style={{ marginBottom: 10 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <label style={{ display: 'block', fontWeight: 800, marginBottom: 6 }}>Método de pago</label>
-                    {metodos.length === 0 && <span style={{ color: '#6b7280', fontSize: 13 }}>No hay métodos disponibles</span>}
+              <div className="space-y-4">
+                {/* Métodos de pago dinámicos */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="block font-bold">Método de pago</label>
+                    {metodos.length === 0 && (
+                      <span className="text-gray-500 text-sm">No hay métodos disponibles</span>
+                    )}
                   </div>
                   {metodos.length > 0 && (
-                    <div style={{ display: 'grid', gap: 8 }}>
+                    <div className="space-y-3">
                       {metodos.map((m) => (
-                        <label key={m.codigo} style={{ display: 'flex', gap: 8, padding: '8px 10px', border: '1px solid #e5e7eb', borderRadius: 10 }}>
+                        <label 
+                          key={m.codigo}
+                          className="flex gap-3 p-3 border border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors"
+                        >
                           <input
                             type="radio"
                             name="metodo_pago"
                             value={m.codigo}
                             checked={metodoSel?.codigo === m.codigo}
                             onChange={() => { setMetodoSel(m); setMetodoPago(m.codigo); }}
+                            className="text-blue-600 focus:ring-blue-500 mt-1"
                           />
-                          <div>
-                            <div style={{ fontWeight: 800 }}>
-                              {m.nombre} <span style={{ color: '#6b7280', fontWeight: 400 }}>({m.descripcion})</span>
+                          <div className="flex-1">
+                            <div className="font-semibold">
+                              {m.nombre} <span className="text-gray-600 font-normal">({m.descripcion})</span>
                             </div>
                             {m.instrucciones && (
-                              <div style={{ color: '#64748b', fontSize: 13, whiteSpace: 'pre-wrap' }}>{m.instrucciones}</div>
+                              <div className="text-gray-600 text-sm mt-1 whitespace-pre-wrap">
+                                {m.instrucciones}
+                              </div>
                             )}
                           </div>
                         </label>
@@ -251,24 +311,27 @@ export default function VerPedido() {
                   )}
                 </div>
 
-                {/* NUEVO: referencia solo si aplica */}
+                {/* Referencia si aplica */}
                 {requiereReferencia && (
-                  <div style={{ marginBottom: 14 }}>
-                    <label style={{ display: 'block', fontWeight: 800, marginBottom: 6 }}>Número de referencia / comprobante</label>
+                  <div>
+                    <label className="block font-bold mb-2">
+                      Número de referencia / comprobante
+                    </label>
                     <input
                       value={referencia}
                       onChange={(e) => setReferencia(e.target.value)}
                       placeholder="# de operación o referencia"
-                      style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: 10, padding: '0.6rem 0.8rem' }}
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
-                    <div style={{ fontSize: 12, color: '#6b7280', marginTop: 6 }}>
+                    <div className="text-gray-500 text-sm mt-2">
                       Ingresa la referencia del pago. El admin validará tu comprobante.
                     </div>
                   </div>
                 )}
-              </>
+              </div>
             )}
 
+            {/* Botón de pago */}
             <button
               disabled={!canPay}
               onClick={async () => {
@@ -277,9 +340,8 @@ export default function VerPedido() {
                 try {
                   await appService.transacciones.pay({
                     pedido_id: id,
-                    // enviar el código del método seleccionado
                     metodo_pago: metodoSel?.nombre || metodoPago,
-                    // si no se requiere, enviamos vacío
+                    referencia: requiereReferencia ? referencia : '',
                     codigo_transaccion: requiereReferencia ? referencia : '',
                     monto: pedido.total,
                   });
@@ -292,7 +354,13 @@ export default function VerPedido() {
                   setPaying(false);
                 }
               }}
-              style={{ width: '100%', padding: '0.9rem 1.2rem', borderRadius: 10, border: 'none', background: canPay ? '#1e88e5' : '#9ca3af', color: '#fff', fontWeight: 900, cursor: canPay ? 'pointer' : 'not-allowed' }}
+              className={`
+                w-full py-4 px-6 rounded-xl font-bold transition-all duration-200
+                ${canPay 
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' 
+                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                }
+              `}
             >
               {paying
                 ? 'Enviando pago…'

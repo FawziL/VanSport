@@ -120,15 +120,15 @@ export default function EditProduct() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Editar producto</h1>
-        <div>Cargando…</div>
+  if (loading) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Cargando producto...</p>
       </div>
-    );
-  }
-
+    </div>
+  );
+  
   return (
     <div className="p-4 max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-4">

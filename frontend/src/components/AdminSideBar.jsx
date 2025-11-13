@@ -18,7 +18,7 @@ import {
   FaUserCog,
   FaSignOutAlt,
 } from 'react-icons/fa';
-import { FiSettings } from 'react-icons/fi';
+import { FiTool, FiSettings } from 'react-icons/fi';
 
 const sections = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: <FaThLarge /> },
@@ -30,7 +30,7 @@ const sections = [
   { to: '/admin/ventas', label: 'Ventas', icon: <FaChartBar /> },
   { to: '/admin/resenas', label: 'Reseñas', icon: <FaStar /> },
   { to: '/admin/notificaciones', label: 'Notificaciones', icon: <FaBell /> },
-  { to: '/admin/reportes', label: 'Reportes', icon: <FaTruck /> },
+  { to: '/admin/reportes', label: 'Reporte de fallas', icon: <FiTool /> },
   { to: '/admin/metodos-pago', label: 'Métodos de Pago', icon: <FaTags /> },
 ];
 

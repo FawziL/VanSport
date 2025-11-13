@@ -173,7 +173,7 @@ export default function ProductReviews({ productoId, nombre }) {
       </div>
 
       {/* Listado de reseñas */}
-      <div style={{ display: 'grid', gap: 10 }}>
+      <div style={{ display: 'grid', gap: 10, textAlign:"start" }}>
         {loading ? (
           <div style={{ color: '#999' }}>Cargando reseñas…</div>
         ) : items.length === 0 ? (
@@ -195,11 +195,11 @@ export default function ProductReviews({ productoId, nombre }) {
                   {new Date(r.fecha_creacion).toLocaleDateString()}
                 </span>
               </div>
-              <div style={{ color: '#111', marginTop: 6, whiteSpace: 'pre-wrap' }}>
-                {r.comentario || <span style={{ color: '#777' }}>(Sin comentario)</span>}
-              </div>
-              <div style={{ color: '#555', marginTop: 6, fontSize: 12 }}>
+              <div style={{ color: '#555', marginTop: 16, fontSize: 10  }}>
                 {r.usuario_nombre || ''} {r.usuario_apellido || ''}{' '}
+              </div>
+              <div style={{ color: '#111', marginTop: 1, whiteSpace: 'pre-wrap' }}>
+                {r.comentario || <span style={{ color: '#777' }}>(Sin comentario)</span>}
               </div>
             </div>
           ))
