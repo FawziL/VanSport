@@ -8,13 +8,14 @@ class ProductoViewSetApi(viewsets.ModelViewSet):
     serializer_class = ProductoSerializer
 
     def get_permissions(self):
+        # Solo operaciones de escritura requieren admin; lectura es pública
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [permissions.IsAdminUser()]
         return [permissions.AllowAny()]
 
     def get_queryset(self):
-        qs = Producto.objects.all()
-        activo = self.request.query_params.get('activo')
+        qs = Producto.objects.filter(activo=True)
+
         categoria_id = self.request.query_params.get('categoria_id')
         min_price = self.request.query_params.get('min_price')
         max_price = self.request.query_params.get('max_price')
@@ -22,13 +23,11 @@ class ProductoViewSetApi(viewsets.ModelViewSet):
         destacado = self.request.query_params.get('destacado')  # true/1 para solo destacados
         q = self.request.query_params.get('q')
 
-        if activo is not None:
-            qs = qs.filter(activo=activo.lower() in ('1','true','t','yes','y'))
         if categoria_id:
             qs = qs.filter(categoria_id=categoria_id)
-        if min_price and min_price.lower() != 'undefined':
+        if min_price and str(min_price).lower() != 'undefined':
             qs = qs.filter(precio__gte=min_price)
-        if max_price and max_price.lower() != 'undefined':
+        if max_price and str(max_price).lower() != 'undefined':
             qs = qs.filter(precio__lte=max_price)
         if oferta is not None and oferta != '':
             truthy = str(oferta).lower() in ('1','true','t','yes','y')
@@ -43,4 +42,5 @@ class ProductoViewSetApi(viewsets.ModelViewSet):
                 qs = qs.filter(destacado=False)
         if q:
             qs = qs.filter(models.Q(nombre__icontains=q) | models.Q(descripcion__icontains=q))
+
         return qs
