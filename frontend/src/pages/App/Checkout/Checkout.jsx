@@ -37,27 +37,44 @@ export default function Checkout() {
       setErrMsg('');
       try {
         const data = await appService.carrito.list();
-        const baseItems = Array.isArray(data) ? data : data.results || [];
-        // Enriquecer con datos de producto si viene solo el ID
-        const cache = new Map();
-        const enriched = await Promise.all(
-          baseItems.map(async (item) => {
-            const prodVal = item.producto;
-            if (prodVal && typeof prodVal === 'number') {
-              if (!cache.has(prodVal)) {
-                try {
-                  const p = await appService.productos.retrieve(prodVal);
-                  cache.set(prodVal, p);
-                } catch {
-                  cache.set(prodVal, { producto_id: prodVal, nombre: 'Producto', precio: 0 });
-                }
-              }
-              return { ...item, producto: cache.get(prodVal) };
-            }
-            return item;
-          })
+        const cartItems = Array.isArray(data) ? data : data.results || [];
+
+        // 1. Recolectar todos los IDs de productos que necesitan ser cargados.
+        const productIdsToFetch = [
+          ...new Set( // Usar Set para evitar duplicados
+            cartItems
+              .map((item) => item.producto)
+              .filter((prod) => typeof prod === 'number')
+          ),
+        ];
+
+        // 2. Realizar todas las llamadas a la API en paralelo.
+        const productPromises = productIdsToFetch.map((id) =>
+          appService.productos.retrieve(id)
         );
-        if (alive) setItems(enriched);
+        const productResults = await Promise.allSettled(productPromises);
+
+        // 3. Crear un mapa de productos para fácil acceso.
+        const productMap = new Map();
+        productResults.forEach((result, index) => {
+          const id = productIdsToFetch[index];
+          if (result.status === 'fulfilled') {
+            productMap.set(id, result.value);
+          } else {
+            // Si falla, usamos un producto por defecto para no romper la UI
+            productMap.set(id, { producto_id: id, nombre: 'Producto no disponible', precio: 0 });
+          }
+        });
+
+        // 4. "Enriquecer" los items del carrito con los datos completos del producto.
+        const enrichedItems = cartItems.map((item) => {
+          if (typeof item.producto === 'number' && productMap.has(item.producto)) {
+            return { ...item, producto: productMap.get(item.producto) };
+          }
+          return item;
+        });
+
+        if (alive) setItems(enrichedItems);
       } catch (e) {
         if (alive) setErrMsg('No se pudo cargar el carrito para checkout');
       } finally {

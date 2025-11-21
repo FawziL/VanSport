@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.db import transaction, connection
 from django.utils import timezone
 from decimal import Decimal
-from ecommerce.models import Pedido
+from ecommerce.models import Pedido, Envio  # 1. Importar el modelo Envio
 from ecommerce.serializers import PedidoSerializer
 from ecommerce.models import Carrito, Producto, DetallePedido
 
@@ -85,6 +85,16 @@ class PedidoViewSetApi(viewsets.ModelViewSet):
                 prod = Producto.objects.get(producto_id=det['producto_id'])
                 prod.stock = prod.stock - det['cantidad']
                 prod.save()
+
+            # Crear el envío si se proporcionó una dirección
+            if direccion_envio:
+                Envio.objects.create(
+                    pedido=pedido,
+                    direccion_envio=direccion_envio,
+                    metodo_envio='estandar',
+                    estado='Pendiente',
+                    costo_envio=Decimal('0.00')
+                )
 
             # Limpiar carrito
             Carrito.objects.filter(usuario_id=usuario_id).delete()
