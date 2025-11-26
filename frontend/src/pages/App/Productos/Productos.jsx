@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import CardProduct from '@/components/CardProduct';
-import { appService } from '@/services/auth';
+import { appService } from '@/services/routes';
 import Pagination from '@/components/Pagination';
 import ProductFilters from '@/components/ProductFilters';
 

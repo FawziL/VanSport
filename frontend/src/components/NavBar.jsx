@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { appService } from '@/services/auth';
+import { appService } from '@/services/routes';
 import { FaShoppingCart } from 'react-icons/fa';
 
 export default function NavBar() {

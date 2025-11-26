@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { adminService } from '@/services/auth';
+import { adminService } from '@/services/routes';
 
 export default function EditPaymentMethod() {
   const { id } = useParams();

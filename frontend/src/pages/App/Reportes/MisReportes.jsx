@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { appService } from '@/services/auth';
+import { appService } from '@/services/routes';
 import {
   Table,
   TableHead,

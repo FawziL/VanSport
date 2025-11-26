@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { adminService } from '@/services/auth';
+import { adminService } from '@/services/routes';
 import { CATEGORIAS_FALLA } from '@/utils/categorias';
 import { resolveImageUrl } from '@/utils/resolveUrl';
 import StatusBadge from '@/components/StatusBadge';

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { adminService } from '@/services/auth';
+import { adminService } from '@/services/routes';
 import ListCategories from '@/components/ListCategories';
 import { resolveImageUrl } from '@/utils/resolveUrl';
 

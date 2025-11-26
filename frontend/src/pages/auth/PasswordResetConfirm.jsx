@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { authService } from '@/services/auth';
+import { authService } from '@/services/routes';
 
 function useQuery() {
   const { search } = useLocation();

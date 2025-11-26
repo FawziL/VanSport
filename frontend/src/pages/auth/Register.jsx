@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { authService } from '@/services/auth';
+import { authService } from '@/services/routes';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css'; // Archivo CSS adicional para estilos más complejos
 

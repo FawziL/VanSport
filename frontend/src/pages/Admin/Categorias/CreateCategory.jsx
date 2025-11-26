@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { adminService } from '@/services/auth';
+import { adminService } from '@/services/routes';
 
 function FieldError({ error }) {
   if (!error) return null;

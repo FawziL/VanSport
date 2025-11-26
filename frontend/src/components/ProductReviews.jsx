@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { appService } from '@/services/auth';
+import { appService } from '@/services/routes';
 import { useAuth } from '@/context/AuthContext';
 import { StarRow, StarInput } from '@/utils/reviews';
 

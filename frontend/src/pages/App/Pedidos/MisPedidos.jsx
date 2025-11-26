@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { appService } from '@/services/auth';
+import { appService } from '@/services/routes';
 import { useAuth } from '@/context/AuthContext';
 import {
   Table,

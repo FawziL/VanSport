@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { appService } from '@/services/auth';
+import { appService } from '@/services/routes';
 import { resolveImageUrl } from '@/utils/resolveUrl';
 import { useAuth } from '@/context/AuthContext';
 import ProductReviews from '@/components/ProductReviews';

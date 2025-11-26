@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { appService } from '@/services/auth';
+import { appService } from '@/services/routes';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { resolveImageUrl } from '@/utils/resolveUrl';

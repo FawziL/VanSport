@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { authService } from '@/services/auth';
+import { authService } from '@/services/routes';
 import { Link } from 'react-router-dom';
 
 export default function PasswordReset() {

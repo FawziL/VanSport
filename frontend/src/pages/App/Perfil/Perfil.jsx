@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '@/services/auth';
+import { authService } from '@/services/routes';
 import { http } from '@/config/api';
 
 export default function Perfil() {
@@ -22,7 +22,7 @@ export default function Perfil() {
 
   // Guard simple: si no hay token, a login
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (!token) navigate('/login');
   }, [navigate]);
 

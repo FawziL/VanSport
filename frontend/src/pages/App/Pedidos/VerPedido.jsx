@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { appService } from '@/services/auth';
+import { appService } from '@/services/routes';
 import { useAuth } from '@/context/AuthContext';
 
 function formatPrice(n) {

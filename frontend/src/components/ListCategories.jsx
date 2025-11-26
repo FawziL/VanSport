@@ -1,20 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { appService } from '@/services/auth';
+import { appService } from '@/services/routes';
 
-/**
- * ListCategories
- * Reusable select component that fetches categories from the API and renders them as options.
- *
- * Props:
- * - value: controlled value (single id or array for multiple)
- * - onChange: function(newValue, event)
- * - name, id, className, disabled, multiple, required, autoFocus: passthrough to <select>
- * - params: optional query params for the API list endpoint (e.g., { search, page_size })
- * - getOptionLabel: function(item) -> string (defaults to item.nombre || item.name || item.titulo || item.title)
- * - getOptionValue: function(item) -> id (string) (defaults to categoria_id || id || pk)
- * - placeholder: string to show as the first option
- * - extraOptions: array of { label, value, disabled? }
- */
 export default function ListCategories({
   value,
   onChange,

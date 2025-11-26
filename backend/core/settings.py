@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Third-party
     'rest_framework',
+    'rest_framework_simplejwt',
     'corsheaders',
     # Local apps
     'ecommerce',
@@ -164,6 +165,10 @@ SIMPLE_JWT = {
     'USER_ID_CLAIM': 'user_id',
 }
 
+# Google Client ID para la verificación en el backend
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID_BACKEND')
+
+
 # Disable migrations for local apps to work against existing DB schema without applying migrations
 MIGRATION_MODULES = {
     'ecommerce': None,
@@ -190,8 +195,5 @@ EMAIL_REPLY_TO = os.getenv('EMAIL_REPLY_TO', '')  # opcional
 # EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 # EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 
-# Branding para correos
-BRAND_NAME = os.getenv('BRAND_NAME', 'VanSport')
-BRAND_PRIMARY_COLOR = os.getenv('BRAND_PRIMARY_COLOR', '#1e88e5')
-BRAND_TEXT_COLOR = os.getenv('BRAND_TEXT_COLOR', '#111111')
-BRAND_LOGO_URL = os.getenv('BRAND_LOGO_URL', '')  # p.ej. https://tudominio/logo.png
+# Permitir que los popups de OAuth (como Google) se comuniquen con la aplicación.
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'

@@ -6,7 +6,8 @@ export const authService = {
   me: () => http.get('/auth/me/'),
   passwordReset: (email) => http.post('/auth/password-reset/', { email }),
   passwordResetConfirm: (token, password) =>
-    http.post('/auth/password-reset/confirm/', { token, password }), // <-- nuevo
+    http.post('/auth/password-reset/confirm/', { token, password }),
+  googleLogin: (accessToken) => http.post('/auth/google/', { access_token: accessToken }),
 };
 
 export const appService = {

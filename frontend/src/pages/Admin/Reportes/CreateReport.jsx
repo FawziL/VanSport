@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { appService } from '@/services/auth';
+import { appService } from '@/services/routes';
 import { CATEGORIAS_FALLA } from '@/utils/categorias';
 import { Link } from 'react-router-dom';
 

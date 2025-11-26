@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from 'react-router-dom';
-import { adminService, appService } from '@/services/auth';
+import { adminService, appService } from '@/services/routes';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 import StatCard from '@/components/admin/StatCard';
 import sections from '@/utils/adminSections';
