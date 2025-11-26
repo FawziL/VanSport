@@ -4,11 +4,11 @@ Sistema de comercio electrónico desarrollado para la Distribuidora Van Sport co
 
 ## 📦 Características principales
 
-- Autenticación de usuarios (registro, login, recuperación de contraseña)
-- Catálogo de productos con búsqueda y filtrado
-- Carrito de compras y procesamiento de pedidos
-- Notificaciones automáticas por email
-- Panel administrativo para gestión de productos, pedidos y usuarios
+- Autenticación de usuarios (registro, login, recuperación de contraseña, cambio de contraseña)
+- Catálogo de productos con búsqueda y filtrado.
+- Carrito de compras y procesamiento de pedidos.
+- Notificaciones automáticas por email.
+- Panel administrativo para gestión de productos, pedidos y usuarios, etc...
 
 ## 🧑‍💻 Tecnologías utilizadas
 
@@ -66,7 +66,7 @@ npm run dev
 ```bash
 cd backend
 python -m venv env
-source env/bin/activate  # Linux/macOS
-env\Scripts\activate     # Windows
+env\Scripts\activate
 pip install -r requirements.txt
+python manage.py runserver
 ```
