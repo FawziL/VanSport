@@ -1,5 +1,9 @@
-import { Controller, Get, Post, Body, Param, Put, Patch, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import {
+  Controller, Get, Post, Body, Param, Put, Patch, Delete,
+  ParseIntPipe, UseGuards, UseInterceptors, UploadedFile, UploadedFiles,
+} from '@nestjs/common';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiConsumes } from '@nestjs/swagger';
 import { BugReportsService } from './bug-reports.service';
 import { CreateBugReportDto } from './dto/create-bug-report.dto';
 import { UpdateBugReportDto } from './dto/update-bug-report.dto';
@@ -21,8 +25,19 @@ export class BugReportsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a bug report' })
-  create(@Body() dto: CreateBugReportDto, @CurrentUser('id') userId: string) {
-    return this.bugReportsService.create(dto, userId);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'imagen', maxCount: 1 },
+      { name: 'video', maxCount: 1 },
+    ]),
+  )
+  async create(
+    @UploadedFiles() files: { imagen?: Express.Multer.File[]; video?: Express.Multer.File[] },
+    @Body() dto: CreateBugReportDto,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.bugReportsService.create(dto, userId, files);
   }
 
   @Get(':id')
@@ -39,14 +54,38 @@ export class BugReportsController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Update a bug report' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateBugReportDto, @CurrentUser('id') userId: string) {
-    return this.bugReportsService.update(id, dto, userId);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'imagen', maxCount: 1 },
+      { name: 'video', maxCount: 1 },
+    ]),
+  )
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFiles() files: { imagen?: Express.Multer.File[]; video?: Express.Multer.File[] },
+    @Body() dto: UpdateBugReportDto,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.bugReportsService.update(id, dto, userId, files);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Partially update a bug report' })
-  partialUpdate(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateBugReportDto, @CurrentUser('id') userId: string) {
-    return this.bugReportsService.update(id, dto, userId);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'imagen', maxCount: 1 },
+      { name: 'video', maxCount: 1 },
+    ]),
+  )
+  async partialUpdate(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFiles() files: { imagen?: Express.Multer.File[]; video?: Express.Multer.File[] },
+    @Body() dto: UpdateBugReportDto,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.bugReportsService.update(id, dto, userId, files);
   }
 
   @Delete(':id')
@@ -57,7 +96,14 @@ export class BugReportsController {
 
   @Post(':id/followups')
   @ApiOperation({ summary: 'Add followup to bug report' })
-  addFollowup(@Param('id', ParseIntPipe) id: number, @Body() dto: AddFollowupDto, @CurrentUser('id') userId: string) {
-    return this.bugReportsService.addFollowup(id, dto, 'user');
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('imagen'))
+  async addFollowup(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: AddFollowupDto,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.bugReportsService.addFollowup(id, dto, 'user', file);
   }
 }

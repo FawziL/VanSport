@@ -11,6 +11,7 @@
 | 5 | Admin Modules | ✅ Done |
 | 6 | Scalar API Docs + /docs | ✅ Done |
 | 7 | Tests + Data Migration | ✅ Done |
+| 8 | Cloudflare R2 Storage (file uploads → R2, no local storage) | ✅ Done |
 
 ## Phase Details
 
@@ -88,6 +89,20 @@
 - [x] Auth controller tests (2 tests)
 - [x] **Total: 25 tests, 7 test files, all passing**
 - [x] Data migration script (db/migrate-legacy.ts)
+
+### Phase 8 — Cloudflare R2 Storage ✅
+- [x] Install @aws-sdk/client-s3 for S3-compatible R2 API
+- [x] Create R2Service (src/storage/r2.service.ts) with upload/delete methods
+- [x] Create StorageModule (global module)
+- [x] Configure .env + .env.example with R2 credentials
+- [x] Products: image + additional_images upload to R2 on create/update
+- [x] Categories: image upload to R2 on create/update
+- [x] Bug Reports: image + video upload to R2 on create/update/followup
+- [x] Transactions: receipt upload to R2 on create/pay/update
+- [x] All uploads use memoryStorage (no local disk writes)
+- [x] Auto-delete old files from R2 on update/delete
+- [x] Field name mapping preserved (imagen, imagenes_adicionales, comprobante, video)
+- [x] R2 folder structure: products/, categories/, bug-reports/, transactions/
 
 ## Table Migration Mapping
 

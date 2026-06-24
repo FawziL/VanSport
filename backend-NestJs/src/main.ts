@@ -1,13 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import 'dotenv/config';
 import { AppModule } from './app.module';
 import { toNodeHandler } from 'better-auth/node';
 import { auth } from './auth/auth.setup';
-import { config } from 'dotenv';
 import { Request, Response, NextFunction } from 'express';
-
-config();
 
 const betterAuthHandler = toNodeHandler(auth);
 
@@ -15,7 +13,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use((req: Request, res: Response, next: NextFunction) => {
-    if (req.path.startsWith('/api/auth/')) {
+    if (req.path.startsWith('/api/auth/') && !req.path.endsWith('/me')) {
       void betterAuthHandler(req, res);
     } else {
       next();

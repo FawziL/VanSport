@@ -15,9 +15,11 @@ import { BugReportsModule } from './bug-reports/bug-reports.module';
 import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
 import { ExchangeRateModule } from './exchange-rate/exchange-rate.module';
 import { ApiDocsModule } from './api-docs/api-docs.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
+    StorageModule,
     DatabaseModule,
     AuthModule,
     CategoriesModule,

@@ -1,5 +1,9 @@
-import { Controller, Get, Post, Body, Param, Put, Patch, Delete, ParseIntPipe, UseGuards, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import {
+  Controller, Get, Post, Body, Param, Put, Patch, Delete,
+  ParseIntPipe, UseGuards, UseInterceptors, UploadedFiles, Query,
+} from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiQuery, ApiConsumes } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -28,24 +32,56 @@ export class ProductsController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @ApiOperation({ summary: 'Create a product (admin)' })
-  create(@Body() dto: CreateProductDto) {
-    return this.productsService.create(dto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'imagen', maxCount: 1 },
+      { name: 'imagenes_adicionales', maxCount: 10 },
+    ]),
+  )
+  async create(
+    @UploadedFiles() files: { imagen?: Express.Multer.File[]; imagenes_adicionales?: Express.Multer.File[] },
+    @Body() dto: CreateProductDto,
+  ) {
+    return this.productsService.create(dto, files);
   }
 
   @Put(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @ApiOperation({ summary: 'Update a product (admin)' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProductDto) {
-    return this.productsService.update(id, dto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'imagen', maxCount: 1 },
+      { name: 'imagenes_adicionales', maxCount: 10 },
+    ]),
+  )
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFiles() files: { imagen?: Express.Multer.File[]; imagenes_adicionales?: Express.Multer.File[] },
+    @Body() dto: UpdateProductDto,
+  ) {
+    return this.productsService.update(id, dto, files);
   }
 
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @ApiOperation({ summary: 'Partially update a product (admin)' })
-  partialUpdate(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProductDto) {
-    return this.productsService.update(id, dto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'imagen', maxCount: 1 },
+      { name: 'imagenes_adicionales', maxCount: 10 },
+    ]),
+  )
+  async partialUpdate(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFiles() files: { imagen?: Express.Multer.File[]; imagenes_adicionales?: Express.Multer.File[] },
+    @Body() dto: UpdateProductDto,
+  ) {
+    return this.productsService.update(id, dto, files);
   }
 
   @Delete(':id')

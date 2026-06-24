@@ -1,5 +1,9 @@
-import { Controller, Get, Post, Body, Param, Put, Patch, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import {
+  Controller, Get, Post, Body, Param, Put, Patch, Delete,
+  ParseIntPipe, UseGuards, UseInterceptors, UploadedFile,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiConsumes } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -27,24 +31,41 @@ export class CategoriesController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @ApiOperation({ summary: 'Create a category (admin)' })
-  create(@Body() dto: CreateCategoryDto) {
-    return this.categoriesService.create(dto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('imagen'))
+  async create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: CreateCategoryDto,
+  ) {
+    return this.categoriesService.create(dto, file);
   }
 
   @Put(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @ApiOperation({ summary: 'Update a category (admin)' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCategoryDto) {
-    return this.categoriesService.update(id, dto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('imagen'))
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: UpdateCategoryDto,
+  ) {
+    return this.categoriesService.update(id, dto, file);
   }
 
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @ApiOperation({ summary: 'Partially update a category (admin)' })
-  partialUpdate(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCategoryDto) {
-    return this.categoriesService.update(id, dto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('imagen'))
+  async partialUpdate(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: UpdateCategoryDto,
+  ) {
+    return this.categoriesService.update(id, dto, file);
   }
 
   @Delete(':id')

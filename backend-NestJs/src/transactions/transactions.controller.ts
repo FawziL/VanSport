@@ -1,5 +1,9 @@
-import { Controller, Get, Post, Body, Param, Put, Patch, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import {
+  Controller, Get, Post, Body, Param, Put, Patch, Delete,
+  ParseIntPipe, UseGuards, UseInterceptors, UploadedFile,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiConsumes } from '@nestjs/swagger';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { PayTransactionDto } from './dto/pay-transaction.dto';
@@ -20,14 +24,24 @@ export class TransactionsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a transaction' })
-  create(@Body() dto: CreateTransactionDto) {
-    return this.transactionsService.create(dto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('comprobante'))
+  async create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: CreateTransactionDto,
+  ) {
+    return this.transactionsService.create(dto, file);
   }
 
   @Post('pay')
   @ApiOperation({ summary: 'Pay a transaction' })
-  pay(@Body() dto: PayTransactionDto) {
-    return this.transactionsService.pay(0, dto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('comprobante'))
+  async pay(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: PayTransactionDto,
+  ) {
+    return this.transactionsService.pay(0, dto, file);
   }
 
   @Get(':id')
@@ -38,14 +52,26 @@ export class TransactionsController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Update a transaction' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: CreateTransactionDto) {
-    return this.transactionsService.update(id, dto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('comprobante'))
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: CreateTransactionDto,
+  ) {
+    return this.transactionsService.update(id, dto, file);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Partially update a transaction' })
-  partialUpdate(@Param('id', ParseIntPipe) id: number, @Body() dto: CreateTransactionDto) {
-    return this.transactionsService.update(id, dto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('comprobante'))
+  async partialUpdate(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: CreateTransactionDto,
+  ) {
+    return this.transactionsService.update(id, dto, file);
   }
 
   @Delete(':id')
