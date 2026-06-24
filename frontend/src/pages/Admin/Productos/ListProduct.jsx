@@ -36,8 +36,8 @@ export default function ListProduct() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.productos
-      .list()
+    adminService.products
+      .listAdmin()
       .then((data) => {
         const items = Array.isArray(data) ? data : data.results || [];
         setProductos(items);
@@ -62,8 +62,8 @@ export default function ListProduct() {
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      await adminService.productos.remove(deleteId);
-      setProductos((prev) => prev.filter((p) => p.producto_id !== deleteId));
+      await adminService.products.remove(deleteId);
+      setProductos((prev) => prev.filter((p) => p.productId !== deleteId));
       setModalOpen(false);
       setDeleteId(null);
       toast.success('Producto eliminado correctamente');
@@ -77,7 +77,7 @@ export default function ListProduct() {
   const handleExportExcel = async () => {
     try {
       setExporting(true);
-      const data = await adminService.productos.export();
+      const data = await adminService.products.export();
       const blob = new Blob([data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
@@ -106,25 +106,25 @@ export default function ListProduct() {
 
   const toggleDestacado = async (p) => {
     try {
-      setTogglingId(p.producto_id);
+      setTogglingId(p.productId);
 
       // Actualización optimista
       setProductos((prev) =>
         prev.map((it) =>
-          it.producto_id === p.producto_id ? { ...it, destacado: !p.destacado } : it
+          it.productId === p.productId ? { ...it, destacado: !p.isFeatured } : it
         )
       );
 
-      await adminService.productos.partialUpdate(p.producto_id, { destacado: !p.destacado });
+      await adminService.products.partialUpdate(p.productId, { destacado: !p.isFeatured });
 
       toast.success(
-        `Producto ${!p.destacado ? 'destacado' : 'quitado de destacados'} correctamente`
+        `Producto ${!p.isFeatured ? 'destacado' : 'quitado de destacados'} correctamente`
       );
     } catch (err) {
       // Revertir cambio en caso de error
       setProductos((prev) =>
         prev.map((it) =>
-          it.producto_id === p.producto_id ? { ...it, destacado: p.destacado } : it
+          it.productId === p.productId ? { ...it, destacado: p.isFeatured } : it
         )
       );
 
@@ -138,20 +138,20 @@ export default function ListProduct() {
 
   const toggleActivoProduct = async (p) => {
     try {
-      setTogglingActivoId(p.producto_id);
+      setTogglingActivoId(p.productId);
 
       // Actualización optimista
       setProductos((prev) =>
-        prev.map((it) => (it.producto_id === p.producto_id ? { ...it, activo: !p.activo } : it))
+        prev.map((it) => (it.productId === p.productId ? { ...it, activo: !p.isActive } : it))
       );
 
-      await adminService.productos.partialUpdate(p.producto_id, { activo: !p.activo });
+      await adminService.products.partialUpdate(p.productId, { activo: !p.isActive });
 
-      toast.success(`Producto ${!p.activo ? 'activado' : 'desactivado'} correctamente`);
+      toast.success(`Producto ${!p.isActive ? 'activado' : 'desactivado'} correctamente`);
     } catch (err) {
       // Revertir cambio en caso de error
       setProductos((prev) =>
-        prev.map((it) => (it.producto_id === p.producto_id ? { ...it, activo: p.activo } : it))
+        prev.map((it) => (it.productId === p.productId ? { ...it, activo: p.isActive } : it))
       );
 
       const msg = err?.response?.data?.detail || 'No se pudo actualizar el estado';
@@ -230,50 +230,50 @@ export default function ListProduct() {
           emptyText="No hay productos."
         >
           {productosPage.map((p) => (
-            <TableRow key={p.producto_id}>
-              <TableCell>{p.producto_id}</TableCell>
-              <TableCell>{p.nombre}</TableCell>
-              <TableCell>{p.categoria?.nombre ?? '-'}</TableCell>
+            <TableRow key={p.productId}>
+              <TableCell>{p.productId}</TableCell>
+              <TableCell>{p.name}</TableCell>
+              <TableCell>{p.category?.name ?? '-'}</TableCell>
               <TableCell>
                 <ProductImage
-                  src={p.imagen_url ? resolveImageUrl(p.imagen_url) : undefined}
-                  alt={p.nombre || 'Producto'}
+                  src={p.imageUrl ? resolveImageUrl(p.imageUrl) : undefined}
+                  alt={p.name || 'Producto'}
                 />
               </TableCell>
-              <TableCell>{fmtPrecio(p.precio)}</TableCell>
+              <TableCell>{fmtPrecio(p.price)}</TableCell>
               <TableCell>{p.stock}</TableCell>
               <TableCell align="center">
                 <FavoriteButton
-                  isFavorite={p.destacado}
+                  isFavorite={p.isFeatured}
                   onClick={() => toggleDestacado(p)}
-                  disabled={togglingId === p.producto_id}
+                  disabled={togglingId === p.productId}
                 />
               </TableCell>
               <TableCell>
                 <button
                   onClick={() => toggleActivoProduct(p)}
-                  disabled={togglingActivoId === p.producto_id}
+                  disabled={togglingActivoId === p.productId}
                   className={`border rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                    p.activo
+                    p.isActive
                       ? 'bg-green-100 border-green-300 text-green-800 hover:bg-green-200'
                       : 'bg-red-100 border-red-300 text-red-800 hover:bg-red-200'
-                  } ${togglingActivoId === p.producto_id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                  } ${togglingActivoId === p.productId ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >
-                  {p.activo ? 'Activo' : 'Inactivo'}
+                  {p.isActive ? 'Activo' : 'Inactivo'}
                 </button>
               </TableCell>
               <TableCell align="center">
                 <div className="flex justify-center gap-2">
                   <ActionButton
                     variant="edit"
-                    onClick={() => navigate(`/admin/productos/editar/${p.producto_id}`)}
+                    onClick={() => navigate(`/admin/productos/editar/${p.productId}`)}
                   >
                     Editar
                   </ActionButton>
                   <ActionButton
                     variant="delete"
                     onClick={() => {
-                      setDeleteId(p.producto_id);
+                      setDeleteId(p.productId);
                       setModalOpen(true);
                     }}
                   >

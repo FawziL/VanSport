@@ -75,11 +75,11 @@ export default function ListReviews() {
   };
 
   const getUserLabel = (r) => {
-    const nombre = r.usuario_nombre || '';
-    const apellido = r.usuario_apellido || '';
+    const nombre = r.userName || '';
+    const apellido = r.userLastName || '';
     const email = r.usuario_email || '';
     const base = `${nombre} ${apellido}`.trim();
-    const id = r.usuario != null ? r.usuario : r.usuario_id != null ? r.usuario_id : null;
+    const id = r.usuario != null ? r.usuario : r.userId != null ? r.userId : null;
     const emailPart = email ? ` - ${email}` : '';
     return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
   };
@@ -149,8 +149,8 @@ export default function ListReviews() {
               <TableCell className="break-words" title={r.comentario || ''}>
                 {truncateWords(r.comentario, 12)}
               </TableCell>
-              <TableCell className="whitespace-nowrap">{r.calificacion}</TableCell>
-              <TableCell className="whitespace-nowrap">{fmt.date(r.fecha_creacion)}</TableCell>
+              <TableCell className="whitespace-nowrap">{r.rating}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.date(r.createdAt)}</TableCell>
               <TableCell align="center">
                 <div className="flex justify-center gap-2">
                   <ActionButton

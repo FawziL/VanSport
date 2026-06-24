@@ -55,7 +55,7 @@ export default function MisPedidos() {
       setLoading(true);
       setErrMsg('');
       try {
-        const data = await appService.pedidos.list({ ordering: '-fecha_pedido' });
+        const data = await appService.orders.list({ ordering: '-fecha_pedido' });
         const results = Array.isArray(data) ? data : data.results || [];
         if (alive) setItems(results);
       } catch (e) {
@@ -110,17 +110,17 @@ export default function MisPedidos() {
 
           <TableBody loading={false} empty={false} colSpan={5}>
             {items.map((p) => (
-              <TableRow key={p.pedido_id}>
-                <TableCell className="font-semibold">#{p.pedido_id}</TableCell>
+              <TableRow key={p.orderId}>
+                <TableCell className="font-semibold">#{p.orderId}</TableCell>
                 <TableCell>{formatDate(p.fecha_pedido)}</TableCell>
                 <TableCell>
-                  <StatusBadge estado={p.estado} variant="order" />
+                  <StatusBadge estado={p.status} variant="order" />
                 </TableCell>
                 <TableCell align="right" className="font-bold text-gray-900">
                   {formatPrice(p.total)}
                 </TableCell>
                 <TableCell align="center">
-                  <ActionButton variant="edit" onClick={() => navigate(`/pedidos/${p.pedido_id}`)}>
+                  <ActionButton variant="edit" onClick={() => navigate(`/pedidos/${p.orderId}`)}>
                     Ver Detalles
                   </ActionButton>
                 </TableCell>

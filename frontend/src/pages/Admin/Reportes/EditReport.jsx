@@ -16,17 +16,17 @@ export default function EditReporte() {
   const [finalizing, setFinalizing] = useState(false);
   const [reopening, setReopening] = useState(false);
 
-  const load = () => adminService.reportes.retrieve(id).then(setItem);
+  const load = () => adminService.bugReports.retrieve(id).then(setItem);
 
   useEffect(() => {
     load();
   }, [id]);
 
   const onFinalize = async () => {
-    if (!item || item.estado === 'finalizado') return;
+    if (!item || item.status === 'finalizado') return;
     setFinalizing(true);
     try {
-      await adminService.reportes.patch(id, { estado: 'finalizado' });
+      await adminService.bugReports.patch(id, { estado: 'finalizado' });
       await load();
       toast.success('Reporte finalizado correctamente');
     } catch (err) {
@@ -38,10 +38,10 @@ export default function EditReporte() {
   };
 
   const onReopen = async () => {
-    if (!item || item.estado !== 'finalizado') return;
+    if (!item || item.status !== 'finalizado') return;
     setReopening(true);
     try {
-      await adminService.reportes.patch(id, { estado: 'en_revision' });
+      await adminService.bugReports.patch(id, { estado: 'en_revision' });
       await load();
       toast.success('Reporte reabierto correctamente');
     } catch (err) {
@@ -57,9 +57,9 @@ export default function EditReporte() {
     setSending(true);
     try {
       const fd = new FormData();
-      if (nuevoMensaje) fd.append('mensaje', nuevoMensaje);
+      if (nuevoMensaje) fd.append('message', nuevoMensaje);
       if (img) fd.append('imagen', img);
-      await adminService.reportes.addFollowUp(id, fd);
+      await adminService.bugReports.addFollowUp(id, fd);
       setNuevoMensaje('');
       setImg(null);
       await load();
@@ -78,9 +78,9 @@ export default function EditReporte() {
       </div>
     );
 
-  const isCompleted = item.estado === 'finalizado';
+  const isCompleted = item.status === 'finalizado';
   const categoriaLabel =
-    CATEGORIAS_FALLA.find((c) => c.value === item.categoria)?.label || item.categoria;
+    CATEGORIAS_FALLA.find((c) => c.value === item.category)?.label || item.category;
 
   return (
     <div className="min-h-screen bg-gray-50 py-6 px-4">
@@ -136,7 +136,7 @@ export default function EditReporte() {
               {/* Estado actual */}
               <div className="mb-4 mt-2">
                 <span className="text-sm font-semibold text-gray-700">Estado actual: </span>
-                <StatusBadge estado={item.estado} />
+                <StatusBadge estado={item.status} />
               </div>
 
               {/* Metadatos */}
@@ -144,11 +144,11 @@ export default function EditReporte() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
                     <span className="font-semibold">Fecha:</span>{' '}
-                    {new Date(item.fecha_creacion).toLocaleString('es-ES')}
+                    {new Date(item.createdAt).toLocaleString('es-ES')}
                   </div>
                   <div>
-                    <span className="font-semibold">Usuario:</span> {item.usuario_nombre}{' '}
-                    {item.usuario_apellido}
+                    <span className="font-semibold">Usuario:</span> {item.userName}{' '}
+                    {item.userLastName}
                   </div>
                   <div>
                     <span className="font-semibold">Email:</span> {item.usuario_email}
@@ -163,35 +163,35 @@ export default function EditReporte() {
               </div>
 
               {/* Descripción */}
-              {item.descripcion && (
+              {item.description && (
                 <div className="mb-6">
                   <h3 className="font-semibold text-gray-700 mb-2">Descripción</h3>
                   <div className="p-4 bg-gray-50 rounded-lg whitespace-pre-wrap">
-                    {item.descripcion}
+                    {item.description}
                   </div>
                 </div>
               )}
 
               {/* Multimedia */}
               <div className="space-y-4">
-                {item.imagen_url && (
+                {item.imageUrl && (
                   <div>
                     <h3 className="font-semibold text-gray-700 mb-2">Imagen adjunta</h3>
                     <div className="flex justify-center">
                       <img
-                        src={resolveImageUrl(item.imagen_url)}
+                        src={resolveImageUrl(item.imageUrl)}
                         alt="captura del reporte"
                         className="max-w-[100px] max-h-[100px] rounded-lg border border-gray-200"
                       />
                     </div>
                   </div>
                 )}
-                {item.video_url && (
+                {item.videoUrl && (
                   <div>
                     <h3 className="font-semibold text-gray-700 mb-2">Video adjunto</h3>
                     <div className="flex justify-center">
                       <video
-                        src={resolveImageUrl(item.video_url)}
+                        src={resolveImageUrl(item.videoUrl)}
                         controls
                         className="max-w-full rounded-lg border border-gray-200"
                       />
@@ -246,26 +246,26 @@ export default function EditReporte() {
                           >
                             {isSupport
                               ? 'Soporte'
-                              : `${item.usuario_nombre} ${item.usuario_apellido}`}
+                              : `${item.userName} ${item.userLastName}`}
                           </span>
                           <span className="text-xs text-gray-500">
-                            {new Date(m.fecha_creacion).toLocaleString('es-ES', {
+                            {new Date(m.createdAt).toLocaleString('es-ES', {
                               dateStyle: 'short',
                               timeStyle: 'short',
                             })}
                           </span>
                         </div>
-                        {m.mensaje && (
+                        {m.message && (
                           <div
                             className={`text-gray-800 whitespace-pre-wrap 
                           ${isSupport ? 'text-end' : 'text-start'}`}
                           >
-                            {m.mensaje}
+                            {m.message}
                           </div>
                         )}
-                        {m.imagen_url && (
+                        {m.imageUrl && (
                           <img
-                            src={resolveImageUrl(m.imagen_url)}
+                            src={resolveImageUrl(m.imageUrl)}
                             alt="adjunto del mensaje"
                             className="max-w-[200px] max-h-[200px] object-contain mt-2 rounded-lg border border-gray-200"
                           />

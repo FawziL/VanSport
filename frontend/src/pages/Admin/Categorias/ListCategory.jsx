@@ -34,7 +34,7 @@ export default function ListCategory() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.categorias
+    adminService.categories
       .list()
       .then((data) => {
         const items = Array.isArray(data) ? data : data.results || [];
@@ -61,8 +61,8 @@ export default function ListCategory() {
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      await adminService.categorias.remove(deleteId);
-      setCategorias((prev) => prev.filter((c) => c.categoria_id !== deleteId));
+      await adminService.categories.remove(deleteId);
+      setCategorias((prev) => prev.filter((c) => c.id !== deleteId));
       setModalOpen(false);
       setDeleteId(null);
       toast.success('Categoría eliminada correctamente');
@@ -80,25 +80,25 @@ export default function ListCategory() {
 
   const toggleDestacado = async (cat) => {
     try {
-      setTogglingId(cat.categoria_id);
+      setTogglingId(cat.id);
 
       // Actualización optimista
       setCategorias((prev) =>
         prev.map((c) =>
-          c.categoria_id === cat.categoria_id ? { ...c, destacado: !cat.destacado } : c
+          c.id === cat.id ? { ...c, isFeatured: !cat.isFeatured } : c
         )
       );
 
-      await adminService.categorias.partialUpdate(cat.categoria_id, { destacado: !cat.destacado });
+      await adminService.categories.partialUpdate(cat.id, { isFeatured: !cat.isFeatured });
 
       toast.success(
-        `Categoría ${!cat.destacado ? 'destacada' : 'quitada de destacados'} correctamente`
+        `Categoría ${!cat.isFeatured ? 'destacada' : 'quitada de destacados'} correctamente`
       );
     } catch (err) {
       // Revertir cambio en caso de error
       setCategorias((prev) =>
         prev.map((c) =>
-          c.categoria_id === cat.categoria_id ? { ...c, destacado: cat.destacado } : c
+          c.id === cat.id ? { ...c, isFeatured: cat.isFeatured } : c
         )
       );
 
@@ -155,42 +155,42 @@ export default function ListCategory() {
           emptyText="No hay categorías."
         >
           {categoriasPage.map((cat) => (
-            <TableRow key={cat.categoria_id}>
-              <TableCell>{cat.categoria_id}</TableCell>
+            <TableRow key={cat.id}>
+              <TableCell>{cat.id}</TableCell>
               <TableCell>
-                {cat.imagen_url ? (
+                {cat.imageUrl ? (
                   <ProductImage
-                    src={resolveImageUrl(cat.imagen_url)}
-                    alt={cat.nombre}
+                    src={resolveImageUrl(cat.imageUrl)}
+                    alt={cat.name}
                     className="w-12 h-12"
                   />
                 ) : (
                   <div className="w-12 h-12 rounded-lg bg-gray-200 inline-block" />
                 )}
               </TableCell>
-              <TableCell className="font-medium">{cat.nombre}</TableCell>
-              <TableCell className="max-w-[200px] truncate" title={cat.descripcion}>
-                {cat.descripcion}
+              <TableCell className="font-medium">{cat.name}</TableCell>
+              <TableCell className="max-w-[200px] truncate" title={cat.description}>
+                {cat.description}
               </TableCell>
               <TableCell align="center">
                 <FavoriteButton
-                  isFavorite={cat.destacado}
+                  isFavorite={cat.isFeatured}
                   onClick={() => toggleDestacado(cat)}
-                  disabled={togglingId === cat.categoria_id}
+                  disabled={togglingId === cat.id}
                 />
               </TableCell>
               <TableCell align="center">
                 <div className="flex justify-center gap-2">
                   <ActionButton
                     variant="edit"
-                    onClick={() => navigate(`/admin/categorias/editar/${cat.categoria_id}`)}
+                    onClick={() => navigate(`/admin/categorias/editar/${cat.id}`)}
                   >
                     Editar
                   </ActionButton>
                   <ActionButton
                     variant="delete"
                     onClick={() => {
-                      setDeleteId(cat.categoria_id);
+                      setDeleteId(cat.id);
                       setModalOpen(true);
                     }}
                   >

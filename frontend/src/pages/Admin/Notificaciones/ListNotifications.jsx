@@ -29,7 +29,7 @@ export default function ListNotifications() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.notificaciones
+    adminService.notifications
       .list()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
@@ -68,11 +68,11 @@ export default function ListNotifications() {
   };
 
   const getUserLabel = (n) => {
-    const nombre = n.usuario_nombre || '';
-    const apellido = n.usuario_apellido || '';
+    const nombre = n.userName || '';
+    const apellido = n.userLastName || '';
     const email = n.usuario_email || '';
     const base = `${nombre} ${apellido}`.trim();
-    const id = n.usuario_id != null ? n.usuario_id : null;
+    const id = n.userId != null ? n.userId : null;
     const emailPart = email ? ` - ${email}` : '';
     return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
   };
@@ -80,7 +80,7 @@ export default function ListNotifications() {
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      await adminService.notificaciones.remove(deleteId);
+      await adminService.notifications.remove(deleteId);
       setItems((prev) => prev.filter((x) => x.notificacion_id !== deleteId));
       toast.success('Notificación eliminada correctamente');
     } catch (err) {
@@ -145,8 +145,8 @@ export default function ListNotifications() {
               <TableCell className="whitespace-nowrap">{n.notificacion_id}</TableCell>
               {/*<TableCell className="break-words">{getUserLabel(n)}</TableCell>*/}
               <TableCell className="break-words">{n.titulo}</TableCell>
-              <TableCell className="break-words">{n.tipo}</TableCell>
-              <TableCell className="whitespace-nowrap">{fmt.date(n.fecha_creacion)}</TableCell>
+              <TableCell className="break-words">{n.type}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.date(n.createdAt)}</TableCell>
               <TableCell className="whitespace-nowrap">{fmt.date(n.expira)}</TableCell>
               <TableCell align="center">
                 <div className="flex justify-center gap-2">

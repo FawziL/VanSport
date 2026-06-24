@@ -62,7 +62,7 @@ export default function VerPedido() {
       setLoading(true);
       setErrMsg('');
       try {
-        const p = await appService.pedidos.retrieve(id);
+        const p = await appService.orders.retrieve(id);
         if (alive) {
           setPedido(p);
           setDetalles(Array.isArray(p.detalles) ? p.detalles : []);
@@ -75,7 +75,7 @@ export default function VerPedido() {
     })();
 
     // NUEVO: cargar métodos de pago públicos (para este pedido)
-    appService.pagos
+    appService.paymentMethods
       ?.listarPublicos()
       .then((arr) => {
         const list = Array.isArray(arr) ? arr : arr?.results || [];
@@ -97,12 +97,12 @@ export default function VerPedido() {
   }, [id, isAuthenticated]);
 
   const enRevision =
-    !!pedido?.ultima_transaccion && pedido?.ultima_transaccion?.estado === 'pendiente';
-  const mostrarFormulario = !!pedido && pedido.estado === 'pendiente' && !enRevision;
+    !!pedido?.ultima_transaccion && pedido?.ultima_transaccion?.status === 'pendiente';
+  const mostrarFormulario = !!pedido && pedido.status === 'pendiente' && !enRevision;
 
   // NUEVO: referencia requerida solo si el método lo pide (por convención en config o por tipo)
   const requiereReferencia = !!(
-    metodoSel?.config?.requiere_referencia || metodoSel?.tipo === 'pago_movil'
+    metodoSel?.config?.requiere_referencia || metodoSel?.type === 'pago_movil'
   );
   const canPay =
     mostrarFormulario &&
@@ -116,9 +116,9 @@ export default function VerPedido() {
     setTotalBs(null);
     setBcv(null);
     setBcvErr('');
-    if (metodoSel?.tipo === 'pago_movil' && pedido?.total != null) {
+    if (metodoSel?.type === 'pago_movil' && pedido?.total != null) {
       setBcvLoading(true);
-      appService.utils
+      appService.exchangeRate
         .dolarBcvHoy()
         .then((data) => {
           if (!alive) return;
@@ -139,7 +139,7 @@ export default function VerPedido() {
     return () => {
       alive = false;
     };
-  }, [metodoSel?.tipo, pedido?.total]);
+  }, [metodoSel?.type, pedido?.total]);
 
   // Loader que solicitaste
   if (loading) {
@@ -185,7 +185,7 @@ export default function VerPedido() {
             <div className="space-y-3 mb-6">
               <div className="text-gray-600">
                 Estado:{' '}
-                <span className="text-gray-900 font-semibold capitalize">{pedido.estado}</span>
+                <span className="text-gray-900 font-semibold capitalize">{pedido.status}</span>
               </div>
               {pedido.transaccion_id && (
                 <div className="text-gray-600">
@@ -193,9 +193,9 @@ export default function VerPedido() {
                   <span className="text-gray-900 font-semibold">#{pedido.transaccion_id}</span>
                 </div>
               )}
-              {pedido.direccion_envio && (
+              {pedido.shippingAddress && (
                 <div className="text-gray-600">
-                  Dirección: <span className="text-gray-900">{pedido.direccion_envio}</span>
+                  Dirección: <span className="text-gray-900">{pedido.shippingAddress}</span>
                 </div>
               )}
               {pedido.notas && (
@@ -219,21 +219,21 @@ export default function VerPedido() {
                 </thead>
                 <tbody>
                   {detalles.map((d, idx) => {
-                    const name = d.producto_nombre || `#${d.producto || d.producto_id}`;
-                    const price = d.precio_unitario ?? 0;
-                    const subtotal = d.subtotal ?? Number(price) * Number(d.cantidad || 0);
+                    const name = d.productName || `#${d.producto || d.productId}`;
+                    const price = d.unitPrice ?? 0;
+                    const subtotal = d.subtotal ?? Number(price) * Number(d.quantity || 0);
                     return (
                       <tr
                         key={
                           d.detalle_id ||
-                          d.detalle_pedido_id ||
-                          `${d.producto_id || d.producto}-${idx}`
+                          d.detalle_orderId ||
+                          `${d.productId || d.producto}-${idx}`
                         }
                         className="border-t border-gray-200"
                       >
                         <td className="p-3">{name}</td>
                         <td className="p-3 text-right">{formatPrice(price)}</td>
-                        <td className="p-3 text-right">{d.cantidad}</td>
+                        <td className="p-3 text-right">{d.quantity}</td>
                         <td className="p-3 text-right font-semibold">{formatPrice(subtotal)}</td>
                       </tr>
                     );
@@ -252,7 +252,7 @@ export default function VerPedido() {
             </div>
 
             {/* Total en Bs para Pago Móvil */}
-            {metodoSel?.tipo === 'pago_movil' && (
+            {metodoSel?.type === 'pago_movil' && (
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600 text-sm">
@@ -279,19 +279,19 @@ export default function VerPedido() {
                   <div className="text-gray-600">
                     Método:{' '}
                     <span className="text-gray-900 capitalize">
-                      {pedido.ultima_transaccion.metodo_pago}
+                      {pedido.ultima_transaccion.paymentMethod}
                     </span>
                   </div>
                   <div className="text-gray-600">
                     Referencia:{' '}
                     <span className="text-gray-900">
-                      {pedido.ultima_transaccion.codigo_transaccion || '-'}
+                      {pedido.ultima_transaccion.transactionCode || '-'}
                     </span>
                   </div>
                   <div className="text-gray-600">
                     Estado:{' '}
                     <span className="text-gray-900 capitalize">
-                      {pedido.ultima_transaccion.estado}
+                      {pedido.ultima_transaccion.status}
                     </span>
                   </div>
                 </div>
@@ -318,7 +318,7 @@ export default function VerPedido() {
                         >
                           <input
                             type="radio"
-                            name="metodo_pago"
+                            name="paymentMethod"
                             value={m.codigo}
                             checked={metodoSel?.codigo === m.codigo}
                             onChange={() => {
@@ -329,8 +329,8 @@ export default function VerPedido() {
                           />
                           <div className="flex-1">
                             <div className="font-semibold">
-                              {m.nombre}{' '}
-                              <span className="text-gray-600 font-normal">({m.descripcion})</span>
+                              {m.name}{' '}
+                              <span className="text-gray-600 font-normal">({m.description})</span>
                             </div>
                             {m.instrucciones && (
                               <div className="text-gray-600 text-sm mt-1 whitespace-pre-wrap">
@@ -371,14 +371,14 @@ export default function VerPedido() {
                 setErrMsg('');
                 setPaying(true);
                 try {
-                  await appService.transacciones.pay({
-                    pedido_id: id,
-                    metodo_pago: metodoSel?.nombre || metodoPago,
+                  await appService.transactions.pay({
+                    orderId: id,
+                    paymentMethod: metodoSel?.name || metodoPago,
                     referencia: requiereReferencia ? referencia : '',
-                    codigo_transaccion: requiereReferencia ? referencia : '',
+                    transactionCode: requiereReferencia ? referencia : '',
                     monto: pedido.total,
                   });
-                  const p = await appService.pedidos.retrieve(id);
+                  const p = await appService.orders.retrieve(id);
                   setPedido(p);
                 } catch (e) {
                   const msg =
@@ -399,13 +399,13 @@ export default function VerPedido() {
             >
               {paying
                 ? 'Enviando pago…'
-                : pedido.estado === 'completado'
+                : pedido.status === 'completado'
                   ? 'Completado'
-                  : pedido.estado === 'pagado'
+                  : pedido.status === 'pagado'
                     ? 'Pagado'
                     : enRevision
                       ? 'Pago en revisión'
-                      : metodoSel?.tipo === 'paypal'
+                      : metodoSel?.type === 'paypal'
                         ? 'Registrar pago (PayPal)'
                         : 'Enviar comprobante'}
             </button>

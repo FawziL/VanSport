@@ -9,18 +9,18 @@ const fetchProductos = async ({ page, filters }) => {
   const params = {
     page,
     q: filters?.q || undefined,
-    categoria_id: filters?.categoria_id || undefined,
+    categoryId: filters?.categoryId || undefined,
     min_price: filters?.min_price || undefined,
     max_price: filters?.max_price || undefined,
     oferta: filters?.oferta || undefined,
     page_size: filters?.pageSize || undefined,
   };
-  const data = await appService.productos.list(params);
+  const data = await appService.products.list(params);
 
   // Acepta ambos formatos: array plano o objeto paginado { count, results, ... }
   const items = Array.isArray(data) ? data : (data?.results ?? []);
   const filtered = items.filter(
-    (p) => !filters?.q || (p?.nombre ?? '').toLowerCase().includes(String(filters.q).toLowerCase())
+    (p) => !filters?.q || (p?.name ?? '').toLowerCase().includes(String(filters.q).toLowerCase())
   );
 
   const pageSize = filters?.pageSize || 6;
@@ -46,7 +46,7 @@ export default function Productos() {
     const pageSize = Number(sp.get('page_size') || '6') || 6;
     return {
       q: get('q'),
-      categoria_id: get('categoria_id'),
+      categoryId: get('categoryId'),
       min_price: get('min_price'),
       max_price: get('max_price'),
       oferta: oferta === '1' ? '1' : '',
@@ -98,7 +98,7 @@ export default function Productos() {
   useEffect(() => {
     const sp = new URLSearchParams();
     if (filters.q) sp.set('q', filters.q);
-    if (filters.categoria_id) sp.set('categoria_id', String(filters.categoria_id));
+    if (filters.categoryId) sp.set('categoryId', String(filters.categoryId));
     if (filters.min_price) sp.set('min_price', String(filters.min_price));
     if (filters.max_price) sp.set('max_price', String(filters.max_price));
     if (filters.oferta) sp.set('oferta', String(filters.oferta));
@@ -195,7 +195,7 @@ export default function Productos() {
                 </h3>
                 <p className="text-gray-600 mb-6">
                   {filters.q ||
-                  filters.categoria_id ||
+                  filters.categoryId ||
                   filters.min_price ||
                   filters.max_price ||
                   filters.oferta
@@ -203,7 +203,7 @@ export default function Productos() {
                     : 'Pronto agregaremos nuevos productos a nuestro catálogo.'}
                 </p>
                 {(filters.q ||
-                  filters.categoria_id ||
+                  filters.categoryId ||
                   filters.min_price ||
                   filters.max_price ||
                   filters.oferta) && (
@@ -211,7 +211,7 @@ export default function Productos() {
                     onClick={() => {
                       setFilters({
                         q: '',
-                        categoria_id: '',
+                        categoryId: '',
                         min_price: '',
                         max_price: '',
                         oferta: '',
@@ -230,7 +230,7 @@ export default function Productos() {
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
                 {productos.map((p) => (
-                  <CardProduct key={p.producto_id ?? p.id ?? Math.random()} producto={p} />
+                  <CardProduct key={p.productId ?? p.id ?? Math.random()} producto={p} />
                 ))}
               </div>
 

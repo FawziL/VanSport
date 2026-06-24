@@ -17,7 +17,7 @@ export default function EditReview() {
       .then((data) => {
         if (!active) return;
         setForm({
-          calificacion: data.calificacion ?? 0,
+          calificacion: data.rating ?? 0,
           comentario: data.comentario || '',
         });
       })
@@ -103,7 +103,7 @@ export default function EditReview() {
             <label className="block text-sm font-semibold text-gray-700 mb-2">Calificación *</label>
             <select
               name="calificacion"
-              value={form.calificacion}
+              value={form.rating}
               onChange={onChange}
               required
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"

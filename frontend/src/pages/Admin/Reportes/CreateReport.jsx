@@ -19,7 +19,7 @@ export default function CreateReport() {
       Object.entries(form).forEach(([k, v]) => fd.append(k, v ?? ''));
       if (imagen) fd.append('imagen', imagen);
       if (video) fd.append('video', video);
-      await appService.reportes.create(fd);
+      await appService.bugReports.create(fd);
       navigate('/admin/reportes');
     } finally {
       setLoading(false);
@@ -47,7 +47,7 @@ export default function CreateReport() {
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Categoría *</label>
               <select
-                value={form.categoria}
+                value={form.category}
                 onChange={(e) => setForm((f) => ({ ...f, categoria: e.target.value }))}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 required
@@ -79,7 +79,7 @@ export default function CreateReport() {
                 Descripción *
               </label>
               <textarea
-                value={form.descripcion}
+                value={form.description}
                 onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value }))}
                 rows={4}
                 placeholder="Proporciona todos los detalles relevantes sobre la falla..."

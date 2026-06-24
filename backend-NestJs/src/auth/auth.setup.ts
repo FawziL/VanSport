@@ -1,4 +1,5 @@
 import { betterAuth } from 'better-auth';
+import { openAPI } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db, schema } from '../../db';
 
@@ -12,6 +13,7 @@ export const auth = betterAuth({
       verification: schema.verification,
     },
   }),
+  trustedOrigins: [process.env.FRONTEND_URL || 'http://localhost:5173'],
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
@@ -22,6 +24,9 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     },
   },
+  plugins: [
+    openAPI(),
+  ],
   user: {
     additionalFields: {
       lastName: {

@@ -12,8 +12,8 @@ export default function CreateCategory() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    nombre: '',
-    descripcion: '',
+    name: '',
+    description: '',
     imagen: null,
     imagenPreview: '',
   });
@@ -23,8 +23,8 @@ export default function CreateCategory() {
 
   const validateLocal = () => {
     const e = {};
-    if (!form.nombre || form.nombre.trim().length < 2) {
-      e.nombre = 'El nombre es requerido (mínimo 2 caracteres).';
+    if (!form.name || form.name.trim().length < 2) {
+      e.name = 'El nombre es requerido (mínimo 2 caracteres).';
     }
     // descripción opcional
     return e;
@@ -58,10 +58,10 @@ export default function CreateCategory() {
     setLoading(true);
     try {
       const fd = new FormData();
-      fd.append('nombre', form.nombre.trim());
-      fd.append('descripcion', form.descripcion?.trim() || '');
+      fd.append('name', form.name.trim());
+      fd.append('description', form.description?.trim() || '');
       if (form.imagen) fd.append('imagen', form.imagen);
-      await adminService.categorias.create(fd);
+      await adminService.categories.create(fd);
       navigate(`/admin/categorias`);
     } catch (err) {
       // Mapea errores del backend (por campo o mensaje general)
@@ -112,14 +112,14 @@ export default function CreateCategory() {
         style={{ background: '#fff', border: '1px solid #eee', borderRadius: 12, padding: '1rem' }}
       >
         <div style={{ marginBottom: 14 }}>
-          <label htmlFor="nombre" style={{ display: 'block', fontWeight: 700, marginBottom: 6 }}>
+          <label htmlFor="name" style={{ display: 'block', fontWeight: 700, marginBottom: 6 }}>
             Nombre
           </label>
           <input
-            id="nombre"
-            name="nombre"
+            id="name"
+            name="name"
             type="text"
-            value={form.nombre}
+            value={form.name}
             onChange={handleChange}
             placeholder="Ej. Camisetas"
             style={{
@@ -131,20 +131,20 @@ export default function CreateCategory() {
             }}
             autoFocus
           />
-          <FieldError error={errors.nombre} />
+          <FieldError error={errors.name} />
         </div>
 
         <div style={{ marginBottom: 14 }}>
           <label
-            htmlFor="descripcion"
+            htmlFor="description"
             style={{ display: 'block', fontWeight: 700, marginBottom: 6 }}
           >
             Descripción (opcional)
           </label>
           <textarea
-            id="descripcion"
-            name="descripcion"
-            value={form.descripcion}
+            id="description"
+            name="description"
+            value={form.description}
             onChange={handleChange}
             placeholder="Breve descripción de la categoría..."
             rows={4}
@@ -157,7 +157,7 @@ export default function CreateCategory() {
               resize: 'vertical',
             }}
           />
-          <FieldError error={errors.descripcion} />
+          <FieldError error={errors.description} />
         </div>
 
         <div style={{ marginBottom: 14 }}>

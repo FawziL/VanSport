@@ -12,13 +12,13 @@ export default function EditOrder() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    adminService.pedidos
+    adminService.orders
       .retrieve(id)
       .then((data) => {
         if (!active) return;
         setForm({
-          estado: data.estado || '',
-          direccion_envio: data.direccion_envio || '',
+          estado: data.status || '',
+          shippingAddress: data.shippingAddress || '',
           notas: data.notas || '',
         });
       })
@@ -36,7 +36,7 @@ export default function EditOrder() {
     e.preventDefault();
     setError('');
     try {
-      await adminService.pedidos.partialUpdate(id, form);
+      await adminService.orders.partialUpdate(id, form);
       navigate('/admin/pedidos');
     } catch (err) {
       setError(err?.detail || 'No se pudo actualizar el pedido');
@@ -173,7 +173,7 @@ export default function EditOrder() {
             </label>
             <select
               name="estado"
-              value={form.estado}
+              value={form.status}
               onChange={onChange}
               required
               style={{
@@ -216,8 +216,8 @@ export default function EditOrder() {
               Dirección de envío
             </label>
             <input
-              name="direccion_envio"
-              value={form.direccion_envio}
+              name="shippingAddress"
+              value={form.shippingAddress}
               onChange={onChange}
               style={{
                 padding: '12px 14px',

@@ -28,7 +28,7 @@ export default function ListPaymentMethods() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.pagos
+    adminService.paymentMethodsAdmin
       .list({})
       .then((data) => setItems(Array.isArray(data) ? data : data.results || []))
       .catch(() => {
@@ -48,14 +48,14 @@ export default function ListPaymentMethods() {
       setTogglingId(m.id);
 
       // Actualización optimista
-      setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, activo: !m.activo } : it)));
+      setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, activo: !m.isActive } : it)));
 
-      await adminService.pagos.partialUpdate(m.id, { activo: !m.activo });
+      await adminService.paymentMethodsAdmin.partialUpdate(m.id, { activo: !m.isActive });
 
-      toast.success(`Método de pago ${!m.activo ? 'activado' : 'desactivado'} correctamente`);
+      toast.success(`Método de pago ${!m.isActive ? 'activado' : 'desactivado'} correctamente`);
     } catch (err) {
       // Revertir cambio en caso de error
-      setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, activo: m.activo } : it)));
+      setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, activo: m.isActive } : it)));
 
       const msg = err?.response?.data?.detail || 'No se pudo actualizar el estado';
       setError(msg);
@@ -68,7 +68,7 @@ export default function ListPaymentMethods() {
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      await adminService.pagos.remove(deleteId);
+      await adminService.paymentMethodsAdmin.remove(deleteId);
       setItems((prev) => prev.filter((it) => it.id !== deleteId));
       setModalOpen(false);
       setDeleteId(null);
@@ -141,20 +141,20 @@ export default function ListPaymentMethods() {
             <TableRow key={m.id}>
               <TableCell>{m.id}</TableCell>
               <TableCell>{m.codigo}</TableCell>
-              <TableCell>{m.nombre}</TableCell>
-              <TableCell>{m.tipo}</TableCell>
+              <TableCell>{m.name}</TableCell>
+              <TableCell>{m.type}</TableCell>
               <TableCell>{m.orden}</TableCell>
               <TableCell align="center">
                 <button
                   onClick={() => toggleActivo(m)}
                   disabled={togglingId === m.id}
                   className={`border rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                    m.activo
+                    m.isActive
                       ? 'bg-green-100 border-green-300 text-green-800 hover:bg-green-200'
                       : 'bg-red-100 border-red-300 text-red-800 hover:bg-red-200'
                   } ${togglingId === m.id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >
-                  {m.activo ? 'Activo' : 'Inactivo'}
+                  {m.isActive ? 'Activo' : 'Inactivo'}
                 </button>
               </TableCell>
               <TableCell>

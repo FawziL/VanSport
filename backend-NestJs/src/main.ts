@@ -9,11 +9,28 @@ import { Request, Response, NextFunction } from 'express';
 
 const betterAuthHandler = toNodeHandler(auth);
 
+const CORS_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+function corsMiddleware(req: Request, res: Response, next: NextFunction) {
+  res.setHeader('Access-Control-Allow-Origin', CORS_ORIGIN);
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(204);
+    return;
+  }
+  next();
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(corsMiddleware);
+
   app.use((req: Request, res: Response, next: NextFunction) => {
-    if (req.path.startsWith('/api/auth/') && !req.path.endsWith('/me')) {
+    if (req.path.startsWith('/api/auth/')) {
       void betterAuthHandler(req, res);
     } else {
       next();
@@ -21,7 +38,7 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: CORS_ORIGIN,
     credentials: true,
   });
 
@@ -41,7 +58,10 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api/openapi.json', app, document);
+
+  app.use('/api/openapi.json', (_req: Request, res: Response) => {
+    res.json(document);
+  });
 
   const port = process.env.PORT || 3000;
   await app.listen(port);

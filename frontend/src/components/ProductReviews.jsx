@@ -21,7 +21,7 @@ export default function ProductReviews({ productoId, nombre }) {
       setLoading(true);
       setErr('');
       try {
-        const data = await appService.reseñas.list({ producto_id: productoId });
+        const data = await appService.reseñas.list({ productId: productoId });
         const arr = Array.isArray(data) ? data : data.results || [];
         if (alive) setItems(arr);
       } catch {
@@ -38,7 +38,7 @@ export default function ProductReviews({ productoId, nombre }) {
 
   const avg = useMemo(() => {
     if (!items.length) return 0;
-    const sum = items.reduce((acc, it) => acc + (Number(it.calificacion) || 0), 0);
+    const sum = items.reduce((acc, it) => acc + (Number(it.rating) || 0), 0);
     return sum / items.length;
   }, [items]);
 
@@ -64,7 +64,7 @@ export default function ProductReviews({ productoId, nombre }) {
         comentario: comentario || '',
       });
       // recargar
-      const data = await appService.reseñas.list({ producto_id: productoId });
+      const data = await appService.reseñas.list({ productId: productoId });
       const arr = Array.isArray(data) ? data : data.results || [];
       setItems(arr);
       setRating(0);
@@ -187,13 +187,13 @@ export default function ProductReviews({ productoId, nombre }) {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <StarRow value={Number(r.calificacion) || 0} size={16} />
+                <StarRow value={Number(r.rating) || 0} size={16} />
                 <span style={{ color: '#666', fontSize: 12 }}>
-                  {new Date(r.fecha_creacion).toLocaleDateString()}
+                  {new Date(r.createdAt).toLocaleDateString()}
                 </span>
               </div>
               <div style={{ color: '#555', marginTop: 16, fontSize: 10 }}>
-                {r.usuario_nombre || ''} {r.usuario_apellido || ''}{' '}
+                {r.userName || ''} {r.userLastName || ''}{' '}
               </div>
               <div style={{ color: '#111', marginTop: 1, whiteSpace: 'pre-wrap' }}>
                 {r.comentario || <span style={{ color: '#777' }}>(Sin comentario)</span>}

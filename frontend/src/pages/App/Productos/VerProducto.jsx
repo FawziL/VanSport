@@ -38,11 +38,11 @@ export default function VerProducto() {
       setLoading(true);
       setErrMsg('');
       try {
-        const data = await appService.productos.retrieve(id);
+        const data = await appService.products.retrieve(id);
 
-        // Normaliza imagenes_adicionales en array de strings
+        // Normaliza additionalImages en array de strings
         let extras = [];
-        const rawExtras = data.imagenes_adicionales ?? data.imagenes ?? null;
+        const rawExtras = data.additionalImages ?? data.imagenes ?? null;
         if (Array.isArray(rawExtras)) {
           extras = rawExtras;
         } else if (typeof rawExtras === 'string') {
@@ -62,21 +62,15 @@ export default function VerProducto() {
         }
 
         const normalized = {
-          id: data.producto_id ?? data.id ?? id,
-          nombre: data.nombre ?? '',
-          descripcion: data.descripcion ?? '',
-          precio: data.precio ?? null,
-          precio_oferta: data.precio_oferta ?? null,
-          categoria:
-            typeof data.categoria === 'string'
-              ? data.categoria
-              : typeof data.categoria === 'object' && data.categoria !== null
-                ? (data.categoria.nombre ?? data.categoria.id ?? '')
-                : (data.categoria ?? ''),
+          id: data.id ?? id,
+          name: data.name ?? '',
+          description: data.description ?? '',
+          price: data.price ?? null,
+          salePrice: data.salePrice ?? null,
+          categoryId: data.categoryId ?? '',
           stock: data.stock ?? 0,
-          imagen: resolveImageUrl(data.imagen_url ?? data.imagen ?? ''),
-          imagenes: extras.map((p) => resolveImageUrl(p)),
-          atributos: data.atributos ?? null,
+          imageUrl: resolveImageUrl(data.imageUrl ?? ''),
+          additionalImages: extras.map((p) => resolveImageUrl(p)),
         };
 
         if (!alive) return;
@@ -104,7 +98,7 @@ export default function VerProducto() {
 
   const allImages = useMemo(() => {
     if (!producto) return [];
-    const list = [producto.imagen, ...(producto.imagenes || [])].filter(Boolean);
+    const list = [producto.imageUrl, ...(producto.additionalImages || [])].filter(Boolean);
     return list;
   }, [producto]);
 
@@ -140,13 +134,13 @@ export default function VerProducto() {
         return;
       }
       try {
-        const data = await appService.carrito.list();
+        const data = await appService.cart.list();
         const items = Array.isArray(data) ? data : data.results || [];
         const found = items.some((i) => {
           const pid =
             typeof i.producto === 'number'
               ? i.producto
-              : (i.producto?.producto_id ?? i.producto_id);
+              : (i.producto?.productId ?? i.productId);
           return Number(pid) === Number(producto.id);
         });
         if (alive) {
@@ -156,10 +150,10 @@ export default function VerProducto() {
               const pid =
                 typeof i.producto === 'number'
                   ? i.producto
-                  : (i.producto?.producto_id ?? i.producto_id);
+                  : (i.producto?.productId ?? i.productId);
               return Number(pid) === Number(producto.id);
             });
-            const c = Number(item?.cantidad) || 1;
+            const c = Number(item?.quantity) || 1;
             const max = Number(producto.stock) || c;
             setQty(Math.min(c, max));
             setCartQty(Math.min(c, max));
@@ -187,11 +181,11 @@ export default function VerProducto() {
     async function loadAvg() {
       if (!producto?.id) return;
       try {
-        const data = await appService.reseñas.list({ producto_id: producto.id });
+        const data = await appService.reseñas.list({ productId: producto.id });
         const arr = Array.isArray(data) ? data : data?.results || [];
         if (!alive) return;
         if (arr.length > 0) {
-          const sum = arr.reduce((acc, r) => acc + (Number(r.calificacion) || 0), 0);
+          const sum = arr.reduce((acc, r) => acc + (Number(r.rating) || 0), 0);
           setAvgRating(sum / arr.length);
           setReviewsCount(arr.length);
         } else {
@@ -222,16 +216,16 @@ export default function VerProducto() {
     try {
       if (inCart) {
         // Actualizar cantidad del carrito
-        await appService.carrito.updateQuantity({
-          producto_id: producto.id,
+        await appService.cart.updateQuantity({
+          productId: producto.id,
           cantidad: Number(qty) || 1,
         });
         setCartQty(Number(qty) || 1);
         toast.success('Cantidad actualizada en el carrito');
       } else {
         // Añadir al carrito
-        await appService.carrito.add({
-          producto_id: producto.id,
+        await appService.cart.add({
+          productId: producto.id,
           cantidad: Number(qty) || 1,
         });
         setInCart(true);
@@ -240,9 +234,9 @@ export default function VerProducto() {
       }
       // Actualizar contador global
       try {
-        const data = await appService.carrito.list();
+        const data = await appService.cart.list();
         const items = Array.isArray(data) ? data : data?.results || [];
-        const totalQty = items.reduce((acc, it) => acc + (Number(it?.cantidad) || 1), 0);
+        const totalQty = items.reduce((acc, it) => acc + (Number(it?.quantity) || 1), 0);
         window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: totalQty } }));
       } catch {}
     } catch (err) {
@@ -268,15 +262,15 @@ export default function VerProducto() {
     setAddMsg('');
     setAddLoading(true);
     try {
-      await appService.carrito.remove({ producto_id: producto.id });
+      await appService.cart.remove({ productId: producto.id });
       setInCart(false);
       setCartQty(0);
       setQty(1);
       toast.success('Producto eliminado del carrito');
       try {
-        const data = await appService.carrito.list();
+        const data = await appService.cart.list();
         const items = Array.isArray(data) ? data : data?.results || [];
-        const totalQty = items.reduce((acc, it) => acc + (Number(it?.cantidad) || 1), 0);
+        const totalQty = items.reduce((acc, it) => acc + (Number(it?.quantity) || 1), 0);
         window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: totalQty } }));
       } catch {}
     } catch (err) {
@@ -349,8 +343,8 @@ export default function VerProducto() {
   }
 
   const discountPct =
-    producto.precio_oferta && producto.precio
-      ? Math.round(((producto.precio - producto.precio_oferta) / producto.precio) * 100)
+    producto.salePrice && producto.price
+      ? Math.round(((producto.price - producto.salePrice) / producto.price) * 100)
       : null;
 
   // Estados de deshabilitado del botón principal (añadir/actualizar)
@@ -375,7 +369,7 @@ export default function VerProducto() {
           Productos
         </Link>
         <span className="text-gray-500">/</span>
-        <span className="text-gray-800 font-semibold">{producto.nombre}</span>
+        <span className="text-gray-800 font-semibold">{producto.name}</span>
       </div>
 
       <div className="flex justify-between gap-6">
@@ -394,7 +388,7 @@ export default function VerProducto() {
               {selectedImage ? (
                 <img
                   src={selectedImage}
-                  alt={producto.nombre}
+                  alt={producto.name}
                   className="w-full h-full object-contain"
                 />
               ) : (
@@ -427,34 +421,22 @@ export default function VerProducto() {
           <div className="mt-6">
             <h2 className="text-xl font-bold mb-2">Descripción</h2>
             <p className="text-gray-700 leading-relaxed">
-              {producto.descripcion || 'Sin descripción.'}
+              {producto.description || 'Sin descripción.'}
             </p>
 
-            {producto.atributos && Object.keys(producto.atributos).length > 0 && (
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">Detalles</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {Object.entries(producto.atributos).map(([label, value]) => (
-                    <div key={label} className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                      <div className="text-gray-600 text-sm">{label}</div>
-                      <div className="font-semibold">{String(value)}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {}
 
             {/* Reseñas */}
             <div className="mt-7">
-              <ProductReviews productoId={producto.id} nombre={producto.nombre} />
+              <ProductReviews productoId={producto.id} nombre={producto.name} />
             </div>
           </div>
         </div>
 
         {/* Sidebar: precio, stock, acciones */}
         <div className="w-1/2">
-          <h1 className="text-2xl font-bold mb-2">{producto.nombre}</h1>
-          <div className="text-gray-600 mb-2">{producto.categoria || 'Categoría'}</div>
+          <h1 className="text-2xl font-bold mb-2">{producto.name}</h1>
+          <div className="text-gray-600 mb-2">{producto.category || 'Categoría'}</div>
 
           {/* Promedio de estrellas (solo si hay reseñas) */}
           {reviewsCount > 0 && (
@@ -467,12 +449,12 @@ export default function VerProducto() {
 
           <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm mb-4">
             {/* Precio */}
-            {producto.precio_oferta ? (
+            {producto.salePrice ? (
               <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-gray-500 line-through">{formatPrice(producto.precio)}</span>
+                  <span className="text-gray-500 line-through">{formatPrice(producto.price)}</span>
                   <span className="text-red-600 font-bold text-xl">
-                    {formatPrice(producto.precio_oferta)}
+                    {formatPrice(producto.salePrice)}
                   </span>
                 </div>
                 {discountPct !== null && (
@@ -482,7 +464,7 @@ export default function VerProducto() {
                 )}
               </div>
             ) : (
-              <div className="text-blue-600 font-bold text-xl">{formatPrice(producto.precio)}</div>
+              <div className="text-blue-600 font-bold text-xl">{formatPrice(producto.price)}</div>
             )}
 
             <div
@@ -598,8 +580,8 @@ export default function VerProducto() {
                     onClick={() =>
                       navigator
                         .share({
-                          title: `Producto: ${producto.nombre}`,
-                          text: `Mira este producto: ${producto.nombre}`,
+                          title: `Producto: ${producto.name}`,
+                          text: `Mira este producto: ${producto.name}`,
                           url: shareLink,
                         })
                         .catch(() => {})
@@ -746,7 +728,7 @@ export default function VerProducto() {
               <button
                 type="button"
                 onClick={() => {
-                  window.location.href = `mailto:?subject=${encodeURIComponent(`Producto: ${producto.nombre}`)}&body=${encodeURIComponent(`Mira este producto: ${shareLink}`)}`;
+                  window.location.href = `mailto:?subject=${encodeURIComponent(`Producto: ${producto.name}`)}&body=${encodeURIComponent(`Mira este producto: ${shareLink}`)}`;
                 }}
                 title="Enviar por email"
                 className="flex items-center gap-2 justify-center px-3 py-2 rounded-lg border border-gray-100 bg-indigo-50 hover:bg-indigo-100 transition text-sm text-indigo-700"
@@ -801,7 +783,7 @@ export default function VerProducto() {
             <div className="relative w-full h-[70vh]">
               <img
                 src={allImages[currentImageIndex]}
-                alt={producto.nombre}
+                alt={producto.name}
                 className="w-full h-full object-contain"
               />
             </div>

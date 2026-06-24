@@ -9,7 +9,7 @@ export default function AdminPage({ children }) {
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
-    if (!user || !user.is_staff) navigate('/');
+    if (!user || !user.isStaff) navigate('/');
   }, [user, navigate]);
 
   return (

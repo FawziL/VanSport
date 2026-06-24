@@ -49,9 +49,9 @@ export default function NavBar() {
         return;
       }
       try {
-        const data = await appService.carrito.list();
+        const data = await appService.cart.list();
         const items = Array.isArray(data) ? data : data?.results || [];
-        const totalQty = items.reduce((acc, it) => acc + (Number(it?.cantidad) || 1), 0);
+        const totalQty = items.reduce((acc, it) => acc + (Number(it?.quantity) || 1), 0);
         if (alive) setCartCount(totalQty);
       } catch {
         if (alive) setCartCount(0);
@@ -166,10 +166,10 @@ export default function NavBar() {
                       aria-hidden
                       className="w-7 h-7 rounded-full bg-gray-800 flex items-center justify-center font-bold"
                     >
-                      {(user.nombre || 'U')[0].toUpperCase()}
+                      {(user.name || 'U')[0].toUpperCase()}
                     </div>
                     <span className="font-semibold">
-                      {user.nombre} {user.apellido}
+                      {user.name} {user.lastName}
                     </span>
                   </button>
 
@@ -211,7 +211,7 @@ export default function NavBar() {
                         Reporte de fallas
                       </button>
 
-                      {user?.is_staff && (
+                      {user?.isStaff && (
                         <button
                           type="button"
                           onClick={() => {
@@ -364,7 +364,7 @@ export default function NavBar() {
                 >
                   Reporte de fallas
                 </NavLink>
-                {user?.is_staff && (
+                {user?.isStaff && (
                   <NavLink
                     to="/admin/dashboard"
                     className={({ isActive }) =>

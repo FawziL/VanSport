@@ -12,18 +12,18 @@ export default function EditUser() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    adminService.usuarios
+    adminService.users
       .retrieve(id)
       .then((data) => {
         if (!active) return;
         setForm({
-          nombre: data.nombre || '',
-          apellido: data.apellido || '',
+          name: data.name || '',
+          lastName: data.lastName || '',
           email: data.email || '',
-          telefono: data.telefono || '',
-          direccion: data.direccion || '',
-          is_active: !!data.is_active,
-          is_staff: !!data.is_staff,
+          phone: data.phone || '',
+          address: data.address || '',
+          isActive: !!data.isActive,
+          isStaff: !!data.isStaff,
         });
       })
       .catch(() => setError('No se pudo cargar el usuario'))
@@ -40,7 +40,7 @@ export default function EditUser() {
     e.preventDefault();
     setError('');
     try {
-      await adminService.usuarios.partialUpdate(id, form);
+      await adminService.users.partialUpdate(id, form);
       navigate('/admin/usuarios');
     } catch (err) {
       setError(err?.detail || 'No se pudo actualizar el usuario');
@@ -178,7 +178,7 @@ export default function EditUser() {
               </label>
               <input
                 name="nombre"
-                value={form.nombre}
+                value={form.name}
                 onChange={onChange}
                 required
                 style={{
@@ -212,7 +212,7 @@ export default function EditUser() {
               </label>
               <input
                 name="apellido"
-                value={form.apellido}
+                value={form.lastName}
                 onChange={onChange}
                 required
                 style={{
@@ -285,7 +285,7 @@ export default function EditUser() {
               </label>
               <input
                 name="telefono"
-                value={form.telefono}
+                value={form.phone}
                 onChange={onChange}
                 style={{
                   padding: '12px 14px',
@@ -318,7 +318,7 @@ export default function EditUser() {
               </label>
               <input
                 name="direccion"
-                value={form.direccion}
+                value={form.address}
                 onChange={onChange}
                 style={{
                   padding: '12px 14px',
@@ -360,8 +360,8 @@ export default function EditUser() {
             >
               <input
                 type="checkbox"
-                name="is_active"
-                checked={form.is_active}
+                name="isActive"
+                checked={form.isActive}
                 onChange={onChange}
                 style={{
                   width: '18px',
@@ -381,8 +381,8 @@ export default function EditUser() {
             >
               <input
                 type="checkbox"
-                name="is_staff"
-                checked={form.is_staff}
+                name="isStaff"
+                checked={form.isStaff}
                 onChange={onChange}
                 style={{
                   width: '18px',

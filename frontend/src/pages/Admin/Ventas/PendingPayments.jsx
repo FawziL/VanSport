@@ -26,11 +26,11 @@ export default function PendingPayments() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.transacciones
+    adminService.transactions
       .list()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
-        const pending = arr.filter((t) => String(t.estado || '').toLowerCase() === 'pendiente');
+        const pending = arr.filter((t) => String(t.status || '').toLowerCase() === 'pendiente');
         setItems(pending);
         const totalPages = Math.max(1, Math.ceil(pending.length / pageSize));
         setPages(totalPages);
@@ -64,11 +64,11 @@ export default function PendingPayments() {
   };
 
   const getUserLabel = (t) => {
-    const nombre = t.usuario_nombre || '';
-    const apellido = t.usuario_apellido || '';
+    const nombre = t.userName || '';
+    const apellido = t.userLastName || '';
     const email = t.usuario_email || '';
     const base = `${nombre} ${apellido}`.trim();
-    const id = t.usuario_id != null ? t.usuario_id : null;
+    const id = t.userId != null ? t.userId : null;
     const emailPart = email ? ` - ${email}` : '';
     return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
   };
@@ -121,9 +121,9 @@ export default function PendingPayments() {
               <TableCell className="whitespace-nowrap">{t.pedido ?? '-'}</TableCell>
               <TableCell className="break-words">{getUserLabel(t)}</TableCell>
               <TableCell className="whitespace-nowrap font-medium">{fmt.money(t.monto)}</TableCell>
-              <TableCell className="break-words">{t.metodo_pago}</TableCell>
+              <TableCell className="break-words">{t.paymentMethod}</TableCell>
               <TableCell className="break-words">
-                <StatusBadge estado={t.estado} />
+                <StatusBadge estado={t.status} />
               </TableCell>
               <TableCell className="whitespace-nowrap">{fmt.date(t.fecha_transaccion)}</TableCell>
               <TableCell align="center">

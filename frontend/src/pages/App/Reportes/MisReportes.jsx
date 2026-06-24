@@ -21,7 +21,7 @@ export default function MisReportes() {
   useEffect(() => {
     let alive = true;
     setLoading(true);
-    appService.reportes
+    appService.bugReports
       .list()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
@@ -75,10 +75,10 @@ export default function MisReportes() {
             <TableRow key={r.id}>
               <TableCell className="font-medium">{r.titulo}</TableCell>
               <TableCell>
-                <StatusBadge estado={r.estado} />
+                <StatusBadge estado={r.status} />
               </TableCell>
               <TableCell>
-                {new Date(r.fecha_creacion).toLocaleString('es-ES', {
+                {new Date(r.createdAt).toLocaleString('es-ES', {
                   dateStyle: 'short',
                   timeStyle: 'short',
                 })}

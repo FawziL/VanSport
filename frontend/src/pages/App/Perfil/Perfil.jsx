@@ -12,18 +12,24 @@ export default function Perfil() {
   const [success, setSuccess] = useState('');
 
   const [form, setForm] = useState({
-    usuario_id: '',
+    id: '',
     email: '',
-    nombre: '',
-    apellido: '',
-    telefono: '',
-    is_staff: false,
+    name: '',
+    lastName: '',
+    phone: '',
+    isStaff: false,
   });
 
-  // Guard simple: si no hay token, a login
+  // Guard simple: si no hay sesión, a login
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (!token) navigate('/login');
+    async function checkAuth() {
+      try {
+        await authService.me();
+      } catch {
+        navigate('/login');
+      }
+    }
+    checkAuth();
   }, [navigate]);
 
   // Cargar perfil
@@ -37,12 +43,12 @@ export default function Perfil() {
         const data = await authService.me();
         if (!alive) return;
         setForm({
-          usuario_id: data.usuario_id ?? '',
+          id: data.id ?? '',
           email: data.email ?? '',
-          nombre: data.nombre ?? '',
-          apellido: data.apellido ?? '',
-          telefono: data.telefono ?? '',
-          is_staff: !!data.is_staff,
+          name: data.name ?? '',
+          lastName: data.lastName ?? '',
+          phone: data.phone ?? '',
+          isStaff: !!data.isStaff,
         });
       } catch (err) {
         if (!alive) return;
@@ -65,7 +71,7 @@ export default function Perfil() {
   }, []);
 
   const initials =
-    ((form.nombre || '') + ' ' + (form.apellido || ''))
+    ((form.name || '') + ' ' + (form.lastName || ''))
       .trim()
       .split(' ')
       .filter(Boolean)
@@ -87,16 +93,16 @@ export default function Perfil() {
     setSuccess('');
     try {
       const payload = {
-        nombre: form.nombre ?? '',
-        apellido: form.apellido ?? '',
-        telefono: form.telefono ?? '',
+        name: form.name ?? '',
+        lastName: form.lastName ?? '',
+        phone: form.phone ?? '',
       };
-      const updated = await http.patch('/auth/me/', payload);
+      const updated = await authService.updateProfile(payload);
       setForm((f) => ({
         ...f,
-        nombre: updated.nombre ?? f.nombre,
-        apellido: updated.apellido ?? f.apellido,
-        telefono: updated.telefono ?? f.telefono,
+        name: updated.name ?? f.name,
+        lastName: updated.lastName ?? f.lastName,
+        phone: updated.phone ?? f.phone,
       }));
       setSuccess('Perfil actualizado correctamente.');
     } catch (err) {
@@ -141,7 +147,7 @@ export default function Perfil() {
         <div className="profile-info">
           <h1 className="profile-title">
             Perfil de usuario
-            {form.is_staff && <span className="admin-badge">Admin</span>}
+            {form.isStaff && <span className="admin-badge">Admin</span>}
           </h1>
           <p className="profile-subtitle">Consulta y actualiza tus datos personales</p>
         </div>
@@ -180,7 +186,7 @@ export default function Perfil() {
             <label className="form-label">ID de usuario</label>
             <input
               type="text"
-              value={form.usuario_id || '—'}
+              value={form.id || '—'}
               disabled
               className="form-input disabled"
             />
@@ -200,10 +206,10 @@ export default function Perfil() {
           <div className="form-group">
             <label className="form-label">Nombre</label>
             <input
-              name="nombre"
+              name="name"
               type="text"
               placeholder="Tu nombre"
-              value={form.nombre}
+              value={form.name}
               onChange={handleChange}
               className="form-input"
             />
@@ -211,10 +217,10 @@ export default function Perfil() {
           <div className="form-group">
             <label className="form-label">Apellido</label>
             <input
-              name="apellido"
+              name="lastName"
               type="text"
               placeholder="Tu apellido"
-              value={form.apellido}
+              value={form.lastName}
               onChange={handleChange}
               className="form-input"
             />
@@ -223,11 +229,11 @@ export default function Perfil() {
 
         <div className="form-group">
           <label className="form-label">Teléfono</label>
-          <input
-            name="telefono"
-            type="tel"
-            placeholder="Tu teléfono"
-            value={form.telefono}
+            <input
+              name="phone"
+              type="tel"
+              placeholder="Tu teléfono"
+              value={form.phone}
             onChange={handleChange}
             className="form-input"
           />

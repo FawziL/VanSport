@@ -29,7 +29,7 @@ export default function ListShipments() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.envios
+    adminService.shipments
       .list()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
@@ -67,11 +67,11 @@ export default function ListShipments() {
   };
 
   const getUserLabel = (e) => {
-    const nombre = e.usuario_nombre || '';
-    const apellido = e.usuario_apellido || '';
+    const nombre = e.userName || '';
+    const apellido = e.userLastName || '';
     const email = e.usuario_email || '';
     const base = `${nombre} ${apellido}`.trim();
-    const id = e.usuario_id != null ? e.usuario_id : null;
+    const id = e.userId != null ? e.userId : null;
     const emailPart = email ? ` - ${email}` : '';
     return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
   };
@@ -83,7 +83,7 @@ export default function ListShipments() {
         ...(startDate ? { start_date: startDate } : {}),
         ...(endDate ? { end_date: endDate } : {}),
       };
-      const data = await adminService.envios.export(params); // ArrayBuffer
+      const data = await adminService.shipments.export(params); // ArrayBuffer
       const blob = new Blob([data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
@@ -185,7 +185,7 @@ export default function ListShipments() {
               <TableCell className="break-words">{getUserLabel(e)}</TableCell>
               <TableCell className="break-words">{e.metodo_envio}</TableCell>
               <TableCell className="break-words">
-                <StatusBadge estado={e.estado} variant="order" />
+                <StatusBadge estado={e.status} variant="order" />
               </TableCell>
               <TableCell className="whitespace-nowrap">{fmt.money(e.costo_envio)}</TableCell>
               <TableCell className="whitespace-nowrap">{fmt.date(e.fecha_envio)}</TableCell>

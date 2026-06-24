@@ -19,23 +19,23 @@ export default function Home() {
       setLoading(true);
       setError('');
       try {
-        const data = await appService.productos.list({ destacado: 1, activo: 1 });
+        const data = await appService.products.list({ destacado: 1, activo: 1 });
         const items = Array.isArray(data) ? data : data?.results || [];
         const top3 = items.slice(0, 3).map((p) => ({
-          id: p.producto_id ?? p.id,
-          name: p.nombre,
-          price: p.precio,
-          img: resolveImageUrl(p.imagen_url || p.imagen),
+          id: p.productId ?? p.id,
+          name: p.name,
+          price: p.price,
+          img: resolveImageUrl(p.imageUrl || p.imagen),
         }));
 
         // Enriquecer cada producto con promedio y conteo de reseñas
         const enriched = await Promise.all(
           top3.map(async (p) => {
             try {
-              const rev = await appService.reseñas.list({ producto_id: p.id });
+              const rev = await appService.reseñas.list({ productId: p.id });
               const arr = Array.isArray(rev) ? rev : rev?.results || [];
               if (arr.length > 0) {
-                const sum = arr.reduce((acc, r) => acc + (Number(r.calificacion) || 0), 0);
+                const sum = arr.reduce((acc, r) => acc + (Number(r.rating) || 0), 0);
                 return { ...p, avgRating: sum / arr.length, reviewsCount: arr.length };
               }
               return { ...p, avgRating: 0, reviewsCount: 0 };
@@ -64,12 +64,12 @@ export default function Home() {
       setCatsLoading(true);
       setCatsError('');
       try {
-        const data = await appService.categorias.list({ destacado: 1 });
+        const data = await appService.categories.list({ destacado: 1 });
         const items = Array.isArray(data) ? data : data?.results || [];
         const mapped = items.slice(0, 6).map((c) => ({
-          id: c.categoria_id ?? c.id,
-          name: c.nombre,
-          img: c.imagen_url ? resolveImageUrl(c.imagen_url) : '/img/cat-placeholder.svg',
+          id: c.categoryId ?? c.id,
+          name: c.name,
+          img: c.imageUrl ? resolveImageUrl(c.imageUrl) : '/img/cat-placeholder.svg',
         }));
         if (alive) setCats(mapped);
       } catch (e) {
@@ -137,7 +137,7 @@ export default function Home() {
             <div className="flex justify-center gap-8">
               {(catsLoading ? Array.from({ length: 6 }) : cats).map((cat, idx) => (
                 <Link
-                  to={cat ? `/productos?categoria_id=${encodeURIComponent(cat.id)}` : '#'}
+                  to={cat ? `/productos?categoryId=${encodeURIComponent(cat.id)}` : '#'}
                   key={cat ? cat.id : idx}
                   className="group block bg-white rounded-2xl overflow-hidden shadow-lg shadow-gray-200/50 no-underline text-gray-800 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 border border-gray-100"
                 >

@@ -1,83 +1,73 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { authService } from '@/services/routes';
 
 const AuthContext = createContext({
   user: null,
   isAuthenticated: false,
   login: async () => {},
-  logout: () => {},
+  logout: async () => {},
   setUser: () => {},
   ensureUserLoaded: async () => false,
+  initialLoading: true,
 });
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('access_token'));
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  const fetchMe = useCallback(async () => {
+    try {
+      const res = await authService.me();
+      return res?.user || res;
+    } catch {
+      return null;
+    }
+  }, []);
 
   useEffect(() => {
-    // Al cargar la app, si estamos autenticados pero no tenemos datos de usuario,
-    // intentamos obtenerlos.
-    const initialLoad = async () => {
-      if (isAuthenticated && !user) {
-        try {
-          const me = await authService.me();
-          setUser(me);
-        } catch (err) {
-          // Si el token es inválido, cerramos sesión.
-          logout();
-        }
+    const checkSession = async () => {
+      const me = await fetchMe();
+      if (me) {
+        setUser(me);
+        setIsAuthenticated(true);
       }
+      setInitialLoading(false);
     };
-    initialLoad();
-  }, [isAuthenticated]); // Se ejecuta solo cuando cambia el estado de autenticación.
+    checkSession();
+  }, [fetchMe]);
 
-  const login = async (accessToken, refreshToken) => {
-    // 1. Guardar los tokens
-    localStorage.setItem('access_token', accessToken);
-    if (refreshToken) {
-      localStorage.setItem('refresh_token', refreshToken);
-    }
-
+  const login = async (email, password) => {
+    await authService.signIn(email, password);
+    const me = await fetchMe();
+    setUser(me);
     setIsAuthenticated(true);
-
-    // 2. Obtener y guardar los datos del usuario
-    try {
-      const userData = await authService.me();
-      setUser(userData);
-      return userData;
-    } catch (error) {
-      // Si falla, limpiar todo para evitar un estado inconsistente.
-      logout();
-      throw new Error('No se pudo obtener la información del usuario después del login.');
-    }
+    return me;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await authService.signOut();
+    } catch {
+      // continue clearing state even if request fails
+    }
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    // LIMPIA la cabecera de axios al cerrar sesión
-    // También borramos los viejos por si acaso
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
   };
 
-  // Helper para forzar carga de /auth/me si hace falta (útil en páginas protegidas)
-  const ensureUserLoaded = async () => {
+  const ensureUserLoaded = useCallback(async () => {
     if (!isAuthenticated) return false;
     if (user) return true;
-    try {
-      const me = await authService.me();
+    const me = await fetchMe();
+    if (me) {
       setUser(me);
       return true;
-    } catch {
-      logout();
-      return false;
     }
-  };
+    setIsAuthenticated(false);
+    return false;
+  }, [isAuthenticated, user, fetchMe]);
 
-  const value = { user, isAuthenticated, login, logout, setUser, ensureUserLoaded };
+  const value = { user, isAuthenticated, login, logout, setUser, ensureUserLoaded, initialLoading };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

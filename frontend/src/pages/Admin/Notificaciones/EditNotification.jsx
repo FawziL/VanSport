@@ -20,14 +20,14 @@ export default function EditNotification() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    adminService.notificaciones
+    adminService.notifications
       .retrieve(id)
       .then((data) => {
         if (!active) return;
         setForm({
           titulo: data.titulo || '',
-          mensaje: data.mensaje || '',
-          tipo: data.tipo || 'banner',
+          mensaje: data.message || '',
+          tipo: data.type || 'banner',
           expira: toDatetimeLocalValue(data.expira || ''),
         });
       })
@@ -45,7 +45,7 @@ export default function EditNotification() {
     e.preventDefault();
     setError('');
     try {
-      const payload = { titulo: form.titulo, mensaje: form.mensaje, tipo: form.tipo };
+      const payload = { titulo: form.titulo, mensaje: form.message, tipo: form.type };
       if (form.expira) {
         const d = new Date(form.expira);
         if (!isNaN(d.getTime())) {
@@ -54,7 +54,7 @@ export default function EditNotification() {
       } else {
         payload.expira = null; // permitir limpiar la expiración
       }
-      await adminService.notificaciones.partialUpdate(id, payload);
+      await adminService.notifications.partialUpdate(id, payload);
       navigate('/admin/notificaciones');
     } catch (err) {
       const msg = err?.response?.data
@@ -231,7 +231,7 @@ export default function EditNotification() {
             </label>
             <textarea
               name="mensaje"
-              value={form.mensaje}
+              value={form.message}
               onChange={onChange}
               rows={4}
               style={{
@@ -269,7 +269,7 @@ export default function EditNotification() {
             </label>
             <select
               name="tipo"
-              value={form.tipo}
+              value={form.type}
               onChange={onChange}
               style={{
                 padding: '12px 14px',
@@ -297,7 +297,7 @@ export default function EditNotification() {
             </select>
           </div>
 
-          {form.tipo === 'oferta' && (
+          {form.type === 'oferta' && (
             <div
               style={{
                 background: '#f8f9fa',

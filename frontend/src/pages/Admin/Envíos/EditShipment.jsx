@@ -12,12 +12,12 @@ export default function EditShipment() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    adminService.envios
+    adminService.shipments
       .retrieve(id)
       .then((data) => {
         if (!active) return;
         setForm({
-          estado: data.estado || '',
+          estado: data.status || '',
           metodo_envio: data.metodo_envio || '',
           codigo_seguimiento: data.codigo_seguimiento || '',
         });
@@ -36,7 +36,7 @@ export default function EditShipment() {
     e.preventDefault();
     setError('');
     try {
-      await adminService.envios.partialUpdate(id, form);
+      await adminService.shipments.partialUpdate(id, form);
       navigate('/admin/envios');
     } catch (err) {
       setError(err?.detail || 'No se pudo actualizar el envío');
@@ -106,7 +106,7 @@ export default function EditShipment() {
             <label className="block text-sm font-semibold text-gray-700 mb-2">Estado *</label>
             <select
               name="estado"
-              value={form.estado}
+              value={form.status}
               onChange={onChange}
               required
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"

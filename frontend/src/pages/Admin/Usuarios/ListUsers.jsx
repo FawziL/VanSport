@@ -26,7 +26,7 @@ export default function ListUsers() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.usuarios
+    adminService.users
       .list()
       .then((data) => {
         const items = Array.isArray(data) ? data : data.results || [];
@@ -37,14 +37,12 @@ export default function ListUsers() {
       })
       .catch(() => setError('No se pudieron cargar los usuarios'))
       .finally(() => setLoading(false));
-    // eslint-disable-next-line
   }, [pageSize]);
 
   useEffect(() => {
     const totalPages = Math.max(1, Math.ceil(usuarios.length / pageSize));
     setPages(totalPages);
     setPage((prev) => Math.min(prev, totalPages));
-    // eslint-disable-next-line
   }, [usuarios, pageSize]);
 
   const start = (page - 1) * pageSize;
@@ -53,18 +51,16 @@ export default function ListUsers() {
 
   const toggleActivo = async (u) => {
     try {
-      // optimista: actualizar UI inmediatamente (opcional)
       setUsuarios((prev) =>
-        prev.map((x) => (x.usuario_id === u.usuario_id ? { ...x, is_active: !x.is_active } : x))
+        prev.map((x) => (x.id === u.id ? { ...x, isActive: !x.isActive } : x))
       );
 
-      await adminService.usuarios.partialUpdate(u.usuario_id, { is_active: !u.is_active });
+      await adminService.users.partialUpdate(u.id, { isActive: !u.isActive });
 
-      toast.success(`${u.nombre ?? u.email} ${u.is_active ? 'desactivado' : 'activado'}`);
+      toast.success(`${u.name ?? u.email} ${u.isActive ? 'desactivado' : 'activado'}`);
     } catch (err) {
-      // revertir cambio si hubo optimista
       setUsuarios((prev) =>
-        prev.map((x) => (x.usuario_id === u.usuario_id ? { ...x, is_active: u.is_active } : x))
+        prev.map((x) => (x.id === u.id ? { ...x, isActive: u.isActive } : x))
       );
       const msg = err?.response?.data?.detail || 'No se pudo actualizar el estado del usuario';
       toast.error(msg);
@@ -74,7 +70,6 @@ export default function ListUsers() {
 
   return (
     <div className="max-w-[1100px] mx-auto my-10 px-4">
-      {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-extrabold">Usuarios</h1>
         <Link
@@ -85,7 +80,6 @@ export default function ListUsers() {
         </Link>
       </div>
 
-      {/* Page Size Selector */}
       <div className="flex justify-end mb-3">
         <PageSizeSelector
           value={pageSize}
@@ -95,10 +89,8 @@ export default function ListUsers() {
         />
       </div>
 
-      {/* Error Message */}
       {error && <div className="text-red-700 font-bold mb-3">{error}</div>}
 
-      {/* Table */}
       <Table minWidth="min-w-[900px]">
         <TableHead>
           <TableHeader>ID</TableHeader>
@@ -118,48 +110,48 @@ export default function ListUsers() {
           emptyText="No hay usuarios."
         >
           {usuariosPage.map((u) => (
-            <TableRow key={u.usuario_id}>
-              <TableCell>{u.usuario_id}</TableCell>
+            <TableRow key={u.id}>
+              <TableCell>{u.id}</TableCell>
               <TableCell className="font-medium">
-                {`${u.nombre ?? ''} ${u.apellido ?? ''}`.trim() || '-'}
+                {`${u.name ?? ''} ${u.lastName ?? ''}`.trim() || '-'}
               </TableCell>
               <TableCell>{u.email}</TableCell>
-              <TableCell>{u.telefono || '-'}</TableCell>
+              <TableCell>{u.phone || '-'}</TableCell>
               <TableCell>
                 <span
                   className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
-                    u.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    u.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}
                 >
-                  {u.is_active ? 'Sí' : 'No'}
+                  {u.isActive ? 'Sí' : 'No'}
                 </span>
               </TableCell>
               <TableCell>
                 <span
                   className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
-                    u.is_staff ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                    u.isStaff ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
                   }`}
                 >
-                  {u.is_staff ? 'Admin' : 'Cliente'}
+                  {u.isStaff ? 'Admin' : 'Cliente'}
                 </span>
               </TableCell>
               <TableCell align="center">
                 <div className="flex justify-center gap-2">
                   <ActionButton
                     variant="edit"
-                    onClick={() => navigate(`/admin/usuarios/editar/${u.usuario_id}`)}
+                    onClick={() => navigate(`/admin/usuarios/editar/${u.id}`)}
                   >
                     Editar
                   </ActionButton>
                   <button
                     onClick={() => toggleActivo(u)}
                     className={`px-3 py-1 rounded font-bold text-white transition-colors ${
-                      u.is_active
+                      u.isActive
                         ? 'bg-orange-600 hover:bg-orange-700'
                         : 'bg-green-600 hover:bg-green-700'
                     }`}
                   >
-                    {u.is_active ? 'Desactivar' : 'Activar'}
+                    {u.isActive ? 'Desactivar' : 'Activar'}
                   </button>
                 </div>
               </TableCell>
@@ -168,7 +160,6 @@ export default function ListUsers() {
         </TableBody>
       </Table>
 
-      {/* Pagination */}
       <Pagination page={page} pages={pages} onChange={setPage} showNumbers />
     </div>
   );

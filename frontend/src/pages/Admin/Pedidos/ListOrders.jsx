@@ -29,7 +29,7 @@ export default function ListOrders() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.pedidos
+    adminService.orders
       .list()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
@@ -66,11 +66,11 @@ export default function ListOrders() {
   };
 
   const getUserLabel = (p) => {
-    const nombre = p.usuario_nombre || '';
-    const apellido = p.usuario_apellido || '';
+    const nombre = p.userName || '';
+    const apellido = p.userLastName || '';
     const email = p.usuario_email || '';
     const base = `${nombre} ${apellido}`.trim();
-    const id = p.usuario != null ? p.usuario : p.usuario_id != null ? p.usuario_id : null;
+    const id = p.usuario != null ? p.usuario : p.userId != null ? p.userId : null;
     const emailPart = email ? ` - ${email}` : '';
     return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
   };
@@ -82,7 +82,7 @@ export default function ListOrders() {
         ...(startDate ? { start_date: startDate } : {}),
         ...(endDate ? { end_date: endDate } : {}),
       };
-      const data = await adminService.pedidos.export(params); // ArrayBuffer
+      const data = await adminService.orders.export(params); // ArrayBuffer
       const blob = new Blob([data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
@@ -177,18 +177,18 @@ export default function ListOrders() {
           emptyText="No hay pedidos."
         >
           {pageItems.map((p) => (
-            <TableRow key={p.pedido_id}>
-              <TableCell className="whitespace-nowrap">{p.pedido_id}</TableCell>
+            <TableRow key={p.orderId}>
+              <TableCell className="whitespace-nowrap">{p.orderId}</TableCell>
               <TableCell className="break-words">{getUserLabel(p)}</TableCell>
               <TableCell className="whitespace-nowrap">{fmt.date(p.fecha_pedido)}</TableCell>
               <TableCell className="break-words">
-                <StatusBadge estado={p.estado} variant="order" />
+                <StatusBadge estado={p.status} variant="order" />
               </TableCell>
               <TableCell className="whitespace-nowrap">{fmt.money(p.total)}</TableCell>
               <TableCell align="center">
                 <ActionButton
                   variant="edit"
-                  onClick={() => navigate(`/admin/pedidos/editar/${p.pedido_id}`)}
+                  onClick={() => navigate(`/admin/pedidos/editar/${p.orderId}`)}
                 >
                   Editar
                 </ActionButton>

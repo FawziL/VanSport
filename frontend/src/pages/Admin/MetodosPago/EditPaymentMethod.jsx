@@ -13,16 +13,16 @@ export default function EditPaymentMethod() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.pagos
+    adminService.paymentMethodsAdmin
       .get(id)
       .then((data) => {
         setForm({
           codigo: data.codigo || '',
-          nombre: data.nombre || '',
-          tipo: data.tipo || '',
-          activo: !!data.activo,
+          nombre: data.name || '',
+          tipo: data.type || '',
+          activo: !!data.isActive,
           orden: data.orden ?? 0,
-          descripcion: data.descripcion || '',
+          descripcion: data.description || '',
           instrucciones: data.instrucciones || '',
           icono: data.icono || '',
           config: JSON.stringify(data.config ?? {}, null, 2),
@@ -47,13 +47,13 @@ export default function EditPaymentMethod() {
 
     try {
       setSaving(true);
-      await adminService.pagos.partialUpdate(id, {
+      await adminService.paymentMethodsAdmin.partialUpdate(id, {
         codigo: form.codigo.trim(),
-        nombre: form.nombre.trim(),
-        tipo: form.tipo.trim(),
-        activo: !!form.activo,
+        nombre: form.name.trim(),
+        tipo: form.type.trim(),
+        activo: !!form.isActive,
         orden: Number(form.orden) || 0,
-        descripcion: form.descripcion || '',
+        descripcion: form.description || '',
         instrucciones: form.instrucciones || '',
         icono: form.icono || '',
         config: cfg,
@@ -143,7 +143,7 @@ export default function EditPaymentMethod() {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre</label>
             <input
-              value={form.nombre}
+              value={form.name}
               onChange={(e) => onChange('nombre', e.target.value)}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
             />
@@ -152,7 +152,7 @@ export default function EditPaymentMethod() {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Tipo</label>
             <input
-              value={form.tipo}
+              value={form.type}
               onChange={(e) => onChange('tipo', e.target.value)}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
             />
@@ -172,7 +172,7 @@ export default function EditPaymentMethod() {
             <input
               id="activo"
               type="checkbox"
-              checked={form.activo}
+              checked={form.isActive}
               onChange={(e) => onChange('activo', e.target.checked)}
               className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-300"
             />
@@ -184,7 +184,7 @@ export default function EditPaymentMethod() {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
             <textarea
-              value={form.descripcion}
+              value={form.description}
               onChange={(e) => onChange('descripcion', e.target.value)}
               rows={2}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"

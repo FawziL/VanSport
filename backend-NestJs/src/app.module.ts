@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from './database.module';
-import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
@@ -21,7 +20,6 @@ import { StorageModule } from './storage/storage.module';
   imports: [
     StorageModule,
     DatabaseModule,
-    AuthModule,
     CategoriesModule,
     ProductsModule,
     UsersModule,

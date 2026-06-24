@@ -32,13 +32,13 @@ export default function CreatePaymentMethod() {
 
     try {
       setSaving(true);
-      await adminService.pagos.create({
+      await adminService.paymentMethodsAdmin.create({
         codigo: form.codigo.trim(),
-        nombre: form.nombre.trim(),
-        tipo: form.tipo.trim(),
-        activo: !!form.activo,
+        nombre: form.name.trim(),
+        tipo: form.type.trim(),
+        activo: !!form.isActive,
         orden: Number(form.orden) || 0,
-        descripcion: form.descripcion || '',
+        descripcion: form.description || '',
         instrucciones: form.instrucciones || '',
         icono: form.icono || '',
         config: cfg,
@@ -76,7 +76,7 @@ export default function CreatePaymentMethod() {
         <div>
           <label>Nombre</label>
           <input
-            value={form.nombre}
+            value={form.name}
             onChange={(e) => onChange('nombre', e.target.value)}
             className="input"
           />
@@ -84,7 +84,7 @@ export default function CreatePaymentMethod() {
         <div>
           <label>Tipo</label>
           <input
-            value={form.tipo}
+            value={form.type}
             onChange={(e) => onChange('tipo', e.target.value)}
             className="input"
             placeholder="paypal | pago_movil | efectivo | ..."
@@ -103,14 +103,14 @@ export default function CreatePaymentMethod() {
           <label>Activo</label>
           <input
             type="checkbox"
-            checked={form.activo}
+            checked={form.isActive}
             onChange={(e) => onChange('activo', e.target.checked)}
           />
         </div>
         <div>
           <label>Descripción</label>
           <textarea
-            value={form.descripcion}
+            value={form.description}
             onChange={(e) => onChange('descripcion', e.target.value)}
             rows={2}
             className="input"

@@ -12,11 +12,11 @@ export default function EditSale() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    adminService.transacciones
+    adminService.transactions
       .retrieve(id)
       .then((data) => {
         if (!active) return;
-        setForm({ estado: data.estado || '', metodo_pago: data.metodo_pago || '' });
+        setForm({ estado: data.status || '', paymentMethod: data.paymentMethod || '' });
       })
       .catch(() => setError('No se pudo cargar la venta'))
       .finally(() => active && setLoading(false));
@@ -32,7 +32,7 @@ export default function EditSale() {
     e.preventDefault();
     setError('');
     try {
-      await adminService.transacciones.partialUpdate(id, form);
+      await adminService.transactions.partialUpdate(id, form);
       navigate('/admin/ventas');
     } catch (err) {
       setError(err?.detail || 'No se pudo actualizar la venta');
@@ -169,7 +169,7 @@ export default function EditSale() {
             </label>
             <select
               name="estado"
-              value={form.estado}
+              value={form.status}
               onChange={onChange}
               required
               style={{
@@ -212,8 +212,8 @@ export default function EditSale() {
               Método de pago
             </label>
             <select
-              name="metodo_pago"
-              value={form.metodo_pago}
+              name="paymentMethod"
+              value={form.paymentMethod}
               onChange={onChange}
               style={{
                 padding: '12px 14px',

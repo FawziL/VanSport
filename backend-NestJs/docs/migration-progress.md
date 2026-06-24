@@ -103,6 +103,12 @@
 - [x] Auto-delete old files from R2 on update/delete
 - [x] Field name mapping preserved (imagen, imagenes_adicionales, comprobante, video)
 - [x] R2 folder structure: products/, categories/, bug-reports/, transactions/
+- [x] Added `GET /products/admin` endpoint (admin-only, returns all including inactive)
+
+## Known Gaps
+- Password reset needs BetterAuth configuration review
+- Google OAuth redirect flow not yet migrated from Google One Tap
+- No `/api` global prefix on NestJS routes (BetterAuth uses `/api/auth/*`)
 
 ## Table Migration Mapping
 

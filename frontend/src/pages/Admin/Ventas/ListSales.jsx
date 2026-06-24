@@ -29,7 +29,7 @@ export default function ListSales() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.transacciones
+    adminService.transactions
       .list()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
@@ -66,10 +66,10 @@ export default function ListSales() {
   };
 
   const getUserLabel = (t) => {
-    const nombre = t.usuario_nombre || '';
-    const apellido = t.usuario_apellido || '';
+    const nombre = t.userName || '';
+    const apellido = t.userLastName || '';
     const base = `${nombre} ${apellido}`.trim();
-    const id = t.usuario_id != null ? t.usuario_id : null;
+    const id = t.userId != null ? t.userId : null;
     return base || id != null ? `${base}${id != null ? ` (ID ${id})` : ''}` : '-';
   };
 
@@ -80,7 +80,7 @@ export default function ListSales() {
         ...(startDate ? { start_date: startDate } : {}),
         ...(endDate ? { end_date: endDate } : {}),
       };
-      const data = await adminService.transacciones.export(params); // ArrayBuffer
+      const data = await adminService.transactions.export(params); // ArrayBuffer
       const blob = new Blob([data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
@@ -183,10 +183,10 @@ export default function ListSales() {
               <TableCell className="whitespace-nowrap">{t.pedido ?? '-'}</TableCell>
               <TableCell className="break-words">{getUserLabel(t)}</TableCell>
               <TableCell className="whitespace-nowrap font-medium">{fmt.money(t.monto)}</TableCell>
-              <TableCell className="break-words">{t.metodo_pago}</TableCell>
+              <TableCell className="break-words">{t.paymentMethod}</TableCell>
               <TableCell className="break-words">{t.referencia}</TableCell>
               <TableCell className="break-words">
-                <StatusBadge estado={t.estado} variant="order" />
+                <StatusBadge estado={t.status} variant="order" />
               </TableCell>
               <TableCell className="whitespace-nowrap">{fmt.date(t.fecha_transaccion)}</TableCell>
               <TableCell align="center">

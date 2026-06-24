@@ -36,7 +36,7 @@ export default function Checkout() {
       setLoading(true);
       setErrMsg('');
       try {
-        const data = await appService.carrito.list();
+        const data = await appService.cart.list();
         const cartItems = Array.isArray(data) ? data : data.results || [];
 
         // 1. Recolectar todos los IDs de productos que necesitan ser cargados.
@@ -50,7 +50,7 @@ export default function Checkout() {
 
         // 2. Realizar todas las llamadas a la API en paralelo.
         const productPromises = productIdsToFetch.map((id) =>
-          appService.productos.retrieve(id)
+          appService.products.retrieve(id)
         );
         const productResults = await Promise.allSettled(productPromises);
 
@@ -62,7 +62,7 @@ export default function Checkout() {
             productMap.set(id, result.value);
           } else {
             // Si falla, usamos un producto por defecto para no romper la UI
-            productMap.set(id, { producto_id: id, nombre: 'Producto no disponible', precio: 0 });
+            productMap.set(id, { productId: id, nombre: 'Producto no disponible', precio: 0 });
           }
         });
 
@@ -89,8 +89,8 @@ export default function Checkout() {
   const total = useMemo(() => {
     return items.reduce((acc, it) => {
       const p = it.producto;
-      const price = Number(p?.precio_oferta ?? p?.precio ?? it.precio ?? 0);
-      return acc + price * it.cantidad;
+      const price = Number(p?.salePrice ?? p?.price ?? it.price ?? 0);
+      return acc + price * it.quantity;
     }, 0);
   }, [items]);
 
@@ -202,7 +202,7 @@ export default function Checkout() {
             <div className="space-y-4 mb-6">
               <div className="flex justify-between">
                 <span className="text-gray-600">Productos</span>
-                <span className="font-bold">{items.reduce((a, it) => a + it.cantidad, 0)}</span>
+                <span className="font-bold">{items.reduce((a, it) => a + it.quantity, 0)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Total</span>
@@ -217,15 +217,15 @@ export default function Checkout() {
                 setPlacing(true);
                 try {
                   const payload = {
-                    direccion_envio: entrega === 'envio' ? direccion.trim() : '',
+                    shippingAddress: entrega === 'envio' ? direccion.trim() : '',
                     notas: notas?.trim() || '',
                   };
-                  const res = await appService.pedidos.checkout(payload);
+                  const res = await appService.orders.checkout(payload);
 
                   window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: 0 } }));
                   window.dispatchEvent(new Event('order:placed'));
 
-                  const pid = res?.pedido?.pedido_id || res?.pedido?.id;
+                  const pid = res?.pedido?.orderId || res?.pedido?.id;
 
                   navigate(pid ? `/pedidos/${pid}` : '/pedidos');
                 } catch (e) {

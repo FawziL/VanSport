@@ -4,7 +4,7 @@ import ListCategories from '@/components/ListCategories';
 export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 12, 24, 48] }) {
   const [local, setLocal] = useState(() => ({
     q: value?.q ?? '',
-    categoria_id: value?.categoria_id ?? '',
+    categoryId: value?.categoryId ?? '',
     min_price: value?.min_price ?? '',
     max_price: value?.max_price ?? '',
     oferta: value?.oferta ?? '',
@@ -21,7 +21,7 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
   const reset = () => {
     const cleared = {
       q: '',
-      categoria_id: '',
+      categoryId: '',
       min_price: '',
       max_price: '',
       oferta: '',
@@ -33,7 +33,7 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
 
   const normalize = (s) => ({
     q: s.q?.trim() || '',
-    categoria_id: s.categoria_id || '',
+    categoryId: s.categoryId || '',
     min_price: s.min_price !== '' ? String(s.min_price) : '',
     max_price: s.max_price !== '' ? String(s.max_price) : '',
     oferta: s.oferta === '' ? '' : s.oferta ? '1' : '0',
@@ -78,8 +78,8 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
           <ListCategories
-            value={local.categoria_id}
-            onChange={(val) => setLocal((p) => ({ ...p, categoria_id: val }))}
+            value={local.categoryId}
+            onChange={(val) => setLocal((p) => ({ ...p, categoryId: val }))}
             placeholder="Todas las categorías"
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />

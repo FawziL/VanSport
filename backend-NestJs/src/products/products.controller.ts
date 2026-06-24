@@ -22,6 +22,14 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
+  @Get('admin')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'List all products (admin, including inactive)' })
+  findAllAdmin() {
+    return this.productsService.findAllAdmin();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get product by ID' })
   findOne(@Param('id', ParseIntPipe) id: number) {

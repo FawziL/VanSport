@@ -1,9 +1,8 @@
-import { API_URL } from '@/config/api';
+const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || '';
 
 export const resolveImageUrl = (path) => {
   if (!path) return '';
   if (/^https?:/i.test(path)) return path;
-  const base = API_URL.replace(/\/+$/, '');
-  const rel = String(path).replace(/^\/+/, '');
-  return `${base}/${rel}`;
+  if (R2_PUBLIC_URL) return `${R2_PUBLIC_URL}/${path}`;
+  return path;
 };

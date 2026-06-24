@@ -1,3 +1,2 @@
 allowBuilds:
-  '@scarf/scarf': true
   esbuild: true

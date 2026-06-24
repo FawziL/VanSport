@@ -28,7 +28,7 @@ export default function CreateNotification() {
           delete payload.expira;
         }
       }
-      await adminService.notificaciones.create(payload);
+      await adminService.notifications.create(payload);
       navigate('/admin/notificaciones');
     } catch (err) {
       const data = err?.response?.data;
@@ -201,7 +201,7 @@ export default function CreateNotification() {
             </label>
             <textarea
               name="mensaje"
-              value={form.mensaje}
+              value={form.message}
               onChange={onChange}
               rows={4}
               required
@@ -241,7 +241,7 @@ export default function CreateNotification() {
             </label>
             <select
               name="tipo"
-              value={form.tipo}
+              value={form.type}
               onChange={onChange}
               style={{
                 padding: '12px 14px',
@@ -269,7 +269,7 @@ export default function CreateNotification() {
             </select>
           </div>
 
-          {form.tipo === 'oferta' && (
+          {form.type === 'oferta' && (
             <div
               style={{
                 background: '#f8f9fa',

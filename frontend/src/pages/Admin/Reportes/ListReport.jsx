@@ -29,7 +29,7 @@ export default function ListReportes() {
     setLoading(true);
     setError('');
 
-    adminService.reportes
+    adminService.bugReports
       .list()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
@@ -111,14 +111,14 @@ export default function ListReportes() {
             <TableRow key={report.id}>
               <TableCell className="font-medium">{report.titulo}</TableCell>
               <TableCell>
-                {report.usuario_nombre} {report.usuario_apellido}
+                {report.userName} {report.userLastName}
                 <br />
                 <span className="text-sm text-gray-500">({report.usuario_email})</span>
               </TableCell>
               <TableCell>
-                <StatusBadge estado={report.estado} />
+                <StatusBadge estado={report.status} />
               </TableCell>
-              <TableCell>{fmtFecha(report.fecha_creacion)}</TableCell>
+              <TableCell>{fmtFecha(report.createdAt)}</TableCell>
               <TableCell align="center">
                 <ActionButton
                   variant="edit"

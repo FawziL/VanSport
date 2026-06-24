@@ -68,8 +68,8 @@ export default function AdminSidebar({ collapsed, onToggle }) {
 
   const displayName = (() => {
     if (!user) return 'Usuario';
-    const nombre = user.nombre || user.first_name || user.name || '';
-    const apellido = user.apellido || user.last_name || '';
+    const nombre = user.name || user.first_name || user.name || '';
+    const apellido = user.lastName || user.last_name || '';
     const combined = `${nombre} ${apellido}`.trim();
     return combined || user.username || 'Usuario';
   })();

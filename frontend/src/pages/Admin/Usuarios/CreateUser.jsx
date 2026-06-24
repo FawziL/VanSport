@@ -4,14 +4,14 @@ import { adminService } from '@/services/routes';
 
 export default function CreateUser() {
   const [form, setForm] = useState({
-    nombre: '',
-    apellido: '',
+    name: '',
+    lastName: '',
     email: '',
     password: '',
-    telefono: '',
-    direccion: '',
-    is_active: true,
-    is_staff: false,
+    phone: '',
+    address: '',
+    isActive: true,
+    isStaff: false,
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,7 +27,7 @@ export default function CreateUser() {
     setLoading(true);
     setError('');
     try {
-      await adminService.usuarios.create(form);
+      await adminService.users.create(form);
       navigate('/admin/usuarios');
     } catch (err) {
       setError(err?.detail || 'No se pudo crear el usuario');
@@ -156,8 +156,8 @@ export default function CreateUser() {
                 Nombre *
               </label>
               <input
-                name="nombre"
-                value={form.nombre}
+                name="name"
+                value={form.name}
                 onChange={onChange}
                 required
                 style={{
@@ -190,8 +190,8 @@ export default function CreateUser() {
                 Apellido *
               </label>
               <input
-                name="apellido"
-                value={form.apellido}
+                name="lastName"
+                value={form.lastName}
                 onChange={onChange}
                 required
                 style={{
@@ -299,8 +299,8 @@ export default function CreateUser() {
                 Teléfono
               </label>
               <input
-                name="telefono"
-                value={form.telefono}
+                name="phone"
+                value={form.phone}
                 onChange={onChange}
                 style={{
                   padding: '12px 14px',
@@ -332,8 +332,8 @@ export default function CreateUser() {
                 Dirección
               </label>
               <input
-                name="direccion"
-                value={form.direccion}
+                name="address"
+                value={form.address}
                 onChange={onChange}
                 style={{
                   padding: '12px 14px',
@@ -375,8 +375,8 @@ export default function CreateUser() {
             >
               <input
                 type="checkbox"
-                name="is_active"
-                checked={form.is_active}
+                name="isActive"
+                checked={form.isActive}
                 onChange={onChange}
                 style={{
                   width: '18px',
@@ -396,8 +396,8 @@ export default function CreateUser() {
             >
               <input
                 type="checkbox"
-                name="is_staff"
-                checked={form.is_staff}
+                name="isStaff"
+                checked={form.isStaff}
                 onChange={onChange}
                 style={{
                   width: '18px',

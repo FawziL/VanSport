@@ -26,7 +26,7 @@ export default function Carrito() {
     setLoading(true);
     setErrMsg('');
     try {
-      const data = await appService.carrito.list();
+      const data = await appService.cart.list();
       const baseItems = Array.isArray(data) ? data : data.results || [];
 
       // Enriquecer: si item.producto es un ID, traer detalle del producto
@@ -37,14 +37,14 @@ export default function Carrito() {
           if (prodVal && typeof prodVal === 'number') {
             if (!cache.has(prodVal)) {
               try {
-                const p = await appService.productos.retrieve(prodVal);
+                const p = await appService.products.retrieve(prodVal);
                 cache.set(prodVal, p);
               } catch {
                 cache.set(prodVal, {
-                  producto_id: prodVal,
+                  productId: prodVal,
                   nombre: 'Producto',
                   precio: 0,
-                  imagen_url: '',
+                  imageUrl: '',
                 });
               }
             }
@@ -78,26 +78,26 @@ export default function Carrito() {
 
   const handleChangeCantidad = async (item, delta) => {
     if (updating) return;
-    const nuevaCantidad = item.cantidad + delta;
+    const nuevaCantidad = item.quantity + delta;
     if (nuevaCantidad < 1) return;
 
     setUpdating(true);
     setErrMsg('');
 
     // Optimista: actualiza en memoria sin refetch
-    const key = item.carrito_id ?? item.id ?? item.producto?.producto_id ?? item.producto_id;
-    const prevCantidad = item.cantidad;
+    const key = item.cartId ?? item.id ?? item.producto?.productId ?? item.productId;
+    const prevCantidad = item.quantity;
     setItems((prev) =>
       prev.map((i) =>
-        (i.carrito_id ?? i.id ?? i.producto?.producto_id ?? i.producto_id) === key
+        (i.cartId ?? i.id ?? i.producto?.productId ?? i.productId) === key
           ? { ...i, cantidad: nuevaCantidad }
           : i
       )
     );
 
     try {
-      await appService.carrito.updateQuantity({
-        producto_id: item.producto?.producto_id ?? item.producto_id,
+      await appService.cart.updateQuantity({
+        productId: item.producto?.productId ?? item.productId,
         cantidad: nuevaCantidad,
       });
 
@@ -108,13 +108,13 @@ export default function Carrito() {
         toast.success('Cantidad reducida');
       }
 
-      const newCount = items.reduce((acc, i) => acc + (i === item ? nuevaCantidad : i.cantidad), 0);
+      const newCount = items.reduce((acc, i) => acc + (i === item ? nuevaCantidad : i.quantity), 0);
       window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: newCount } }));
     } catch (err) {
       // Revertir si falla
       setItems((prev) =>
         prev.map((i) =>
-          (i.carrito_id ?? i.id ?? i.producto?.producto_id ?? i.producto_id) === key
+          (i.cartId ?? i.id ?? i.producto?.productId ?? i.productId) === key
             ? { ...i, cantidad: prevCantidad }
             : i
         )
@@ -129,12 +129,12 @@ export default function Carrito() {
     if (updating) return;
     setUpdating(true);
     try {
-      await appService.carrito.remove({
-        producto_id: item.producto?.producto_id ?? item.producto_id,
+      await appService.cart.remove({
+        productId: item.producto?.productId ?? item.productId,
       });
       await fetchCarrito();
       toast.success('Producto eliminado del carrito');
-      const newCount = items.reduce((acc, i) => acc + (i === item ? 0 : i.cantidad), 0);
+      const newCount = items.reduce((acc, i) => acc + (i === item ? 0 : i.quantity), 0);
       window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: newCount } }));
     } catch {
       toast.error('No se pudo eliminar el producto');
@@ -147,7 +147,7 @@ export default function Carrito() {
     if (updating) return;
     setUpdating(true);
     try {
-      await appService.carrito.clear();
+      await appService.cart.clear();
       await fetchCarrito();
       toast.success('Carrito vaciado correctamente');
       window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: 0 } }));
@@ -159,7 +159,7 @@ export default function Carrito() {
   };
 
   const total = items.reduce(
-    (acc, item) => acc + Number(item.producto?.precio ?? item.precio ?? 0) * item.cantidad,
+    (acc, item) => acc + Number(item.producto?.price ?? item.price ?? 0) * item.quantity,
     0
   );
 
@@ -231,17 +231,17 @@ export default function Carrito() {
           <div className="w-2/3 bg-white border border-gray-200 rounded-xl shadow-sm p-4">
             {items.map((item) => {
               const producto = item.producto || {};
-              const precioUnit = Number(producto.precio ?? item.precio ?? 0);
-              const subtotal = precioUnit * item.cantidad;
+              const precioUnit = Number(producto.price ?? item.price ?? 0);
+              const subtotal = precioUnit * item.quantity;
 
               return (
                 <div
-                  key={item.carrito_id ?? item.id}
+                  key={item.cartId ?? item.id}
                   className="flex gap-3 p-3 rounded-xl border border-gray-200 mb-3 items-center"
                 >
                   <img
-                    src={resolveImageUrl(producto.imagen_url)}
-                    alt={producto.nombre || `Producto ${producto.producto_id ?? ''}`}
+                    src={resolveImageUrl(producto.imageUrl)}
+                    alt={producto.name || `Producto ${producto.productId ?? ''}`}
                     className="w-20 h-20 object-cover rounded-xl bg-gray-100 flex-shrink-0"
                     onError={(e) => {
                       e.target.src = '';
@@ -252,12 +252,12 @@ export default function Carrito() {
                       <div className="min-w-0">
                         <div
                           className="font-black text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis"
-                          title={producto.nombre}
+                          title={producto.name}
                         >
-                          {producto.nombre ?? `Producto #${producto.producto_id ?? ''}`}
+                          {producto.name ?? `Producto #${producto.productId ?? ''}`}
                         </div>
                         <div className="text-gray-600 text-sm">
-                          {producto.categoria?.nombre || producto.categoria || ''}
+                          {producto.category?.name || producto.category || ''}
                         </div>
                       </div>
                       <div className="text-right">
@@ -270,13 +270,13 @@ export default function Carrito() {
                       <div className="flex items-center gap-2">
                         <QtyButton
                           ariaLabel="Disminuir cantidad"
-                          disabled={item.cantidad <= 1 || updating}
+                          disabled={item.quantity <= 1 || updating}
                           onClick={() => handleChangeCantidad(item, -1)}
                         >
                           −
                         </QtyButton>
                         <span className="min-w-8 text-center font-black text-gray-900">
-                          {item.cantidad}
+                          {item.quantity}
                         </span>
                         <QtyButton
                           ariaLabel="Aumentar cantidad"
@@ -310,7 +310,7 @@ export default function Carrito() {
             <div className="flex justify-between mb-3">
               <span className="text-gray-600">Productos</span>
               <span className="font-black text-gray-900">
-                {items.reduce((acc, i) => acc + i.cantidad, 0)}
+                {items.reduce((acc, i) => acc + i.quantity, 0)}
               </span>
             </div>
             <div className="flex justify-between mb-3">

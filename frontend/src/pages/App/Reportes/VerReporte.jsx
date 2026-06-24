@@ -11,9 +11,9 @@ export default function VerReporte() {
   const [imagen, setImagen] = useState(null);
   const [sending, setSending] = useState(false);
 
-  const isFinalizado = (reporte?.estado || '').toLowerCase() === 'finalizado';
+  const isFinalizado = (reporte?.status || '').toLowerCase() === 'finalizado';
 
-  const load = () => appService.reportes.retrieve(id).then(setReporte);
+  const load = () => appService.bugReports.retrieve(id).then(setReporte);
 
   useEffect(() => {
     load();
@@ -25,9 +25,9 @@ export default function VerReporte() {
     setSending(true);
     try {
       const fd = new FormData();
-      if (mensaje) fd.append('mensaje', mensaje);
+      if (mensaje) fd.append('message', mensaje);
       if (imagen) fd.append('imagen', imagen);
-      await appService.reportes.addFollowUp(id, fd);
+      await appService.bugReports.addFollowUp(id, fd);
       setMensaje('');
       setImagen(null);
       await load();
@@ -79,20 +79,20 @@ export default function VerReporte() {
               {/* Estado actual */}
               <div className="mb-4 mt-2">
                 <span className="text-sm font-semibold text-gray-700">Estado actual: </span>
-                <StatusBadge estado={reporte.estado} />
+                <StatusBadge estado={reporte.status} />
               </div>
               <div className="mb-6">
                 <div className="text-sm text-gray-600 p-4 bg-gray-50 rounded-lg">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
                       <span className="font-semibold">Fecha:</span>{' '}
-                      {new Date(reporte.fecha_creacion).toLocaleString('es-ES', {
+                      {new Date(reporte.createdAt).toLocaleString('es-ES', {
                         dateStyle: 'short',
                         timeStyle: 'short',
                       })}
                     </div>
                     <div>
-                      <span className="font-semibold">Categoría:</span> {reporte.categoria}
+                      <span className="font-semibold">Categoría:</span> {reporte.category}
                     </div>
                     <div>
                       <span className="font-semibold">Sección:</span> {reporte.seccion}
@@ -102,35 +102,35 @@ export default function VerReporte() {
               </div>
 
               {/* Descripción */}
-              {reporte.descripcion && (
+              {reporte.description && (
                 <div className="mb-6">
                   <h3 className="font-semibold text-gray-700 mb-2">Descripción</h3>
                   <div className="p-4 bg-gray-50 rounded-lg whitespace-pre-wrap">
-                    {reporte.descripcion}
+                    {reporte.description}
                   </div>
                 </div>
               )}
 
               {/* Multimedia */}
               <div className="space-y-4">
-                {reporte.imagen_url && (
+                {reporte.imageUrl && (
                   <div>
                     <h3 className="font-semibold text-gray-700 mb-2">Imagen adjunta</h3>
                     <div className="flex justify-center">
                       <img
-                        src={resolveImageUrl(reporte.imagen_url)}
+                        src={resolveImageUrl(reporte.imageUrl)}
                         alt="captura del reporte"
                         className="max-w-[100px] max-h-[100px] rounded-lg border border-gray-200"
                       />
                     </div>
                   </div>
                 )}
-                {reporte.video_url && (
+                {reporte.videoUrl && (
                   <div>
                     <h3 className="font-semibold text-gray-700 mb-2">Video adjunto</h3>
                     <div className="flex justify-center">
                       <video
-                        src={resolveImageUrl(reporte.video_url)}
+                        src={resolveImageUrl(reporte.videoUrl)}
                         controls
                         className="max-w-full rounded-lg border border-gray-200"
                       />
@@ -186,26 +186,26 @@ export default function VerReporte() {
                           >
                             {isSupport
                               ? 'Soporte'
-                              : `${reporte.usuario_nombre} ${reporte.usuario_apellido}`}
+                              : `${reporte.userName} ${reporte.userLastName}`}
                           </span>
                           <span className="text-xs text-gray-500">
-                            {new Date(followup.fecha_creacion).toLocaleString('es-ES', {
+                            {new Date(followup.createdAt).toLocaleString('es-ES', {
                               dateStyle: 'short',
                               timeStyle: 'short',
                             })}
                           </span>
                         </div>
-                        {followup.mensaje && (
+                        {followup.message && (
                           <div
                             className={`text-gray-800 whitespace-pre-wrap 
                           ${isSupport ? 'text-start' : 'text-end'}`}
                           >
-                            {followup.mensaje}
+                            {followup.message}
                           </div>
                         )}
-                        {followup.imagen_url && (
+                        {followup.imageUrl && (
                           <img
-                            src={resolveImageUrl(followup.imagen_url)}
+                            src={resolveImageUrl(followup.imageUrl)}
                             alt="adjunto del mensaje"
                             className="max-w-[200px] max-h-[200px] object-contain mt-2 rounded-lg border border-gray-200"
                           />

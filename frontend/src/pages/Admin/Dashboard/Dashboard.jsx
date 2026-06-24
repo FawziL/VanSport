@@ -20,7 +20,7 @@ export default function Dashboard() {
   const [bcv, setBcv] = useState(null);
 
   useEffect(() => {
-    appService.utils
+    appService.exchangeRate
       .dolarBcvHoy()
       .then(setBcv)
       .catch(() => setBcv(null));
@@ -28,11 +28,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     let alive = true;
-    adminService.transacciones
+    adminService.transactions
       .list()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
-        const cnt = arr.filter((t) => String(t.estado || '').toLowerCase() === 'pendiente').length;
+        const cnt = arr.filter((t) => String(t.status || '').toLowerCase() === 'pendiente').length;
         if (alive) setPendingCount(cnt);
       })
       .catch(() => {
@@ -46,9 +46,9 @@ export default function Dashboard() {
   useEffect(() => {
     let alive = true;
     Promise.all([
-      adminService.productos.list(),
-      adminService.pedidos.list(),
-      adminService.usuarios.list(),
+      adminService.products.list(),
+      adminService.orders.list(),
+      adminService.users.list(),
     ])
       .then(([prodData, pedData, usrData]) => {
         if (!alive) return;
@@ -57,7 +57,7 @@ export default function Dashboard() {
         const pedidos = Array.isArray(pedData) ? pedData : pedData.results || [];
         const usuarios = Array.isArray(usrData) ? usrData : usrData.results || [];
 
-        const prodIds = new Set(prods.map((p) => p.producto_id ?? p.id ?? JSON.stringify(p)));
+        const prodIds = new Set(prods.map((p) => p.productId ?? p.id ?? JSON.stringify(p)));
         const productos = prodIds.size;
 
         const now = new Date();
@@ -84,7 +84,7 @@ export default function Dashboard() {
 
         const usuariosTotal = usuarios.length;
         const usuariosMes = usuarios.filter((u) => {
-          const d = parseDate(u.fecha_registro || u.created_at || u.fecha_creacion);
+          const d = parseDate(u.registeredAt || u.created_at || u.createdAt);
           return d && d.getFullYear() === y && d.getMonth() === m;
         }).length;
 
@@ -106,7 +106,7 @@ export default function Dashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-600">
-            Bienvenido{user?.nombre ? `, ${user.nombre} ${user.apellido}` : ''}
+            Bienvenido{user?.name ? `, ${user.name} ${user.lastName}` : ''}
           </h1>
           <div className="text-gray-600 mt-1">
             Gestiona tu tienda desde el panel de administración.

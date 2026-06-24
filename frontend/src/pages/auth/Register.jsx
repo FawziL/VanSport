@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { authService } from '@/services/routes';
 import { useNavigate } from 'react-router-dom';
-import './Auth.css'; // Archivo CSS adicional para estilos más complejos
+import './Auth.css';
 
 function Register() {
   const { login } = useAuth();
@@ -12,9 +12,9 @@ function Register() {
     email: '',
     password: '',
     confirmPassword: '',
-    nombre: '',
-    apellido: '',
-    telefono: '',
+    name: '',
+    lastName: '',
+    phone: '',
   });
 
   const [error, setError] = useState('');
@@ -31,7 +31,7 @@ function Register() {
     setError('');
     setSuccess(false);
 
-    const { email, password, confirmPassword, nombre, apellido, telefono } = form;
+    const { email, password, confirmPassword, name, lastName, phone } = form;
 
     if (password.length < 8) {
       setError('La contraseña debe tener al menos 8 caracteres.');
@@ -42,13 +42,12 @@ function Register() {
       return;
     }
 
-    const payload = { email, password, nombre, apellido, telefono };
+    const payload = { email, password, name, lastName, phone };
 
     try {
       setSubmitting(true);
-      await authService.register(payload);
-      const loginData = await authService.login(email, password);
-      login(loginData.user, loginData.access);
+      await authService.signUp(payload);
+      await login(email, password);
       setSuccess(true);
       navigate('/');
     } catch (err) {
@@ -83,25 +82,25 @@ function Register() {
             <h3 className="section-title">Información Personal</h3>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="nombre">Nombre</label>
+                <label htmlFor="name">Nombre</label>
                 <input
                   type="text"
-                  id="nombre"
-                  name="nombre"
+                  id="name"
+                  name="name"
                   placeholder="Tu nombre"
-                  value={form.nombre}
+                  value={form.name}
                   onChange={handleChange}
                   required
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="apellido">Apellido</label>
+                <label htmlFor="lastName">Apellido</label>
                 <input
                   type="text"
-                  id="apellido"
-                  name="apellido"
+                  id="lastName"
+                  name="lastName"
                   placeholder="Tu apellido"
-                  value={form.apellido}
+                  value={form.lastName}
                   onChange={handleChange}
                   required
                 />
@@ -122,13 +121,13 @@ function Register() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="telefono">Teléfono</label>
+              <label htmlFor="phone">Teléfono</label>
               <input
                 type="tel"
-                id="telefono"
-                name="telefono"
+                id="phone"
+                name="phone"
                 placeholder="+34 123 456 789"
-                value={form.telefono}
+                value={form.phone}
                 onChange={handleChange}
               />
             </div>

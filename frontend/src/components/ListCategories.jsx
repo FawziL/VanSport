@@ -27,7 +27,7 @@ export default function ListCategories({
       setLoading(true);
       setError(null);
       try {
-        const res = await appService.categorias.list(params);
+        const res = await appService.categories.list(params);
         const items = Array.isArray(res) ? res : Array.isArray(res?.results) ? res.results : [];
         if (!ignore) setData(items);
       } catch (err) {
@@ -46,11 +46,11 @@ export default function ListCategories({
   const labelGetter = useMemo(
     () =>
       getOptionLabel ||
-      ((item) => item?.nombre ?? item?.name ?? item?.titulo ?? item?.title ?? `#${item?.id}`),
+      ((item) => item?.name ?? item?.name ?? item?.titulo ?? item?.title ?? `#${item?.id}`),
     [getOptionLabel]
   );
   const valueGetter = useMemo(
-    () => getOptionValue || ((item) => String(item?.categoria_id ?? item?.id ?? item?.pk ?? '')),
+    () => getOptionValue || ((item) => String(item?.categoryId ?? item?.id ?? item?.pk ?? '')),
     [getOptionValue]
   );
 
