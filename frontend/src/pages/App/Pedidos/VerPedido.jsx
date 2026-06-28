@@ -76,7 +76,7 @@ export default function VerPedido() {
 
     // NUEVO: cargar métodos de pago públicos (para este pedido)
     appService.paymentMethods
-      ?.listarPublicos()
+      .listPublic()
       .then((arr) => {
         const list = Array.isArray(arr) ? arr : arr?.results || [];
         if (alive) {
@@ -102,7 +102,7 @@ export default function VerPedido() {
 
   // NUEVO: referencia requerida solo si el método lo pide (por convención en config o por tipo)
   const requiereReferencia = !!(
-    metodoSel?.config?.requiere_referencia || metodoSel?.type === 'pago_movil'
+    metodoSel?.config?.requiere_referencia || metodoSel?.type === 'pago_movil' || metodoSel?.type === 'pago movil'
   );
   const canPay =
     mostrarFormulario &&
@@ -313,17 +313,17 @@ export default function VerPedido() {
                     <div className="space-y-3">
                       {metodos.map((m) => (
                         <label
-                          key={m.codigo}
+                          key={m.code}
                           className="flex gap-3 p-3 border border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors"
                         >
                           <input
                             type="radio"
                             name="paymentMethod"
-                            value={m.codigo}
-                            checked={metodoSel?.codigo === m.codigo}
+                            value={m.code}
+                            checked={metodoSel?.code === m.code}
                             onChange={() => {
                               setMetodoSel(m);
-                              setMetodoPago(m.codigo);
+                              setMetodoPago(m.code);
                             }}
                             className="text-blue-600 focus:ring-blue-500 mt-1"
                           />
@@ -332,9 +332,9 @@ export default function VerPedido() {
                               {m.name}{' '}
                               <span className="text-gray-600 font-normal">({m.description})</span>
                             </div>
-                            {m.instrucciones && (
+                            {m.instructions && (
                               <div className="text-gray-600 text-sm mt-1 whitespace-pre-wrap">
-                                {m.instrucciones}
+                                {m.instructions}
                               </div>
                             )}
                           </div>

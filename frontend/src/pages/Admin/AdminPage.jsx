@@ -4,13 +4,16 @@ import { useAuth } from '@/context/AuthContext';
 import AdminSidebar from '@/components/AdminSidebar';
 
 export default function AdminPage({ children }) {
-  const { user } = useAuth();
+  const { user, initialLoading } = useAuth();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
+    if (initialLoading) return;
     if (!user || !user.isStaff) navigate('/');
-  }, [user, navigate]);
+  }, [user, navigate, initialLoading]);
+
+  if (initialLoading) return null;
 
   return (
     <div

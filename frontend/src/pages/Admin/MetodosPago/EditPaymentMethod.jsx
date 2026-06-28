@@ -14,17 +14,17 @@ export default function EditPaymentMethod() {
     setLoading(true);
     setError('');
     adminService.paymentMethodsAdmin
-      .get(id)
+      .retrieve(id)
       .then((data) => {
         setForm({
-          codigo: data.codigo || '',
+          codigo: data.code || '',
           nombre: data.name || '',
           tipo: data.type || '',
           activo: !!data.isActive,
-          orden: data.orden ?? 0,
+          orden: data.sortOrder ?? 0,
           descripcion: data.description || '',
-          instrucciones: data.instrucciones || '',
-          icono: data.icono || '',
+          instrucciones: data.instructions || '',
+          icono: data.icon || '',
           config: JSON.stringify(data.config ?? {}, null, 2),
         });
       })
@@ -48,14 +48,14 @@ export default function EditPaymentMethod() {
     try {
       setSaving(true);
       await adminService.paymentMethodsAdmin.partialUpdate(id, {
-        codigo: form.codigo.trim(),
-        nombre: form.name.trim(),
-        tipo: form.type.trim(),
-        activo: !!form.isActive,
-        orden: Number(form.orden) || 0,
-        descripcion: form.description || '',
-        instrucciones: form.instrucciones || '',
-        icono: form.icono || '',
+        code: form.codigo.trim(),
+        name: form.nombre.trim(),
+        type: form.tipo.trim(),
+        isActive: !!form.activo,
+        sortOrder: Number(form.orden) || 0,
+        description: form.descripcion || '',
+        instructions: form.instrucciones || '',
+        icon: form.icono || '',
         config: cfg,
       });
       navigate('/admin/metodos-pago');
@@ -143,7 +143,7 @@ export default function EditPaymentMethod() {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre</label>
             <input
-              value={form.name}
+              value={form.nombre}
               onChange={(e) => onChange('nombre', e.target.value)}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
             />
@@ -152,7 +152,7 @@ export default function EditPaymentMethod() {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Tipo</label>
             <input
-              value={form.type}
+              value={form.tipo}
               onChange={(e) => onChange('tipo', e.target.value)}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
             />
@@ -172,7 +172,7 @@ export default function EditPaymentMethod() {
             <input
               id="activo"
               type="checkbox"
-              checked={form.isActive}
+              checked={form.activo}
               onChange={(e) => onChange('activo', e.target.checked)}
               className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-300"
             />
@@ -184,7 +184,7 @@ export default function EditPaymentMethod() {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
             <textarea
-              value={form.description}
+              value={form.descripcion}
               onChange={(e) => onChange('descripcion', e.target.value)}
               rows={2}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"

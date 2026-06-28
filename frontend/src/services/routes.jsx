@@ -47,8 +47,14 @@ export const appService = {
   },
   reviews: {
     list: (params) => http.get('/reviews', { params }),
+    listAdmin: (params) => http.get('/reviews/admin', { params }),
     retrieve: (id) => http.get(`/reviews/${id}`),
     create: (data) => http.post('/reviews', data),
+    update: (id, data) => http.put(`/reviews/${id}`, data),
+    partialUpdate: (id, data) => http.patch(`/reviews/${id}`, data),
+    remove: (id) => http.delete(`/reviews/${id}`),
+    updateAdmin: (id, data) => http.put(`/reviews/admin/${id}`, data),
+    removeAdmin: (id) => http.delete(`/reviews/admin/${id}`),
   },
   notifications: {
     list: (params) => http.get('/notifications', { params }),
@@ -94,6 +100,7 @@ export const appService = {
   users: {
     list: (params) => http.get('/users', { params }),
     retrieve: (id) => http.get(`/users/${id}`),
+    create: (data) => http.post('/users', data),
     update: (id, data) => http.put(`/users/${id}`, data),
     partialUpdate: (id, data) => http.patch(`/users/${id}`, data),
     remove: (id) => http.delete(`/users/${id}`),

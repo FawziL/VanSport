@@ -39,7 +39,11 @@ export class NotificationsService {
 
   async create(dto: CreateNotificationDto) {
     const values: any = { ...dto };
-    if (dto.expiresAt) values.expiresAt = new Date(dto.expiresAt);
+    if (dto.expiresAt) {
+      values.expiresAt = new Date(dto.expiresAt);
+    } else {
+      delete values.expiresAt;
+    }
     const result = await this.db.insert(notifications).values(values).returning();
     return result[0];
   }

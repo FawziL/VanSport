@@ -25,10 +25,10 @@ export default function EditNotification() {
       .then((data) => {
         if (!active) return;
         setForm({
-          titulo: data.titulo || '',
-          mensaje: data.message || '',
-          tipo: data.type || 'banner',
-          expira: toDatetimeLocalValue(data.expira || ''),
+          title: data.title || '',
+          message: data.message || '',
+          type: data.type || 'banner',
+          expiresAt: toDatetimeLocalValue(data.expiresAt || ''),
         });
       })
       .catch(() => setError('No se pudo cargar la notificación'))
@@ -45,14 +45,14 @@ export default function EditNotification() {
     e.preventDefault();
     setError('');
     try {
-      const payload = { titulo: form.titulo, mensaje: form.message, tipo: form.type };
-      if (form.expira) {
-        const d = new Date(form.expira);
+      const payload = { title: form.title, message: form.message, type: form.type };
+      if (form.expiresAt) {
+        const d = new Date(form.expiresAt);
         if (!isNaN(d.getTime())) {
-          payload.expira = d.toISOString();
+          payload.expiresAt = d.toISOString();
         }
       } else {
-        payload.expira = null; // permitir limpiar la expiración
+        delete payload.expiresAt;
       }
       await adminService.notifications.partialUpdate(id, payload);
       navigate('/admin/notificaciones');
@@ -66,12 +66,12 @@ export default function EditNotification() {
     }
   };
 
-  if (loading)
+  if (loading || !form)
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando notificación...</p>
+          <p className="mt-4 text-gray-600">{loading ? 'Cargando notificación...' : error || 'Error al cargar la notificación'}</p>
         </div>
       </div>
     );
@@ -195,8 +195,8 @@ export default function EditNotification() {
               Título *
             </label>
             <input
-              name="titulo"
-              value={form.titulo}
+              name="title"
+              value={form.title}
               onChange={onChange}
               required
               style={{
@@ -230,7 +230,7 @@ export default function EditNotification() {
               Mensaje
             </label>
             <textarea
-              name="mensaje"
+              name="message"
               value={form.message}
               onChange={onChange}
               rows={4}
@@ -268,7 +268,7 @@ export default function EditNotification() {
               Tipo
             </label>
             <select
-              name="tipo"
+              name="type"
               value={form.type}
               onChange={onChange}
               style={{
@@ -326,8 +326,8 @@ export default function EditNotification() {
                 </label>
                 <input
                   type="datetime-local"
-                  name="expira"
-                  value={form.expira || ''}
+                  name="expiresAt"
+                  value={form.expiresAt || ''}
                   onChange={onChange}
                   style={{
                     padding: '12px 14px',
@@ -366,7 +366,7 @@ export default function EditNotification() {
                     const d = new Date(Date.now() + 2 * 60 * 60 * 1000);
                     const pad = (n) => n.toString().padStart(2, '0');
                     const val = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-                    setForm((f) => ({ ...f, expira: val }));
+                    setForm((f) => ({ ...f, expiresAt: val }));
                   }}
                   style={{
                     padding: '0.5rem 1rem',
@@ -390,7 +390,7 @@ export default function EditNotification() {
                     const d = new Date(Date.now() + 24 * 60 * 60 * 1000);
                     const pad = (n) => n.toString().padStart(2, '0');
                     const val = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-                    setForm((f) => ({ ...f, expira: val }));
+                    setForm((f) => ({ ...f, expiresAt: val }));
                   }}
                   style={{
                     padding: '0.5rem 1rem',
@@ -410,7 +410,7 @@ export default function EditNotification() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setForm((f) => ({ ...f, expira: '' }))}
+                  onClick={() => setForm((f) => ({ ...f, expiresAt: '' }))}
                   style={{
                     padding: '0.5rem 1rem',
                     borderRadius: '6px',

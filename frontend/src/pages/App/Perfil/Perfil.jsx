@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '@/services/routes';
 import { http } from '@/config/api';
+import PhoneInput from '@/components/PhoneInput';
 
 export default function Perfil() {
   const navigate = useNavigate();
@@ -16,9 +17,11 @@ export default function Perfil() {
     email: '',
     name: '',
     lastName: '',
-    phone: '',
     isStaff: false,
   });
+
+  const [initialPhone, setInitialPhone] = useState('');
+  const phoneRef = useRef();
 
   // Guard simple: si no hay sesión, a login
   useEffect(() => {
@@ -47,9 +50,9 @@ export default function Perfil() {
           email: data.email ?? '',
           name: data.name ?? '',
           lastName: data.lastName ?? '',
-          phone: data.phone ?? '',
-          isStaff: !!data.isStaff,
+          isStaff: data.isStaff ?? false,
         });
+        setInitialPhone(data.phone || '');
       } catch (err) {
         if (!alive) return;
         const backend = err?.response?.data;
@@ -95,15 +98,15 @@ export default function Perfil() {
       const payload = {
         name: form.name ?? '',
         lastName: form.lastName ?? '',
-        phone: form.phone ?? '',
+        phone: phoneRef.current?.getValue() || '',
       };
       const updated = await authService.updateProfile(payload);
       setForm((f) => ({
         ...f,
         name: updated.name ?? f.name,
         lastName: updated.lastName ?? f.lastName,
-        phone: updated.phone ?? f.phone,
       }));
+      setInitialPhone(updated.phone || '');
       setSuccess('Perfil actualizado correctamente.');
     } catch (err) {
       const backend = err?.response?.data;
@@ -229,14 +232,7 @@ export default function Perfil() {
 
         <div className="form-group">
           <label className="form-label">Teléfono</label>
-            <input
-              name="phone"
-              type="tel"
-              placeholder="Tu teléfono"
-              value={form.phone}
-            onChange={handleChange}
-            className="form-input"
-          />
+          <PhoneInput ref={phoneRef} initialValue={initialPhone} />
         </div>
 
         <div className="form-actions">

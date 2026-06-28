@@ -109,11 +109,9 @@ export default function ListReportes() {
         >
           {itemsPage.map((report) => (
             <TableRow key={report.id}>
-              <TableCell className="font-medium">{report.titulo}</TableCell>
+              <TableCell className="font-medium">{report.title}</TableCell>
               <TableCell>
-                {report.userName} {report.userLastName}
-                <br />
-                <span className="text-sm text-gray-500">({report.usuario_email})</span>
+                {report.userId}
               </TableCell>
               <TableCell>
                 <StatusBadge estado={report.status} />

@@ -73,7 +73,7 @@ export default function MisReportes() {
         >
           {items.map((r) => (
             <TableRow key={r.id}>
-              <TableCell className="font-medium">{r.titulo}</TableCell>
+              <TableCell className="font-medium">{r.title}</TableCell>
               <TableCell>
                 <StatusBadge estado={r.status} />
               </TableCell>

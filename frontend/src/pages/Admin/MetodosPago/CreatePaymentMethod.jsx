@@ -33,14 +33,14 @@ export default function CreatePaymentMethod() {
     try {
       setSaving(true);
       await adminService.paymentMethodsAdmin.create({
-        codigo: form.codigo.trim(),
-        nombre: form.name.trim(),
-        tipo: form.type.trim(),
-        activo: !!form.isActive,
-        orden: Number(form.orden) || 0,
-        descripcion: form.description || '',
-        instrucciones: form.instrucciones || '',
-        icono: form.icono || '',
+        code: form.codigo.trim(),
+        name: form.nombre.trim(),
+        type: form.tipo.trim(),
+        isActive: !!form.activo,
+        sortOrder: Number(form.orden) || 0,
+        description: form.descripcion || '',
+        instructions: form.instrucciones || '',
+        icon: form.icono || '',
         config: cfg,
       });
       navigate('/admin/metodos-pago');
@@ -76,7 +76,7 @@ export default function CreatePaymentMethod() {
         <div>
           <label>Nombre</label>
           <input
-            value={form.name}
+            value={form.nombre}
             onChange={(e) => onChange('nombre', e.target.value)}
             className="input"
           />
@@ -84,7 +84,7 @@ export default function CreatePaymentMethod() {
         <div>
           <label>Tipo</label>
           <input
-            value={form.type}
+            value={form.tipo}
             onChange={(e) => onChange('tipo', e.target.value)}
             className="input"
             placeholder="paypal | pago_movil | efectivo | ..."
@@ -103,14 +103,14 @@ export default function CreatePaymentMethod() {
           <label>Activo</label>
           <input
             type="checkbox"
-            checked={form.isActive}
+            checked={form.activo}
             onChange={(e) => onChange('activo', e.target.checked)}
           />
         </div>
         <div>
           <label>Descripción</label>
           <textarea
-            value={form.description}
+            value={form.descripcion}
             onChange={(e) => onChange('descripcion', e.target.value)}
             rows={2}
             className="input"

@@ -48,14 +48,14 @@ export default function ListPaymentMethods() {
       setTogglingId(m.id);
 
       // Actualización optimista
-      setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, activo: !m.isActive } : it)));
+      setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, isActive: !m.isActive } : it)));
 
-      await adminService.paymentMethodsAdmin.partialUpdate(m.id, { activo: !m.isActive });
+      await adminService.paymentMethodsAdmin.partialUpdate(m.id, { isActive: !m.isActive });
 
       toast.success(`Método de pago ${!m.isActive ? 'activado' : 'desactivado'} correctamente`);
     } catch (err) {
       // Revertir cambio en caso de error
-      setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, activo: m.isActive } : it)));
+      setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, isActive: m.isActive } : it)));
 
       const msg = err?.response?.data?.detail || 'No se pudo actualizar el estado';
       setError(msg);
@@ -140,10 +140,10 @@ export default function ListPaymentMethods() {
           {pageItems.map((m) => (
             <TableRow key={m.id}>
               <TableCell>{m.id}</TableCell>
-              <TableCell>{m.codigo}</TableCell>
+              <TableCell>{m.code}</TableCell>
               <TableCell>{m.name}</TableCell>
               <TableCell>{m.type}</TableCell>
-              <TableCell>{m.orden}</TableCell>
+              <TableCell>{m.sortOrder}</TableCell>
               <TableCell align="center">
                 <button
                   onClick={() => toggleActivo(m)}
@@ -158,8 +158,8 @@ export default function ListPaymentMethods() {
                 </button>
               </TableCell>
               <TableCell>
-                {m.actualizado
-                  ? new Date(m.actualizado).toLocaleString('es-ES', {
+                {m.updatedAt
+                  ? new Date(m.updatedAt).toLocaleString('es-ES', {
                       dateStyle: 'short',
                       timeStyle: 'short',
                     })

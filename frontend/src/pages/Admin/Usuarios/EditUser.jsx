@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { adminService } from '@/services/routes';
+import PhoneInput from '@/components/PhoneInput';
 
 export default function EditUser() {
   const { id } = useParams();
   const [form, setForm] = useState(null);
+  const [initialPhone, setInitialPhone] = useState('');
+  const phoneRef = useRef();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -20,11 +23,11 @@ export default function EditUser() {
           name: data.name || '',
           lastName: data.lastName || '',
           email: data.email || '',
-          phone: data.phone || '',
           address: data.address || '',
           isActive: !!data.isActive,
           isStaff: !!data.isStaff,
         });
+        setInitialPhone(data.phone || '');
       })
       .catch(() => setError('No se pudo cargar el usuario'))
       .finally(() => active && setLoading(false));
@@ -40,7 +43,7 @@ export default function EditUser() {
     e.preventDefault();
     setError('');
     try {
-      await adminService.users.partialUpdate(id, form);
+      await adminService.users.partialUpdate(id, { ...form, phone: phoneRef.current?.getValue() || '' });
       navigate('/admin/usuarios');
     } catch (err) {
       setError(err?.detail || 'No se pudo actualizar el usuario');
@@ -177,7 +180,7 @@ export default function EditUser() {
                 Nombre
               </label>
               <input
-                name="nombre"
+                name="name"
                 value={form.name}
                 onChange={onChange}
                 required
@@ -211,7 +214,7 @@ export default function EditUser() {
                 Apellido
               </label>
               <input
-                name="apellido"
+                name="lastName"
                 value={form.lastName}
                 onChange={onChange}
                 required
@@ -283,27 +286,7 @@ export default function EditUser() {
               >
                 Teléfono
               </label>
-              <input
-                name="telefono"
-                value={form.phone}
-                onChange={onChange}
-                style={{
-                  padding: '12px 14px',
-                  borderRadius: '8px',
-                  border: '1px solid #ddd',
-                  fontSize: '16px',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                  outline: 'none',
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#1e88e5';
-                  e.target.style.boxShadow = '0 0 0 2px rgba(30, 136, 229, 0.2)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#ddd';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
+              <PhoneInput ref={phoneRef} initialValue={initialPhone} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <label
@@ -317,7 +300,7 @@ export default function EditUser() {
                 Dirección
               </label>
               <input
-                name="direccion"
+                name="address"
                 value={form.address}
                 onChange={onChange}
                 style={{

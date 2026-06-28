@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { adminService } from '@/services/routes';
 
 export default function CreateNotification() {
-  const [form, setForm] = useState({ titulo: '', mensaje: '', tipo: 'banner', expira: '' }); // expira opcional
+  const [form, setForm] = useState({ title: '', message: '', type: 'banner', expiresAt: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -19,13 +19,14 @@ export default function CreateNotification() {
     setLoading(true);
     try {
       const payload = { ...form };
-      // Solo enviar expira si hay valor
-      if (payload.expira) {
-        const d = new Date(payload.expira); // viene de <input type="datetime-local">
+      if (!payload.expiresAt) {
+        delete payload.expiresAt;
+      } else {
+        const d = new Date(payload.expiresAt);
         if (!isNaN(d.getTime())) {
-          payload.expira = d.toISOString(); // enviar ISO 8601
+          payload.expiresAt = d.toISOString();
         } else {
-          delete payload.expira;
+          delete payload.expiresAt;
         }
       }
       await adminService.notifications.create(payload);
@@ -164,8 +165,8 @@ export default function CreateNotification() {
               Título *
             </label>
             <input
-              name="titulo"
-              value={form.titulo}
+              name="title"
+              value={form.title}
               onChange={onChange}
               required
               style={{
@@ -200,7 +201,7 @@ export default function CreateNotification() {
               Mensaje *
             </label>
             <textarea
-              name="mensaje"
+              name="message"
               value={form.message}
               onChange={onChange}
               rows={4}
@@ -240,7 +241,7 @@ export default function CreateNotification() {
               Tipo de notificación
             </label>
             <select
-              name="tipo"
+              name="type"
               value={form.type}
               onChange={onChange}
               style={{
@@ -296,10 +297,10 @@ export default function CreateNotification() {
                 >
                   Fecha de expiración (opcional)
                 </label>
-                <input
-                  type="datetime-local"
-                  name="expira"
-                  value={form.expira || ''}
+                  <input
+                    type="datetime-local"
+                    name="expiresAt"
+                    value={form.expiresAt || ''}
                   onChange={onChange}
                   style={{
                     padding: '12px 14px',
@@ -339,7 +340,7 @@ export default function CreateNotification() {
                     const d = new Date(Date.now() + 2 * 60 * 60 * 1000); // +2 horas
                     const pad = (n) => n.toString().padStart(2, '0');
                     const val = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-                    setForm((f) => ({ ...f, expira: val }));
+                    setForm((f) => ({ ...f, expiresAt: val }));
                   }}
                   style={{
                     padding: '0.5rem 1rem',
@@ -363,7 +364,7 @@ export default function CreateNotification() {
                     const d = new Date(Date.now() + 24 * 60 * 60 * 1000); // +1 día
                     const pad = (n) => n.toString().padStart(2, '0');
                     const val = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-                    setForm((f) => ({ ...f, expira: val }));
+                    setForm((f) => ({ ...f, expiresAt: val }));
                   }}
                   style={{
                     padding: '0.5rem 1rem',
@@ -383,7 +384,7 @@ export default function CreateNotification() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setForm((f) => ({ ...f, expira: '' }))}
+                  onClick={() => setForm((f) => ({ ...f, expiresAt: '' }))}
                   style={{
                     padding: '0.5rem 1rem',
                     borderRadius: '6px',

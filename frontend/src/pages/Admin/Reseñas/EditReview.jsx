@@ -12,13 +12,13 @@ export default function EditReview() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    adminService.reseñas
+    adminService.reviews
       .retrieve(id)
       .then((data) => {
         if (!active) return;
         setForm({
-          calificacion: data.rating ?? 0,
-          comentario: data.comentario || '',
+          rating: data.rating ?? 0,
+          comment: data.comment || '',
         });
       })
       .catch(() => setError('No se pudo cargar la reseña'))
@@ -35,7 +35,7 @@ export default function EditReview() {
     e.preventDefault();
     setError('');
     try {
-      await adminService.reseñas.partialUpdate(id, form);
+      await adminService.reviews.partialUpdate(id, form);
       navigate('/admin/resenas');
     } catch (err) {
       setError(err?.detail || 'No se pudo actualizar la reseña');
@@ -102,7 +102,7 @@ export default function EditReview() {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Calificación *</label>
             <select
-              name="calificacion"
+              name="rating"
               value={form.rating}
               onChange={onChange}
               required
@@ -120,8 +120,8 @@ export default function EditReview() {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Comentario</label>
             <textarea
-              name="comentario"
-              value={form.comentario}
+              name="comment"
+              value={form.comment}
               onChange={onChange}
               rows={4}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"

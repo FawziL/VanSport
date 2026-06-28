@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { authService } from '@/services/routes';
 import { useNavigate } from 'react-router-dom';
+import PhoneInput from '@/components/PhoneInput';
 import './Auth.css';
 
 function Register() {
@@ -14,8 +15,9 @@ function Register() {
     confirmPassword: '',
     name: '',
     lastName: '',
-    phone: '',
   });
+
+  const phoneRef = useRef();
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -31,7 +33,7 @@ function Register() {
     setError('');
     setSuccess(false);
 
-    const { email, password, confirmPassword, name, lastName, phone } = form;
+    const { email, password, confirmPassword, name, lastName } = form;
 
     if (password.length < 8) {
       setError('La contraseña debe tener al menos 8 caracteres.');
@@ -42,6 +44,7 @@ function Register() {
       return;
     }
 
+    const phone = phoneRef.current?.getValue() || '';
     const payload = { email, password, name, lastName, phone };
 
     try {
@@ -122,14 +125,7 @@ function Register() {
 
             <div className="form-group">
               <label htmlFor="phone">Teléfono</label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                placeholder="+34 123 456 789"
-                value={form.phone}
-                onChange={handleChange}
-              />
+              <PhoneInput ref={phoneRef} />
             </div>
           </div>
 

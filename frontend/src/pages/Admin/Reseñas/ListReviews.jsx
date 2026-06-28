@@ -29,8 +29,8 @@ export default function ListReviews() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.reseñas
-      .list()
+    adminService.reviews
+      .listAdmin()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
         setItems(arr);
@@ -77,18 +77,16 @@ export default function ListReviews() {
   const getUserLabel = (r) => {
     const nombre = r.userName || '';
     const apellido = r.userLastName || '';
-    const email = r.usuario_email || '';
     const base = `${nombre} ${apellido}`.trim();
-    const id = r.usuario != null ? r.usuario : r.userId != null ? r.userId : null;
-    const emailPart = email ? ` - ${email}` : '';
-    return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
+    const id = r.userId != null ? r.userId : null;
+    return base || id != null ? `${base}${id != null ? ` (ID ${id})` : ''}` : '-';
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      await adminService.reseñas.remove(deleteId);
-      setItems((prev) => prev.filter((x) => x.resena_id !== deleteId));
+      await adminService.reviews.removeAdmin(deleteId);
+      setItems((prev) => prev.filter((x) => x.id !== deleteId));
       toast.success('Reseña eliminada correctamente');
     } catch (err) {
       const msg = err?.response?.data?.detail || 'No se pudo eliminar la reseña';
@@ -142,12 +140,12 @@ export default function ListReviews() {
           emptyText="No hay reseñas."
         >
           {pageItems.map((r) => (
-            <TableRow key={r.resena_id}>
-              <TableCell className="whitespace-nowrap">{r.resena_id}</TableCell>
-              <TableCell className="break-words">{r.producto ?? '-'}</TableCell>
+            <TableRow key={r.id}>
+              <TableCell className="whitespace-nowrap">{r.id}</TableCell>
+              <TableCell className="break-words">{r.productName ?? '-'}</TableCell>
               <TableCell className="break-words">{getUserLabel(r)}</TableCell>
-              <TableCell className="break-words" title={r.comentario || ''}>
-                {truncateWords(r.comentario, 12)}
+              <TableCell className="break-words" title={r.comment || ''}>
+                {truncateWords(r.comment, 12)}
               </TableCell>
               <TableCell className="whitespace-nowrap">{r.rating}</TableCell>
               <TableCell className="whitespace-nowrap">{fmt.date(r.createdAt)}</TableCell>
@@ -155,14 +153,14 @@ export default function ListReviews() {
                 <div className="flex justify-center gap-2">
                   <ActionButton
                     variant="edit"
-                    onClick={() => navigate(`/admin/resenas/editar/${r.resena_id}`)}
+                    onClick={() => navigate(`/admin/resenas/editar/${r.id}`)}
                   >
                     Editar
                   </ActionButton>
                   <ActionButton
                     variant="delete"
                     onClick={() => {
-                      setDeleteId(r.resena_id);
+                      setDeleteId(r.id);
                       setModalOpen(true);
                     }}
                   >

@@ -13,7 +13,13 @@ export default function VerReporte() {
 
   const isFinalizado = (reporte?.status || '').toLowerCase() === 'finalizado';
 
-  const load = () => appService.bugReports.retrieve(id).then(setReporte);
+  const load = async () => {
+    const [report, followups] = await Promise.all([
+      appService.bugReports.retrieve(id),
+      appService.bugReports.findFollowups(id),
+    ]);
+    setReporte({ ...report, followups });
+  };
 
   useEffect(() => {
     load();
@@ -68,7 +74,7 @@ export default function VerReporte() {
           <div className="space-y-6">
             {/* Tarjeta principal */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4 break-words">{reporte.titulo}</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4 break-words">{reporte.title}</h2>
 
               {/* Estado y metadatos */}
               <div>
@@ -95,7 +101,7 @@ export default function VerReporte() {
                       <span className="font-semibold">Categoría:</span> {reporte.category}
                     </div>
                     <div>
-                      <span className="font-semibold">Sección:</span> {reporte.seccion}
+                      <span className="font-semibold">Sección:</span> {reporte.section}
                     </div>
                   </div>
                 </div>
@@ -165,10 +171,10 @@ export default function VerReporte() {
 
               <div className="space-y-4 max-h-[400px] overflow-y-auto">
                 {(reporte.followups || []).map((followup) => {
-                  const isSupport = followup.autor_tipo === 'soporte';
+                  const isSupport = followup.authorType === 'soporte';
                   return (
                     <div
-                      key={followup.followup_id}
+                      key={followup.id}
                       className={`flex ${isSupport ? 'justify-start' : 'justify-end'}`}
                     >
                       <div

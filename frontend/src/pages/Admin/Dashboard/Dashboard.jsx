@@ -106,7 +106,7 @@ export default function Dashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-600">
-            Bienvenido{user?.name ? `, ${user.name} ${user.lastName}` : ''}
+            Bienvenido{user?.name ? `, ${user.name}${user?.lastName ? ` ${user.lastName}` : ''}` : ''}
           </h1>
           <div className="text-gray-600 mt-1">
             Gestiona tu tienda desde el panel de administración.

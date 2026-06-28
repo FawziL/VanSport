@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminService } from '@/services/routes';
+import PhoneInput from '@/components/PhoneInput';
 
 export default function CreateUser() {
   const [form, setForm] = useState({
@@ -8,11 +9,11 @@ export default function CreateUser() {
     lastName: '',
     email: '',
     password: '',
-    phone: '',
     address: '',
     isActive: true,
     isStaff: false,
   });
+  const phoneRef = useRef();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -27,10 +28,11 @@ export default function CreateUser() {
     setLoading(true);
     setError('');
     try {
-      await adminService.users.create(form);
+      await adminService.users.create({ ...form, phone: phoneRef.current?.getValue() || '' });
       navigate('/admin/usuarios');
     } catch (err) {
-      setError(err?.detail || 'No se pudo crear el usuario');
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.detail || err?.message || 'No se pudo crear el usuario';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -298,27 +300,7 @@ export default function CreateUser() {
               >
                 Teléfono
               </label>
-              <input
-                name="phone"
-                value={form.phone}
-                onChange={onChange}
-                style={{
-                  padding: '12px 14px',
-                  borderRadius: '8px',
-                  border: '1px solid #ddd',
-                  fontSize: '16px',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                  outline: 'none',
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#1e88e5';
-                  e.target.style.boxShadow = '0 0 0 2px rgba(30, 136, 229, 0.2)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#ddd';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
+              <PhoneInput ref={phoneRef} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <label

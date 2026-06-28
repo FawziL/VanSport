@@ -16,17 +16,33 @@ export default function EditReporte() {
   const [finalizing, setFinalizing] = useState(false);
   const [reopening, setReopening] = useState(false);
 
-  const load = () => adminService.bugReports.retrieve(id).then(setItem);
+  const load = async () => {
+    const [report, followups] = await Promise.all([
+      adminService.bugReports.retrieve(id),
+      adminService.bugReports.findFollowups(id),
+    ]);
+    let user = null;
+    try {
+      user = await adminService.users.retrieve(report.userId);
+    } catch {}
+    setItem({ ...report, followups, user });
+  };
 
   useEffect(() => {
     load();
   }, [id]);
 
+  const updateStatus = async (status) => {
+    const fd = new FormData();
+    fd.append('status', status);
+    return adminService.bugReports.partialUpdate(id, fd);
+  };
+
   const onFinalize = async () => {
     if (!item || item.status === 'finalizado') return;
     setFinalizing(true);
     try {
-      await adminService.bugReports.patch(id, { estado: 'finalizado' });
+      await updateStatus('finalizado');
       await load();
       toast.success('Reporte finalizado correctamente');
     } catch (err) {
@@ -41,7 +57,7 @@ export default function EditReporte() {
     if (!item || item.status !== 'finalizado') return;
     setReopening(true);
     try {
-      await adminService.bugReports.patch(id, { estado: 'en_revision' });
+      await updateStatus('en_revision');
       await load();
       toast.success('Reporte reabierto correctamente');
     } catch (err) {
@@ -106,7 +122,7 @@ export default function EditReporte() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-start">
               {/* Header con título y estado */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-                <h2 className="text-xl font-bold text-gray-900 break-words">{item.titulo}</h2>
+                <h2 className="text-xl font-bold text-gray-900 break-words">{item.title}</h2>
                 <div className="flex flex-wrap gap-2">
                   {!isCompleted ? (
                     <button
@@ -147,17 +163,16 @@ export default function EditReporte() {
                     {new Date(item.createdAt).toLocaleString('es-ES')}
                   </div>
                   <div>
-                    <span className="font-semibold">Usuario:</span> {item.userName}{' '}
-                    {item.userLastName}
+                    <span className="font-semibold">Usuario:</span> {item.user?.name} {item.user?.lastName || ''}
                   </div>
                   <div>
-                    <span className="font-semibold">Email:</span> {item.usuario_email}
+                    <span className="font-semibold">Email:</span> {item.user?.email}
                   </div>
                   <div>
                     <span className="font-semibold">Categoría:</span> {categoriaLabel}
                   </div>
                   <div>
-                    <span className="font-semibold">Sección:</span> {item.seccion}
+                    <span className="font-semibold">Sección:</span> {item.section}
                   </div>
                 </div>
               </div>
@@ -225,10 +240,10 @@ export default function EditReporte() {
 
               <div className="space-y-4 max-h-[400px] overflow-y-auto">
                 {(item.followups || []).map((m) => {
-                  const isSupport = m.autor_tipo === 'soporte';
+                  const isSupport = m.authorType === 'soporte';
                   return (
                     <div
-                      key={m.followup_id}
+                      key={m.id}
                       className={`flex ${isSupport ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
@@ -244,9 +259,7 @@ export default function EditReporte() {
                               isSupport ? 'text-blue-700' : 'text-gray-700'
                             }`}
                           >
-                            {isSupport
-                              ? 'Soporte'
-                              : `${item.userName} ${item.userLastName}`}
+                            {isSupport ? 'Soporte' : 'Usuario'}
                           </span>
                           <span className="text-xs text-gray-500">
                             {new Date(m.createdAt).toLocaleString('es-ES', {

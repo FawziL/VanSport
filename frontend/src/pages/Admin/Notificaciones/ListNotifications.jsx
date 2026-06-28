@@ -81,7 +81,7 @@ export default function ListNotifications() {
     if (!deleteId) return;
     try {
       await adminService.notifications.remove(deleteId);
-      setItems((prev) => prev.filter((x) => x.notificacion_id !== deleteId));
+      setItems((prev) => prev.filter((x) => x.id !== deleteId));
       toast.success('Notificación eliminada correctamente');
     } catch (err) {
       const msg = err?.response?.data?.detail || 'No se pudo eliminar la notificación';
@@ -141,25 +141,25 @@ export default function ListNotifications() {
           emptyText="No hay notificaciones."
         >
           {pageItems.map((n) => (
-            <TableRow key={n.notificacion_id}>
-              <TableCell className="whitespace-nowrap">{n.notificacion_id}</TableCell>
+            <TableRow key={n.id}>
+              <TableCell className="whitespace-nowrap">{n.id}</TableCell>
               {/*<TableCell className="break-words">{getUserLabel(n)}</TableCell>*/}
-              <TableCell className="break-words">{n.titulo}</TableCell>
+              <TableCell className="break-words">{n.title}</TableCell>
               <TableCell className="break-words">{n.type}</TableCell>
               <TableCell className="whitespace-nowrap">{fmt.date(n.createdAt)}</TableCell>
-              <TableCell className="whitespace-nowrap">{fmt.date(n.expira)}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.date(n.expiresAt)}</TableCell>
               <TableCell align="center">
                 <div className="flex justify-center gap-2">
                   <ActionButton
                     variant="edit"
-                    onClick={() => navigate(`/admin/notificaciones/editar/${n.notificacion_id}`)}
+                    onClick={() => navigate(`/admin/notificaciones/editar/${n.id}`)}
                   >
                     Editar
                   </ActionButton>
                   <ActionButton
                     variant="delete"
                     onClick={() => {
-                      setDeleteId(n.notificacion_id);
+                      setDeleteId(n.id);
                       setModalOpen(true);
                     }}
                   >

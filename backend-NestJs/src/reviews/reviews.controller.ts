@@ -21,6 +21,14 @@ export class ReviewsController {
     return this.reviewsService.findAll();
   }
 
+  @Get('admin')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'List all reviews (admin, with product/user info)' })
+  findAllAdmin() {
+    return this.reviewsService.findAllAdmin();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get review by ID' })
   findOne(@Param('id', ParseIntPipe) id: number) {
@@ -53,5 +61,29 @@ export class ReviewsController {
   @ApiOperation({ summary: 'Delete a review' })
   remove(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: string) {
     return this.reviewsService.remove(id, userId);
+  }
+
+  @Put('admin/:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Update any review (admin)' })
+  updateAdmin(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateReviewDto) {
+    return this.reviewsService.updateAdmin(id, dto);
+  }
+
+  @Patch('admin/:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Partially update any review (admin)' })
+  partialUpdateAdmin(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateReviewDto) {
+    return this.reviewsService.updateAdmin(id, dto);
+  }
+
+  @Delete('admin/:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Delete any review (admin)' })
+  removeAdmin(@Param('id', ParseIntPipe) id: number) {
+    return this.reviewsService.removeAdmin(id);
   }
 }
