@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
 import { CATEGORIAS_FALLA } from '@/utils/categorias';
 import { resolveImageUrl } from '@/utils/resolveUrl';
@@ -8,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 export default function EditReporte() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const [item, setItem] = useState(null);
   const [nuevoMensaje, setNuevoMensaje] = useState('');
@@ -44,9 +46,9 @@ export default function EditReporte() {
     try {
       await updateStatus('finalizado');
       await load();
-      toast.success('Reporte finalizado correctamente');
+      toast.success(t('editReport.successFinalizar'));
     } catch (err) {
-      const msg = err?.response?.data?.detail || 'No se pudo finalizar el reporte';
+      const msg = err?.response?.data?.detail || t('editReport.errorFinalizar');
       toast.error(msg);
     } finally {
       setFinalizing(false);
@@ -59,9 +61,9 @@ export default function EditReporte() {
     try {
       await updateStatus('en_revision');
       await load();
-      toast.success('Reporte reabierto correctamente');
+      toast.success(t('editReport.successReabrir'));
     } catch (err) {
-      const msg = err?.response?.data?.detail || 'No se pudo reabrir el reporte';
+      const msg = err?.response?.data?.detail || t('editReport.errorReabrir');
       toast.error(msg);
     } finally {
       setReopening(false);
@@ -89,7 +91,7 @@ export default function EditReporte() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando reporte...</p>
+          <p className="mt-4 text-gray-600">{t('editReport.cargando')}</p>
         </div>
       </div>
     );
@@ -104,14 +106,14 @@ export default function EditReporte() {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Reporte de Falla</h1>
-            <p className="text-gray-600 mt-1">Gestión y seguimiento del reporte</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('editReport.titulo')}</h1>
+            <p className="text-gray-600 mt-1">{t('editReport.subtitulo')}</p>
           </div>
           <Link
             to="/admin/reportes"
             className="px-4 py-2 bg-gray-600 text-white! font-bold rounded-lg hover:bg-gray-700 transition-colors no-underline"
           >
-            Volver a Reportes
+            {t('editReport.volver')}
           </Link>
         </div>
 
@@ -130,7 +132,7 @@ export default function EditReporte() {
                       disabled={finalizing}
                       className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {finalizing ? 'Finalizando...' : 'Finalizar'}
+                      {finalizing ? t('editReport.finalizando') : t('editReport.finalizar')}
                     </button>
                   ) : (
                     <button
@@ -138,20 +140,20 @@ export default function EditReporte() {
                       disabled={reopening}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {reopening ? 'Reabriendo...' : 'Reabrir'}
+                      {reopening ? t('editReport.reabriendo') : t('editReport.reabrir')}
                     </button>
                   )}
                 </div>
               </div>
 
               <div>
-                <span className="font-semibold">UUID:</span>{' '}
+                <span className="font-semibold">{t('editReport.uuid')}</span>{' '}
                 <code className="font-mono px-2 py-1 rounded">{item.id}</code>
               </div>
 
               {/* Estado actual */}
               <div className="mb-4 mt-2">
-                <span className="text-sm font-semibold text-gray-700">Estado actual: </span>
+                <span className="text-sm font-semibold text-gray-700">{t('editReport.estadoActual')} </span>
                 <StatusBadge estado={item.status} />
               </div>
 
@@ -159,20 +161,20 @@ export default function EditReporte() {
               <div className="text-sm text-gray-600 mb-6 p-4 bg-gray-50 rounded-lg">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <span className="font-semibold">Fecha:</span>{' '}
+                    <span className="font-semibold">{t('editReport.fecha')}</span>{' '}
                     {new Date(item.createdAt).toLocaleString('es-ES')}
                   </div>
                   <div>
-                    <span className="font-semibold">Usuario:</span> {item.user?.name} {item.user?.lastName || ''}
+                    <span className="font-semibold">{t('editReport.usuario')}</span> {item.user?.name} {item.user?.lastName || ''}
                   </div>
                   <div>
-                    <span className="font-semibold">Email:</span> {item.user?.email}
+                    <span className="font-semibold">{t('editReport.email')}</span> {item.user?.email}
                   </div>
                   <div>
-                    <span className="font-semibold">Categoría:</span> {categoriaLabel}
+                    <span className="font-semibold">{t('editReport.categoria')}</span> {categoriaLabel}
                   </div>
                   <div>
-                    <span className="font-semibold">Sección:</span> {item.section}
+                    <span className="font-semibold">{t('editReport.seccion')}</span> {item.section}
                   </div>
                 </div>
               </div>
@@ -180,7 +182,7 @@ export default function EditReporte() {
               {/* Descripción */}
               {item.description && (
                 <div className="mb-6">
-                  <h3 className="font-semibold text-gray-700 mb-2">Descripción</h3>
+                  <h3 className="font-semibold text-gray-700 mb-2">{t('editReport.descripcion')}</h3>
                   <div className="p-4 bg-gray-50 rounded-lg whitespace-pre-wrap">
                     {item.description}
                   </div>
@@ -191,7 +193,7 @@ export default function EditReporte() {
               <div className="space-y-4">
                 {item.imageUrl && (
                   <div>
-                    <h3 className="font-semibold text-gray-700 mb-2">Imagen adjunta</h3>
+                    <h3 className="font-semibold text-gray-700 mb-2">{t('editReport.imagenAdjunta')}</h3>
                     <div className="flex justify-center">
                       <img
                         src={resolveImageUrl(item.imageUrl)}
@@ -203,7 +205,7 @@ export default function EditReporte() {
                 )}
                 {item.videoUrl && (
                   <div>
-                    <h3 className="font-semibold text-gray-700 mb-2">Video adjunto</h3>
+                    <h3 className="font-semibold text-gray-700 mb-2">{t('editReport.videoAdjunto')}</h3>
                     <div className="flex justify-center">
                       <video
                         src={resolveImageUrl(item.videoUrl)}
@@ -221,7 +223,7 @@ export default function EditReporte() {
           <div className="space-y-6">
             {/* Historial de mensajes */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Historial de Mensajes</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('editReport.historial')}</h3>
 
               {isCompleted && (
                 <div className="bg-orange-50 border border-orange-200 text-orange-800 px-4 py-3 rounded-lg mb-4">
@@ -233,7 +235,7 @@ export default function EditReporte() {
                         clipRule="evenodd"
                       />
                     </svg>
-                    Este reporte está finalizado. No se pueden enviar nuevos mensajes.
+                    {t('editReport.finalizadoMsg')}
                   </div>
                 </div>
               )}
@@ -259,7 +261,7 @@ export default function EditReporte() {
                               isSupport ? 'text-blue-700' : 'text-gray-700'
                             }`}
                           >
-                            {isSupport ? 'Soporte' : 'Usuario'}
+                            {isSupport ? t('editReport.soporte') : t('editReport.usuarioLabel')}
                           </span>
                           <span className="text-xs text-gray-500">
                             {new Date(m.createdAt).toLocaleString('es-ES', {
@@ -302,7 +304,7 @@ export default function EditReporte() {
                         d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                       />
                     </svg>
-                    Aún no hay mensajes en este reporte.
+                    {t('editReport.sinMensajes')}
                   </div>
                 )}
               </div>
@@ -310,20 +312,18 @@ export default function EditReporte() {
 
             {/* Formulario de respuesta */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">Enviar Respuesta</h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">{t('editReport.enviarRespuesta')}</h4>
               <div className={`space-y-4 ${isCompleted ? 'opacity-50' : ''}`}>
                 <textarea
                   rows={4}
-                  placeholder="Escribe tu mensaje de respuesta (opcional si adjuntas imagen)..."
+                  placeholder={t('editReport.respuestaPlaceholder')}
                   value={nuevoMensaje}
                   onChange={(e) => setNuevoMensaje(e.target.value)}
                   disabled={isCompleted}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical disabled:bg-gray-100"
                 />
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Imagen adjunta (opcional)
-                  </label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editReport.imagenAdjuntaOpcional')}</label>
                   <input
                     type="file"
                     accept="image/*"
@@ -358,10 +358,10 @@ export default function EditReporte() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      Enviando...
+                      {t('editReport.enviando')}
                     </div>
                   ) : (
-                    'Enviar Respuesta'
+                    t('editReport.enviar')
                   )}
                 </button>
               </div>

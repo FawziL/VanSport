@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function Pagination({ page = 1, pages = 1, onChange, showNumbers = true }) {
+  const { t } = useTranslation('admin');
   const current = Math.max(1, Math.min(page || 1, pages || 1));
   const total = Math.max(1, pages || 1);
 
@@ -29,7 +31,7 @@ export default function Pagination({ page = 1, pages = 1, onChange, showNumbers 
             cursor: current <= 1 ? 'not-allowed' : 'pointer',
           }}
         >
-          Anterior
+          {t('pagination.anterior')}
         </button>
 
         <span
@@ -62,7 +64,7 @@ export default function Pagination({ page = 1, pages = 1, onChange, showNumbers 
             cursor: current >= total ? 'not-allowed' : 'pointer',
           }}
         >
-          Siguiente
+          {t('pagination.siguiente')}
         </button>
       </div>
 

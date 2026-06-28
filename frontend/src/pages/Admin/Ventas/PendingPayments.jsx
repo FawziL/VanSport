@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
@@ -15,6 +16,7 @@ import {
 import StatusBadge from '@/components/StatusBadge';
 
 export default function PendingPayments() {
+  const { t } = useTranslation('admin');
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -36,7 +38,7 @@ export default function PendingPayments() {
         setPages(totalPages);
         setPage((prev) => Math.min(prev, totalPages));
       })
-      .catch(() => setError('No se pudieron cargar los pagos pendientes'))
+      .catch(() => setError(t('pendingPayments.errorCargar')))
       .finally(() => setLoading(false));
     // eslint-disable-next-line
   }, [pageSize]);
@@ -63,21 +65,13 @@ export default function PendingPayments() {
     money: (n) => (n != null ? `$${Number(n).toFixed(2)}` : '-'),
   };
 
-  const getUserLabel = (t) => {
-    const nombre = t.userName || '';
-    const apellido = t.userLastName || '';
-    const email = t.usuario_email || '';
-    const base = `${nombre} ${apellido}`.trim();
-    const id = t.userId != null ? t.userId : null;
-    const emailPart = email ? ` - ${email}` : '';
-    return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
-  };
+  const getUserLabel = (t) => t.userId ?? '-';
 
   return (
     <div className="max-w-[1200px] mx-auto my-10 px-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-extrabold">Pagos Pendientes</h1>
+        <h1 className="text-2xl font-extrabold">{t('pendingPayments.titulo')}</h1>
       </div>
 
       {/* Page Size Selector */}
@@ -86,7 +80,7 @@ export default function PendingPayments() {
           value={pageSize}
           onChange={setPageSize}
           options={[5, 10, 20, 50]}
-          label="Por página"
+          label={t('pendingPayments.porPagina')}
         />
       </div>
 
@@ -96,15 +90,15 @@ export default function PendingPayments() {
       {/* Table */}
       <Table>
         <TableHead>
-          <TableHeader width="10%">ID</TableHeader>
-          <TableHeader width="12%">Pedido</TableHeader>
-          <TableHeader width="30%">Usuario</TableHeader>
-          <TableHeader width="12%">Monto</TableHeader>
-          <TableHeader width="14%">Método</TableHeader>
-          <TableHeader width="12%">Estado</TableHeader>
-          <TableHeader width="10%">Fecha</TableHeader>
+          <TableHeader width="10%">{t('pendingPayments.colId')}</TableHeader>
+          <TableHeader width="12%">{t('pendingPayments.colPedido')}</TableHeader>
+          <TableHeader width="30%">{t('pendingPayments.colUsuario')}</TableHeader>
+          <TableHeader width="12%">{t('pendingPayments.colMonto')}</TableHeader>
+          <TableHeader width="14%">{t('pendingPayments.colMetodo')}</TableHeader>
+          <TableHeader width="12%">{t('pendingPayments.colEstado')}</TableHeader>
+          <TableHeader width="10%">{t('pendingPayments.colFecha')}</TableHeader>
           <TableHeader width="10%" align="center">
-            Acciones
+            {t('pendingPayments.colAcciones')}
           </TableHeader>
         </TableHead>
 
@@ -112,26 +106,26 @@ export default function PendingPayments() {
           loading={loading}
           empty={pageItems.length === 0}
           colSpan={8}
-          loadingText="Cargando pagos pendientes..."
-          emptyText="No hay pagos pendientes."
+          loadingText={t('pendingPayments.cargando')}
+          emptyText={t('pendingPayments.vacio')}
         >
           {pageItems.map((t) => (
-            <TableRow key={t.transaccion_id}>
-              <TableCell className="whitespace-nowrap">{t.transaccion_id}</TableCell>
-              <TableCell className="whitespace-nowrap">{t.pedido ?? '-'}</TableCell>
+            <TableRow key={t.id}>
+              <TableCell className="whitespace-nowrap">{t.id}</TableCell>
+              <TableCell className="whitespace-nowrap">{t.orderId ?? '-'}</TableCell>
               <TableCell className="break-words">{getUserLabel(t)}</TableCell>
-              <TableCell className="whitespace-nowrap font-medium">{fmt.money(t.monto)}</TableCell>
+              <TableCell className="whitespace-nowrap font-medium">{fmt.money(t.amount)}</TableCell>
               <TableCell className="break-words">{t.paymentMethod}</TableCell>
               <TableCell className="break-words">
                 <StatusBadge estado={t.status} />
               </TableCell>
-              <TableCell className="whitespace-nowrap">{fmt.date(t.fecha_transaccion)}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.date(t.createdAt)}</TableCell>
               <TableCell align="center">
                 <ActionButton
                   variant="primary"
-                  onClick={() => navigate(`/admin/ventas/editar/${t.transaccion_id}`)}
+                  onClick={() => navigate(`/admin/ventas/editar/${t.id}`)}
                 >
-                  Revisar
+                  {t('pendingPayments.revisar')}
                 </ActionButton>
               </TableCell>
             </TableRow>

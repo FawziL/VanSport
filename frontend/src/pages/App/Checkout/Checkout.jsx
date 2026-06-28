@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { appService } from '@/services/routes';
 import { useAuth } from '@/context/AuthContext';
+import { useTranslation } from 'react-i18next';
+import { locPath } from '@/utils/localePath';
 
 function formatPrice(n) {
   const num = Number(n);
@@ -12,6 +14,7 @@ function formatPrice(n) {
 export default function Checkout() {
   const navigate = useNavigate();
   const { isAuthenticated, ensureUserLoaded } = useAuth();
+  const { t } = useTranslation('carrito');
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -76,7 +79,7 @@ export default function Checkout() {
 
         if (alive) setItems(enrichedItems);
       } catch (e) {
-        if (alive) setErrMsg('No se pudo cargar el carrito para checkout');
+        if (alive) setErrMsg(t('checkout.errorCargar'));
       } finally {
         if (alive) setLoading(false);
       }
@@ -105,7 +108,7 @@ export default function Checkout() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando checkout...</p>
+          <p className="mt-4 text-gray-600">{t('checkout.cargando')}</p>
         </div>
       </div>
     );
@@ -113,7 +116,7 @@ export default function Checkout() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 text-gray-900">
-      <h1 className="text-3xl font-bold mb-4">Checkout</h1>
+      <h1 className="text-3xl font-bold mb-4">{t('checkout.titulo')}</h1>
 
       {errMsg && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-4 font-semibold">
@@ -123,12 +126,12 @@ export default function Checkout() {
 
       {items.length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <p>Tu carrito está vacío.</p>
+          <p>{t('checkout.vacio')}</p>
           <button
-            onClick={() => navigate('/productos')}
+            onClick={() => navigate(locPath('/productos'))}
             className="ml-2 bg-blue-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-blue-700 transition-colors"
           >
-            Ver productos
+            {t('verProductos')}
           </button>
         </div>
       ) : (
@@ -137,7 +140,7 @@ export default function Checkout() {
           <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6">
             {/* Método de entrega */}
             <div className="mb-6">
-              <div className="font-bold mb-3">Método de entrega</div>
+              <div className="font-bold mb-3">{t('checkout.entrega')}</div>
               <div className="flex flex-col sm:flex-row gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -148,7 +151,7 @@ export default function Checkout() {
                     onChange={() => setEntrega('envio')}
                     className="text-blue-600 focus:ring-blue-500"
                   />
-                  Envío a domicilio
+                  {t('checkout.envio')}
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -159,7 +162,7 @@ export default function Checkout() {
                     onChange={() => setEntrega('retiro')}
                     className="text-blue-600 focus:ring-blue-500"
                   />
-                  Retiro en tienda
+                  {t('checkout.retiro')}
                 </label>
               </div>
             </div>
@@ -168,14 +171,14 @@ export default function Checkout() {
             {entrega === 'envio' && (
               <div className="mb-6">
                 <label htmlFor="direccion" className="block font-bold mb-2">
-                  Dirección de envío
+                  {t('checkout.direccion')}
                 </label>
                 <textarea
                   id="direccion"
                   rows={3}
                   value={direccion}
                   onChange={(e) => setDireccion(e.target.value)}
-                  placeholder="Calle, número, ciudad, referencia…"
+                  placeholder={t('checkout.direccionPlaceholder')}
                   className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
               </div>
@@ -184,14 +187,14 @@ export default function Checkout() {
             {/* Notas */}
             <div className="mb-6">
               <label htmlFor="notas" className="block font-bold mb-2">
-                Notas (opcional)
+                {t('checkout.notas')}
               </label>
               <textarea
                 id="notas"
                 rows={2}
                 value={notas}
                 onChange={(e) => setNotas(e.target.value)}
-                placeholder="Instrucciones para el envío…"
+                placeholder={t('checkout.notasPlaceholder')}
                 className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               />
             </div>
@@ -201,11 +204,11 @@ export default function Checkout() {
           <div className="h-50 bg-white border border-gray-200 rounded-xl p-6 lg:sticky lg:top-6">
             <div className="space-y-4 mb-6">
               <div className="flex justify-between">
-                <span className="text-gray-600">Productos</span>
+                <span className="text-gray-600">{t('checkout.productos')}</span>
                 <span className="font-bold">{items.reduce((a, it) => a + it.quantity, 0)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Total</span>
+                <span className="text-gray-600">{t('checkout.total')}</span>
                 <span className="font-bold text-lg">{formatPrice(total)}</span>
               </div>
             </div>
@@ -230,7 +233,7 @@ export default function Checkout() {
                   navigate(pid ? `/pedidos/${pid}` : '/pedidos');
                 } catch (e) {
                   const msg =
-                    e?.response?.data?.error || e?.message || 'No se pudo finalizar el pedido';
+                    e?.response?.data?.error || e?.message || t('checkout.error');
                   setErrMsg(msg);
                 } finally {
                   setPlacing(false);
@@ -245,7 +248,7 @@ export default function Checkout() {
                 }
               `}
             >
-              {placing ? 'Procesando…' : 'Confirmar pedido'}
+              {placing ? t('checkout.procesando') : t('checkout.confirmar')}
             </button>
           </div>
         </div>

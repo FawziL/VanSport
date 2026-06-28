@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { resolveImageUrl } from '@/utils/resolveUrl';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
+import { locPath } from '@/utils/localePath';
 
 function formatPrice(n) {
   const num = Number(n);
@@ -14,6 +16,7 @@ function formatPrice(n) {
 export default function Carrito() {
   const navigate = useNavigate();
   const { isAuthenticated, ensureUserLoaded } = useAuth();
+  const { t } = useTranslation('carrito');
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -56,7 +59,7 @@ export default function Carrito() {
 
       setItems(enriched);
     } catch (err) {
-      setErrMsg('No se pudo cargar el carrito');
+      setErrMsg(t('errorCargar'));
       setItems([]);
     } finally {
       setLoading(false);
@@ -103,9 +106,9 @@ export default function Carrito() {
 
       // Éxito: mostrar toast
       if (delta > 0) {
-        toast.success('Cantidad aumentada');
+        toast.success(t('cantidadAumentada'));
       } else {
-        toast.success('Cantidad reducida');
+        toast.success(t('cantidadReducida'));
       }
 
       const newCount = items.reduce((acc, i) => acc + (i === item ? nuevaCantidad : i.quantity), 0);
@@ -119,7 +122,7 @@ export default function Carrito() {
             : i
         )
       );
-      toast.error('No se pudo actualizar la cantidad');
+      toast.error(t('errorActualizar'));
     } finally {
       setUpdating(false);
     }
@@ -133,11 +136,11 @@ export default function Carrito() {
         productId: item.producto?.productId ?? item.productId,
       });
       await fetchCarrito();
-      toast.success('Producto eliminado del carrito');
+      toast.success(t('productoEliminado'));
       const newCount = items.reduce((acc, i) => acc + (i === item ? 0 : i.quantity), 0);
       window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: newCount } }));
     } catch {
-      toast.error('No se pudo eliminar el producto');
+      toast.error(t('errorEliminar'));
     } finally {
       setUpdating(false);
     }
@@ -149,10 +152,10 @@ export default function Carrito() {
     try {
       await appService.cart.clear();
       await fetchCarrito();
-      toast.success('Carrito vaciado correctamente');
+      toast.success(t('carritoVaciado'));
       window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: 0 } }));
     } catch {
-      toast.error('No se pudo vaciar el carrito');
+      toast.error(t('errorVaciar'));
     } finally {
       setUpdating(false);
     }
@@ -204,8 +207,8 @@ export default function Carrito() {
   return (
     <div className="max-w-7xl mx-auto my-10 px-4">
       <div className="mb-5">
-        <h1 className="text-3xl font-black text-gray-900 mb-2">Mi carrito</h1>
-        <p className="text-gray-600">Revisa tu selección antes de finalizar la compra.</p>
+        <h1 className="text-3xl font-black text-gray-900 mb-2">{t('titulo')}</h1>
+        <p className="text-gray-600">{t('subtitulo')}</p>
       </div>
 
       {errMsg && (
@@ -216,13 +219,13 @@ export default function Carrito() {
 
       {items.length === 0 ? (
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center">
-          <div className="text-xl font-black text-gray-900 mb-2">Tu carrito está vacío</div>
-          <p className="text-gray-600 mb-4">Explora los productos y añade tus favoritos.</p>
+          <div className="text-xl font-black text-gray-900 mb-2">{t('vacio')}</div>
+          <p className="text-gray-600 mb-4">{t('vacioDesc')}</p>
           <Link
-            to="/productos"
+            to={locPath('/productos')}
             className="inline-block px-5 py-3 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
           >
-            Ver productos
+            {t('verProductos')}
           </Link>
         </div>
       ) : (
@@ -262,14 +265,14 @@ export default function Carrito() {
                       </div>
                       <div className="text-right">
                         <div className="text-gray-900 font-black">{formatPrice(precioUnit)}</div>
-                        <div className="text-gray-600 text-xs">Precio unitario</div>
+                        <div className="text-gray-600 text-xs">{t('precioUnitario')}</div>
                       </div>
                     </div>
 
                     <div className="flex justify-between mt-3 items-center">
                       <div className="flex items-center gap-2">
                         <QtyButton
-                          ariaLabel="Disminuir cantidad"
+                          ariaLabel={t('disminuirCantidad')}
                           disabled={item.quantity <= 1 || updating}
                           onClick={() => handleChangeCantidad(item, -1)}
                         >
@@ -279,7 +282,7 @@ export default function Carrito() {
                           {item.quantity}
                         </span>
                         <QtyButton
-                          ariaLabel="Aumentar cantidad"
+                          ariaLabel={t('aumentarCantidad')}
                           disabled={updating}
                           onClick={() => handleChangeCantidad(item, 1)}
                         >
@@ -292,10 +295,10 @@ export default function Carrito() {
                         <button
                           onClick={() => handleRemove(item)}
                           disabled={updating}
-                          title="Eliminar"
+                          title={t('eliminar')}
                           className="px-3 py-1 rounded-lg border border-red-300 bg-red-50 text-red-700 font-bold disabled:cursor-not-allowed hover:bg-red-100 transition-colors"
                         >
-                          Eliminar
+                          {t('eliminar')}
                         </button>
                       </div>
                     </div>
@@ -308,27 +311,27 @@ export default function Carrito() {
           {/* Resumen */}
           <div className="w-1/3 bg-white border border-gray-200 rounded-xl shadow-sm p-4 sticky top-6 self-start">
             <div className="flex justify-between mb-3">
-              <span className="text-gray-600">Productos</span>
+              <span className="text-gray-600">{t('productos')}</span>
               <span className="font-black text-gray-900">
                 {items.reduce((acc, i) => acc + i.quantity, 0)}
               </span>
             </div>
             <div className="flex justify-between mb-3">
-              <span className="text-gray-600">Subtotal</span>
+              <span className="text-gray-600">{t('subtotal')}</span>
               <span className="font-black text-gray-900">{formatPrice(total)}</span>
             </div>
             <hr className="border-t border-gray-200 my-3" />
             <div className="flex justify-between mb-4">
-              <span className="font-black text-gray-900">Total</span>
+              <span className="font-black text-gray-900">{t('total')}</span>
               <span className="font-black text-gray-900">{formatPrice(total)}</span>
             </div>
 
             <button
               className="w-full py-3 px-4 rounded-lg bg-blue-600 text-white font-black text-lg disabled:cursor-not-allowed disabled:opacity-80 hover:bg-blue-700 transition-colors"
               disabled={updating || placing || items.length === 0}
-              onClick={() => navigate('/checkout')}
+              onClick={() => navigate(locPath('/checkout'))}
             >
-              Ir a checkout
+              {t('irCheckout')}
             </button>
 
             <button
@@ -336,15 +339,15 @@ export default function Carrito() {
               disabled={updating}
               className="w-full mt-3 py-2 px-4 rounded-lg border border-red-600 bg-white text-red-600 font-bold disabled:cursor-not-allowed hover:bg-red-50 transition-colors"
             >
-              Vaciar carrito
+              {t('vaciar')}
             </button>
 
             <div className="mt-3 text-center">
               <Link
-                to="/productos"
+                to={locPath('/productos')}
                 className="text-blue-600 font-bold no-underline hover:text-blue-800"
               >
-                Seguir comprando
+                {t('seguirComprando')}
               </Link>
             </div>
           </div>

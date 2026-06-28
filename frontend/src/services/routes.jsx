@@ -7,6 +7,13 @@ export const authService = {
   signOut: () => http.post('/api/auth/sign-out'),
   me: () => http.get('/api/auth/get-session'),
   updateProfile: (data) => http.post('/api/auth/update-user', data),
+  passwordReset: (email) =>
+    http.post('/api/auth/forget-password', {
+      email,
+      redirectTo: `${window.location.origin}/password-reset/confirm`,
+    }),
+  passwordResetConfirm: (token, newPassword) =>
+    http.post('/api/auth/reset-password', { token, newPassword }),
 };
 
 // --- Public & Authenticated API ---

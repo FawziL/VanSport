@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { appService } from '@/services/routes';
 import { useAuth } from '@/context/AuthContext';
+import { locPath } from '@/utils/localePath';
 
 function formatPrice(n) {
   const num = Number(n);
@@ -13,6 +15,7 @@ export default function VerPedido() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, ensureUserLoaded } = useAuth();
+  const { t } = useTranslation('pedido');
 
   const [pedido, setPedido] = useState(null);
   const [detalles, setDetalles] = useState([]);
@@ -51,12 +54,12 @@ export default function VerPedido() {
     let alive = true;
     (async () => {
       if (!isAuthenticated) {
-        navigate('/login', { replace: true });
+        navigate(locPath('/login'), { replace: true });
         return;
       }
       const ok = await ensureUserLoaded();
       if (!ok) {
-        navigate('/login', { replace: true });
+        navigate(locPath('/login'), { replace: true });
         return;
       }
       setLoading(true);
@@ -68,7 +71,7 @@ export default function VerPedido() {
           setDetalles(Array.isArray(p.detalles) ? p.detalles : []);
         }
       } catch (e) {
-        if (alive) setErrMsg('No se pudo cargar el pedido');
+        if (alive) setErrMsg(t('verPedido.errorCargar'));
       } finally {
         if (alive) setLoading(false);
       }
@@ -83,7 +86,7 @@ export default function VerPedido() {
           setMetodos(list);
           if (list.length) {
             setMetodoSel(list[0]);
-            setMetodoPago(list[0].codigo); // mantener compat con variable existente
+            setMetodoPago(list[0].code); // mantener compat con variable existente
           }
         }
       })
@@ -128,11 +131,11 @@ export default function VerPedido() {
           if (!Number.isNaN(tasa) && !Number.isNaN(total)) {
             setTotalBs(total * tasa);
           } else {
-            setBcvErr('Tasa inválida');
+            setBcvErr(t('verPedido.tasaInvalida'));
           }
         })
         .catch(() => {
-          if (alive) setBcvErr('No se pudo obtener la tasa BCV');
+          if (alive) setBcvErr(t('verPedido.errorTasa'));
         })
         .finally(() => alive && setBcvLoading(false));
     }
@@ -147,7 +150,7 @@ export default function VerPedido() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando pedido...</p>
+          <p className="mt-4 text-gray-600">{t('verPedido.cargando')}</p>
         </div>
       </div>
     );
@@ -157,12 +160,12 @@ export default function VerPedido() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 text-gray-900">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-        <h1 className="text-3xl font-bold">Pedido #{id}</h1>
+        <h1 className="text-3xl font-bold">{t('verPedido.titulo')}{id}</h1>
         <Link
-          to="/pedidos"
+          to={locPath('/pedidos')}
           className="text-blue-600 font-semibold hover:text-blue-700 transition-colors"
         >
-          Volver a mis pedidos
+          {t('verPedido.volver')}
         </Link>
       </div>
 
@@ -175,7 +178,7 @@ export default function VerPedido() {
 
       {!pedido ? (
         <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
-          <p>No se pudo cargar el pedido.</p>
+          <p>{t('verPedido.noEncontrado')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -184,51 +187,47 @@ export default function VerPedido() {
             {/* Información del pedido */}
             <div className="space-y-3 mb-6">
               <div className="text-gray-600">
-                Estado:{' '}
+                {t('verPedido.estado')}{' '}
                 <span className="text-gray-900 font-semibold capitalize">{pedido.status}</span>
               </div>
               {pedido.transaccion_id && (
                 <div className="text-gray-600">
-                  Transacción:{' '}
+                  {t('verPedido.transaccion')}{' '}
                   <span className="text-gray-900 font-semibold">#{pedido.transaccion_id}</span>
                 </div>
               )}
               {pedido.shippingAddress && (
                 <div className="text-gray-600">
-                  Dirección: <span className="text-gray-900">{pedido.shippingAddress}</span>
+                  {t('verPedido.direccion')} <span className="text-gray-900">{pedido.shippingAddress}</span>
                 </div>
               )}
-              {pedido.notas && (
+              {pedido.notes && (
                 <div className="text-gray-600">
-                  Notas: <span className="text-gray-900">{pedido.notas}</span>
+                  {t('verPedido.notas')} <span className="text-gray-900">{pedido.notes}</span>
                 </div>
               )}
             </div>
 
             {/* Artículos */}
-            <div className="font-bold text-lg mb-4">Artículos</div>
+            <div className="font-bold text-lg mb-4">{t('verPedido.articulos')}</div>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="text-left p-3 font-semibold">Producto</th>
-                    <th className="text-right p-3 font-semibold">Precio</th>
-                    <th className="text-right p-3 font-semibold">Cant.</th>
-                    <th className="text-right p-3 font-semibold">Subtotal</th>
+                    <th className="text-left p-3 font-semibold">{t('verPedido.colProducto')}</th>
+                    <th className="text-right p-3 font-semibold">{t('verPedido.colPrecio')}</th>
+                    <th className="text-right p-3 font-semibold">{t('verPedido.colCant')}</th>
+                    <th className="text-right p-3 font-semibold">{t('verPedido.colSubtotal')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {detalles.map((d, idx) => {
-                    const name = d.productName || `#${d.producto || d.productId}`;
+                    const name = d.productName || `#${d.productId}`;
                     const price = d.unitPrice ?? 0;
                     const subtotal = d.subtotal ?? Number(price) * Number(d.quantity || 0);
                     return (
                       <tr
-                        key={
-                          d.detalle_id ||
-                          d.detalle_orderId ||
-                          `${d.productId || d.producto}-${idx}`
-                        }
+                        key={d.id || `${d.productId}-${idx}`}
                         className="border-t border-gray-200"
                       >
                         <td className="p-3">{name}</td>
@@ -247,7 +246,7 @@ export default function VerPedido() {
           <div className="bg-white border border-gray-200 rounded-xl p-6 lg:sticky lg:top-6 space-y-6">
             {/* Total */}
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Total</span>
+              <span className="text-gray-600">{t('verPedido.total')}</span>
               <span className="text-xl font-bold">{formatPrice(pedido.total)}</span>
             </div>
 
@@ -256,10 +255,10 @@ export default function VerPedido() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600 text-sm">
-                    Total en Bs (BCV hoy{bcv?.desactualizado ? ' – anterior' : ''})
+                    {t('verPedido.totalBs')}{bcv?.desactualizado ? ' – anterior' : ''})
                   </span>
                   <span className="font-bold">
-                    {bcvLoading ? 'Calculando…' : bcvErr ? '—' : formatBs(totalBs)}
+                    {bcvLoading ? t('verPedido.calculando') : bcvErr ? '—' : formatBs(totalBs)}
                   </span>
                 </div>
                 {bcv?.fecha && (
@@ -274,22 +273,22 @@ export default function VerPedido() {
             {/* Último pago */}
             {pedido.ultima_transaccion && (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <div className="font-bold mb-2">Último pago</div>
+                <div className="font-bold mb-2">{t('verPedido.ultimoPago')}</div>
                 <div className="space-y-1 text-sm">
                   <div className="text-gray-600">
-                    Método:{' '}
+                    {t('verPedido.metodo')}{' '}
                     <span className="text-gray-900 capitalize">
                       {pedido.ultima_transaccion.paymentMethod}
                     </span>
                   </div>
                   <div className="text-gray-600">
-                    Referencia:{' '}
+                    {t('verPedido.referencia')}{' '}
                     <span className="text-gray-900">
                       {pedido.ultima_transaccion.transactionCode || '-'}
                     </span>
                   </div>
                   <div className="text-gray-600">
-                    Estado:{' '}
+                    {t('verPedido.estadoPago')}{' '}
                     <span className="text-gray-900 capitalize">
                       {pedido.ultima_transaccion.status}
                     </span>
@@ -304,9 +303,9 @@ export default function VerPedido() {
                 {/* Métodos de pago dinámicos */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <label className="block font-bold">Método de pago</label>
+                    <label className="block font-bold">{t('verPedido.metodoPago')}</label>
                     {metodos.length === 0 && (
-                      <span className="text-gray-500 text-sm">No hay métodos disponibles</span>
+                      <span className="text-gray-500 text-sm">{t('verPedido.sinMetodos')}</span>
                     )}
                   </div>
                   {metodos.length > 0 && (
@@ -348,16 +347,16 @@ export default function VerPedido() {
                 {requiereReferencia && (
                   <div>
                     <label className="block font-bold mb-2">
-                      Número de referencia / comprobante
+                      {t('verPedido.referenciaLabel')}
                     </label>
                     <input
                       value={referencia}
                       onChange={(e) => setReferencia(e.target.value)}
-                      placeholder="# de operación o referencia"
+                      placeholder={t('verPedido.referenciaPlaceholder')}
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <div className="text-gray-500 text-sm mt-2">
-                      Ingresa la referencia del pago. El admin validará tu comprobante.
+                      {t('verPedido.referenciaHelp')}
                     </div>
                   </div>
                 )}
@@ -382,7 +381,7 @@ export default function VerPedido() {
                   setPedido(p);
                 } catch (e) {
                   const msg =
-                    e?.response?.data?.error || e?.message || 'No se pudo procesar el pago';
+                    e?.response?.data?.error || e?.message || t('verPedido.errorPago');
                   setErrMsg(msg);
                 } finally {
                   setPaying(false);
@@ -398,16 +397,16 @@ export default function VerPedido() {
               `}
             >
               {paying
-                ? 'Enviando pago…'
+                ? t('verPedido.pagarProcesando')
                 : pedido.status === 'completado'
-                  ? 'Completado'
+                  ? t('verPedido.completado')
                   : pedido.status === 'pagado'
-                    ? 'Pagado'
+                    ? t('verPedido.pagado')
                     : enRevision
-                      ? 'Pago en revisión'
+                      ? t('verPedido.enRevision')
                       : metodoSel?.type === 'paypal'
-                        ? 'Registrar pago (PayPal)'
-                        : 'Enviar comprobante'}
+                        ? t('verPedido.pagarPaypal')
+                        : t('verPedido.enviarComprobante')}
             </button>
           </div>
         </div>

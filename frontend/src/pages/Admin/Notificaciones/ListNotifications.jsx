@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
 import ConfirmModal from '@/components/ConfirmModal';
 import Pagination from '@/components/Pagination';
@@ -16,6 +17,7 @@ import {
 import { toast } from 'react-toastify';
 
 export default function ListNotifications() {
+  const { t } = useTranslation('admin');
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -39,8 +41,8 @@ export default function ListNotifications() {
         setPage((prev) => Math.min(prev, totalPages));
       })
       .catch(() => {
-        setError('No se pudieron cargar las notificaciones');
-        toast.error('No se pudieron cargar las notificaciones');
+        setError(t('listNotifications.errorCargar'));
+        toast.error(t('listNotifications.errorCargar'));
       })
       .finally(() => setLoading(false));
     // eslint-disable-next-line
@@ -67,24 +69,16 @@ export default function ListNotifications() {
         : '-',
   };
 
-  const getUserLabel = (n) => {
-    const nombre = n.userName || '';
-    const apellido = n.userLastName || '';
-    const email = n.usuario_email || '';
-    const base = `${nombre} ${apellido}`.trim();
-    const id = n.userId != null ? n.userId : null;
-    const emailPart = email ? ` - ${email}` : '';
-    return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
-  };
+  const getUserLabel = (n) => n.userId ?? '-';
 
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
       await adminService.notifications.remove(deleteId);
       setItems((prev) => prev.filter((x) => x.id !== deleteId));
-      toast.success('Notificación eliminada correctamente');
+      toast.success(t('listNotifications.successEliminar'));
     } catch (err) {
-      const msg = err?.response?.data?.detail || 'No se pudo eliminar la notificación';
+      const msg = err?.response?.data?.detail || t('listNotifications.errorEliminar');
       setError(msg);
       toast.error(msg);
     } finally {
@@ -97,12 +91,12 @@ export default function ListNotifications() {
     <div className="max-w-[1200px] mx-auto my-10 px-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-extrabold">Notificaciones</h1>
+        <h1 className="text-2xl font-extrabold">{t('listNotifications.titulo')}</h1>
         <button
           onClick={() => navigate('/admin/notificaciones/crear')}
           className="px-4 py-2 rounded-lg bg-blue-600 text-white! font-bold hover:bg-blue-700 transition-colors"
         >
-          + Crear Notificación
+          {t('listNotifications.crear')}
         </button>
       </div>
 
@@ -112,7 +106,7 @@ export default function ListNotifications() {
           value={pageSize}
           onChange={setPageSize}
           options={[5, 10, 20, 50]}
-          label="Por página"
+          label={t('listNotifications.porPagina')}
         />
       </div>
 
@@ -122,14 +116,14 @@ export default function ListNotifications() {
       {/* Table */}
       <Table>
         <TableHead>
-          <TableHeader width="10%">ID</TableHeader>
+          <TableHeader width="10%">{t('listNotifications.colId')}</TableHeader>
           {/*<TableHeader width="26%">Usuario</TableHeader>*/}
-          <TableHeader>Título</TableHeader>
-          <TableHeader width="12%">Tipo</TableHeader>
-          <TableHeader width="15%">Fecha</TableHeader>
-          <TableHeader width="17%">Expira</TableHeader>
+          <TableHeader>{t('listNotifications.colTitulo')}</TableHeader>
+          <TableHeader width="12%">{t('listNotifications.colTipo')}</TableHeader>
+          <TableHeader width="15%">{t('listNotifications.colFecha')}</TableHeader>
+          <TableHeader width="17%">{t('listNotifications.colExpira')}</TableHeader>
           <TableHeader width="10%" align="center">
-            Acciones
+            {t('listNotifications.colAcciones')}
           </TableHeader>
         </TableHead>
 
@@ -137,8 +131,8 @@ export default function ListNotifications() {
           loading={loading}
           empty={pageItems.length === 0}
           colSpan={7}
-          loadingText="Cargando notificaciones..."
-          emptyText="No hay notificaciones."
+          loadingText={t('listNotifications.cargando')}
+          emptyText={t('listNotifications.vacio')}
         >
           {pageItems.map((n) => (
             <TableRow key={n.id}>
@@ -154,7 +148,7 @@ export default function ListNotifications() {
                     variant="edit"
                     onClick={() => navigate(`/admin/notificaciones/editar/${n.id}`)}
                   >
-                    Editar
+                    {t('listNotifications.editar')}
                   </ActionButton>
                   <ActionButton
                     variant="delete"
@@ -163,7 +157,7 @@ export default function ListNotifications() {
                       setModalOpen(true);
                     }}
                   >
-                    Eliminar
+                    {t('listNotifications.eliminar')}
                   </ActionButton>
                 </div>
               </TableCell>
@@ -178,10 +172,10 @@ export default function ListNotifications() {
       {/* Confirm Modal */}
       <ConfirmModal
         open={modalOpen}
-        title="¿Eliminar notificación?"
-        message="Esta acción no se puede deshacer."
-        confirmText="Sí, eliminar"
-        cancelText="Cancelar"
+        title={t('listNotifications.confirmarTitulo')}
+        message={t('listNotifications.confirmarMensaje')}
+        confirmText={t('listNotifications.confirmarSi')}
+        cancelText={t('confirm.cancelar')}
         danger
         onCancel={() => setModalOpen(false)}
         onConfirm={handleDelete}

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 
 function FieldError({ error }) {
   if (!error) return null;
@@ -9,6 +11,7 @@ function FieldError({ error }) {
 }
 
 export default function EditCategory() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -42,7 +45,7 @@ export default function EditCategory() {
       } catch (err) {
         if (!alive) return;
         const msg =
-          err?.response?.data?.detail || err?.message || 'No se pudo cargar la categoría.';
+          err?.response?.data?.detail || err?.message || t('editCategory.errorCargar');
         setGlobalError(msg);
       } finally {
         if (alive) setLoading(false);
@@ -57,7 +60,7 @@ export default function EditCategory() {
   const validateLocal = () => {
     const e = {};
     if (!form.name || form.name.trim().length < 2) {
-      e.name = 'El nombre es requerido (mínimo 2 caracteres).';
+      e.name = t('editCategory.nombreRequerido');
     }
     // descripción es opcional
     return e;
@@ -95,7 +98,7 @@ export default function EditCategory() {
       fd.append('description', form.description?.trim() || '');
       if (form.imagen) fd.append('imagen', form.imagen);
       await adminService.categories.update(id, fd);
-      navigate('/admin/categorias');
+      navigate(locPath('/admin/categorias'));
     } catch (err) {
       const data = err?.response?.data;
       if (data && typeof data === 'object') {
@@ -103,7 +106,7 @@ export default function EditCategory() {
         const global = data.detail || data.non_field_errors || data.error || null;
         setGlobalError(global ? (Array.isArray(global) ? global.join(', ') : String(global)) : '');
       } else {
-        setGlobalError(err?.message || 'No se pudo actualizar la categoría.');
+        setGlobalError(err?.message || t('editCategory.errorGuardar'));
       }
     } finally {
       setSaving(false);
@@ -115,7 +118,7 @@ export default function EditCategory() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando datos de categoría...</p>
+          <p className="mt-4 text-gray-600">{t('editCategory.cargando')}</p>
         </div>
       </div>
     );
@@ -123,13 +126,13 @@ export default function EditCategory() {
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', padding: '0 1rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 12 }}>Editar categoría</h1>
+        <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 12 }}>{t('editCategory.titulo')}</h1>
         <div style={{ display: 'flex', gap: 10 }}>
           <Link
-            to="/admin/categorias"
+            to={locPath('/admin/categorias')}
             style={{ color: '#1e88e5', fontWeight: 700, textDecoration: 'none' }}
           >
-            ← Volver
+            {t('editCategory.volver')}
           </Link>
         </div>
       </div>
@@ -156,7 +159,7 @@ export default function EditCategory() {
       >
         <div style={{ marginBottom: 14 }}>
           <label htmlFor="name" style={{ display: 'block', fontWeight: 700, marginBottom: 6 }}>
-            Nombre
+            {t('editCategory.nombre')}
           </label>
           <input
             id="name"
@@ -164,7 +167,7 @@ export default function EditCategory() {
             type="text"
             value={form.name}
             onChange={handleChange}
-            placeholder="Ej. Camisetas"
+            placeholder={t('editCategory.nombrePlaceholder')}
             style={{
               width: '100%',
               padding: '0.6rem 0.8rem',
@@ -181,14 +184,14 @@ export default function EditCategory() {
             htmlFor="description"
             style={{ display: 'block', fontWeight: 700, marginBottom: 6 }}
           >
-            Descripción (opcional)
+            {t('editCategory.descripcion')}
           </label>
           <textarea
             id="description"
             name="description"
             value={form.description}
             onChange={handleChange}
-            placeholder="Breve descripción de la categoría..."
+            placeholder={t('editCategory.descripcionPlaceholder')}
             rows={4}
             style={{
               width: '100%',
@@ -204,18 +207,18 @@ export default function EditCategory() {
 
         <div style={{ marginBottom: 14 }}>
           <label htmlFor="imagen" style={{ display: 'block', fontWeight: 700, marginBottom: 6 }}>
-            Imagen (opcional)
+            {t('editCategory.imagen')}
           </label>
           {form.imagenPreview ? (
             <img
               src={form.imagenPreview}
-              alt="Vista previa"
+              alt={t('editCategory.nombre')}
               style={{ display: 'block', maxWidth: 260, marginBottom: 8, borderRadius: 10 }}
             />
           ) : form.imagenActual ? (
             <img
               src={form.imagenActual}
-              alt="Imagen actual"
+              alt={t('editCategory.imagen')}
               style={{ display: 'block', maxWidth: 260, marginBottom: 8, borderRadius: 10 }}
             />
           ) : null}
@@ -237,10 +240,10 @@ export default function EditCategory() {
               cursor: saving ? 'not-allowed' : 'pointer',
             }}
           >
-            {saving ? 'Guardando...' : 'Guardar cambios'}
+            {saving ? t('editCategory.guardando') : t('editCategory.guardar')}
           </button>
           <Link
-            to="/admin/categorias"
+            to={locPath('/admin/categorias')}
             style={{
               padding: '0.7rem 1.2rem',
               borderRadius: 10,
@@ -251,7 +254,7 @@ export default function EditCategory() {
               textDecoration: 'none',
             }}
           >
-            Cancelar
+            {t('editCategory.cancelar')}
           </Link>
         </div>
       </form>

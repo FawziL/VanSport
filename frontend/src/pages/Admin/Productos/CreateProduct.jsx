@@ -1,9 +1,12 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import ListCategories from '@/components/ListCategories';
 
 export default function CreateProduct() {
+  const { t } = useTranslation('admin');
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: '',
@@ -143,9 +146,9 @@ export default function CreateProduct() {
         if (file) fd.append('imagenes_adicionales', file);
       });
       await adminService.products.create(fd);
-      navigate('/admin/productos');
+      navigate(locPath('/admin/productos'));
     } catch (err) {
-      setError(err?.response?.data?.detail || err?.message || 'Error al crear producto');
+      setError(err?.response?.data?.detail || err?.message || t('createProduct.error'));
     } finally {
       setSubmitting(false);
     }
@@ -162,8 +165,8 @@ export default function CreateProduct() {
   return (
     <div className="p-4 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Crear producto</h1>
-        <Link to="/admin/productos" className="text-blue-600 hover:underline font-medium">Volver</Link>
+        <h1 className="text-2xl font-bold text-gray-900">{t('createProduct.titulo')}</h1>
+        <Link to={locPath('/admin/productos')} className="text-blue-600 hover:underline font-medium">{t('createProduct.volver')}</Link>
       </div>
 
       {error && (
@@ -173,34 +176,34 @@ export default function CreateProduct() {
       <form onSubmit={handleSubmit} className="grid gap-6 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <div className="grid gap-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">Nombre del producto *</label>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">{t('createProduct.nombre')}</label>
             <input id="name" name="name" value={form.name} onChange={handleChange} required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              placeholder="Ingresa el nombre del producto" />
+              placeholder={t('createProduct.nombrePlaceholder')} />
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">{t('createProduct.descripcion')}</label>
             <textarea id="description" name="description" value={form.description} onChange={handleChange} rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              placeholder="Describe el producto..." />
+              placeholder={t('createProduct.descripcionPlaceholder')} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">Precio *</label>
+              <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">{t('createProduct.precio')}</label>
               <input id="price" name="price" type="number" step="0.01" min="0" value={form.price} onChange={handleChange} required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 placeholder="0.00" />
             </div>
             <div>
-              <label htmlFor="salePrice" className="block text-sm font-medium text-gray-700 mb-2">Precio Oferta</label>
+              <label htmlFor="salePrice" className="block text-sm font-medium text-gray-700 mb-2">{t('createProduct.precioOferta')}</label>
               <input id="salePrice" name="salePrice" type="number" step="0.01" min="0" value={form.salePrice} onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 placeholder="0.00" />
             </div>
             <div>
-              <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-2">Stock *</label>
+              <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-2">{t('createProduct.stock')}</label>
               <input id="stock" name="stock" type="number" min="0" value={form.stock} onChange={handleChange} required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 placeholder="0" />
@@ -208,15 +211,15 @@ export default function CreateProduct() {
           </div>
 
           <div>
-            <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-2">Categoría *</label>
+            <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-2">{t('createProduct.categoria')}</label>
             <ListCategories name="categoryId" value={form.categoryId} onChange={handleCategoriaChange} required
-              placeholder="Seleccione una categoría"
+              placeholder={t('createProduct.categoriaPlaceholder')}
               className="w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">Imagen principal</label>
+          <label className="block text-sm font-medium text-gray-700 mb-3">{t('createProduct.imagenPrincipal')}</label>
           <input ref={mainImageInputRef} type="file" accept="image/*" onChange={handleMainImageChange} className="hidden" />
           {!imagenPreview ? (
             <div className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${isDragOverMain ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'}`}
@@ -228,24 +231,24 @@ export default function CreateProduct() {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Arrastra y suelta la imagen principal</p>
-                  <p className="text-sm text-gray-500 mt-1">o haz clic para seleccionar</p>
+                  <p className="text-sm font-medium text-gray-900">{t('createProduct.arrastrar')}</p>
+                  <p className="text-sm text-gray-500 mt-1">{t('createProduct.oClick')}</p>
                 </div>
-                <p className="text-xs text-gray-400">PNG, JPG, WEBP hasta 10MB</p>
+                <p className="text-xs text-gray-400">{t('createProduct.formatos')}</p>
               </div>
             </div>
           ) : (
             <div className="border border-gray-200 rounded-xl p-6 bg-gray-50">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-medium text-gray-900">Imagen principal seleccionada</span>
+                <span className="text-sm font-medium text-gray-900">{t('createProduct.imagenSeleccionada')}</span>
                 <button type="button" onClick={removeMainImage} className="text-red-600 hover:text-red-800 text-sm font-medium flex items-center gap-1">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg> Eliminar
+                  </svg> {t('createProduct.eliminar')}
                 </button>
               </div>
               <div className="flex items-center gap-4 w-full">
-                <img src={imagenPreview} alt="Preview imagen principal" className="w-50 h-50 rounded-lg object-cover border border-gray-200" />
+                <img src={imagenPreview} alt={t('createProduct.imagenPrincipal')} className="w-50 h-50 rounded-lg object-cover border border-gray-200" />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900">{imagen.name}</p>
                   <p className="text-sm text-gray-500">{formatFileSize(imagen.size)}</p>
@@ -256,7 +259,7 @@ export default function CreateProduct() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">Imágenes adicionales</label>
+          <label className="block text-sm font-medium text-gray-700 mb-3">{t('createProduct.imagenesAdicionales')}</label>
           <input ref={extrasInputRef} type="file" accept="image/*" multiple onChange={handleExtrasChange} className="hidden" />
           <div className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${isDragOverExtras ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'}`}
             onClick={handleExtrasClick} onDrop={handleExtrasDrop} onDragOver={handleExtrasDragOver} onDragLeave={handleExtrasDragLeave}>
@@ -267,21 +270,21 @@ export default function CreateProduct() {
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Arrastra y suelta imágenes adicionales</p>
-                <p className="text-sm text-gray-500 mt-1">o haz clic para seleccionar</p>
+                <p className="text-sm font-medium text-gray-900">{t('createProduct.arrastrarAdicionales')}</p>
+                <p className="text-sm text-gray-500 mt-1">{t('createProduct.oClickAdicionales')}</p>
               </div>
-              <p className="text-xs text-gray-400">Puedes seleccionar múltiples imágenes</p>
+              <p className="text-xs text-gray-400">{t('createProduct.multiples')}</p>
             </div>
           </div>
           {extrasPreviews.length > 0 && (
             <div className="mt-6">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-sm font-medium text-gray-900">Imágenes adicionales ({extrasPreviews.length})</h4>
+                <h4 className="text-sm font-medium text-gray-900">{t('createProduct.imagenesAdicionales')} ({extrasPreviews.length})</h4>
                 <button type="button" onClick={() => { setExtras([]); setExtrasPreviews([]); if (extrasInputRef.current) extrasInputRef.current.value = ''; }}
                   className="text-red-600 hover:text-red-800 text-sm font-medium flex items-center gap-1">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg> Eliminar todas
+                  </svg> {t('createProduct.eliminarTodas')}
                 </button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -304,7 +307,7 @@ export default function CreateProduct() {
         <div className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
           <input id="isActive" name="isActive" type="checkbox" checked={!!form.isActive} onChange={handleChange}
             className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-          <label htmlFor="isActive" className="text-sm font-medium text-gray-700">Producto activo (visible para los clientes)</label>
+          <label htmlFor="isActive" className="text-sm font-medium text-gray-700">{t('createProduct.activo')}</label>
         </div>
 
         <div className="flex gap-3 pt-4 border-t border-gray-200">
@@ -315,9 +318,9 @@ export default function CreateProduct() {
                 <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg> Guardando...
+                </svg> {t('createProduct.guardando')}
               </span>
-            ) : 'Crear producto'}
+            ) : t('createProduct.crear')}
           </button>
         </div>
       </form>

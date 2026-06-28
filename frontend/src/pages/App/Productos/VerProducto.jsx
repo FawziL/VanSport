@@ -6,6 +6,8 @@ import { useAuth } from '@/context/AuthContext';
 import ProductReviews from '@/components/ProductReviews';
 import { StarRow } from '@/utils/reviews';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
+import { locPath } from '@/utils/localePath';
 
 function formatPrice(n) {
   const num = Number(n);
@@ -14,6 +16,7 @@ function formatPrice(n) {
 }
 
 export default function VerProducto() {
+  const { t } = useTranslation('producto');
   const { id } = useParams();
   const [producto, setProducto] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -75,7 +78,7 @@ export default function VerProducto() {
 
         if (!alive) return;
         setProducto(normalized);
-        setSelectedImage(normalized.imagen || normalized.imagenes[0] || '');
+        setSelectedImage(normalized.imageUrl || normalized.additionalImages[0] || '');
       } catch (err) {
         if (!alive) return;
         const backendMsg = err?.response?.data;
@@ -84,7 +87,7 @@ export default function VerProducto() {
             ? Object.entries(backendMsg)
                 .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
                 .join(' | ')
-            : backendMsg || err.message || 'Error al cargar el producto';
+            : backendMsg || err.message || t('errorCargar');
         setErrMsg(msg);
       } finally {
         if (alive) setLoading(false);
@@ -221,7 +224,7 @@ export default function VerProducto() {
           cantidad: Number(qty) || 1,
         });
         setCartQty(Number(qty) || 1);
-        toast.success('Cantidad actualizada en el carrito');
+        toast.success(t('cantidadActualizada'));
       } else {
         // Añadir al carrito
         await appService.cart.add({
@@ -230,7 +233,7 @@ export default function VerProducto() {
         });
         setInCart(true);
         setCartQty(Number(qty) || 1);
-        toast.success('¡Producto añadido al carrito!');
+        toast.success(t('productoAnadido'));
       }
       // Actualizar contador global
       try {
@@ -246,7 +249,7 @@ export default function VerProducto() {
           ? Object.entries(backendMsg)
               .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
               .join(' | ')
-          : backendMsg || err.message || 'Error al procesar el carrito';
+          : backendMsg || err.message || t('errorCarrito');
       toast.error(msg);
     } finally {
       setAddLoading(false);
@@ -266,7 +269,7 @@ export default function VerProducto() {
       setInCart(false);
       setCartQty(0);
       setQty(1);
-      toast.success('Producto eliminado del carrito');
+      toast.success(t('productoEliminado'));
       try {
         const data = await appService.cart.list();
         const items = Array.isArray(data) ? data : data?.results || [];
@@ -280,7 +283,7 @@ export default function VerProducto() {
           ? Object.entries(backendMsg)
               .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
               .join(' | ')
-          : backendMsg || err.message || 'No se pudo quitar del carrito';
+          : backendMsg || err.message || t('errorEliminar');
       toast.error(msg);
     } finally {
       setAddLoading(false);
@@ -316,10 +319,10 @@ export default function VerProducto() {
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">{errMsg}</div>
         <div className="mt-3">
           <Link
-            to="/productos"
+            to={locPath('/productos')}
             className="text-blue-600 font-bold no-underline hover:text-blue-800"
           >
-            Volver a productos
+            {t('volver')}
           </Link>
         </div>
       </div>
@@ -329,13 +332,13 @@ export default function VerProducto() {
   if (!producto) {
     return (
       <div className="max-w-4xl mx-auto my-8 px-4 text-center">
-        No se encontró el producto.
+        {t('noEncontrado')}
         <div className="mt-3">
           <Link
-            to="/productos"
+            to={locPath('/productos')}
             className="text-blue-600 font-bold no-underline hover:text-blue-800"
           >
-            Volver a productos
+            {t('volver')}
           </Link>
         </div>
       </div>
@@ -358,16 +361,16 @@ export default function VerProducto() {
     <div className="max-w-7xl mx-auto my-8 px-4">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 mb-4">
-        <Link to="/" className="text-blue-600 font-semibold no-underline hover:text-blue-800">
-          Inicio
+        <Link to={locPath('/')} className="text-blue-600 font-semibold no-underline hover:text-blue-800">
+          {t('inicio')}
         </Link>
         <span className="text-gray-500">/</span>
-        <Link
-          to="/productos"
-          className="text-blue-600 font-semibold no-underline hover:text-blue-800"
-        >
-          Productos
-        </Link>
+          <Link
+            to={locPath('/productos')}
+            className="text-blue-600 font-semibold no-underline hover:text-blue-800"
+          >
+            {t('productos')}
+          </Link>
         <span className="text-gray-500">/</span>
         <span className="text-gray-800 font-semibold">{producto.name}</span>
       </div>
@@ -378,7 +381,7 @@ export default function VerProducto() {
           <div className="relative">
             {discountPct !== null && (
               <span className="absolute top-3 right-3 bg-red-600 text-white font-bold text-sm rounded-lg px-2 py-1 z-10">
-                {discountPct}% OFF
+                {t('descuento', { pct: discountPct })}
               </span>
             )}
             <div
@@ -392,7 +395,7 @@ export default function VerProducto() {
                   className="w-full h-full object-contain"
                 />
               ) : (
-                <div className="text-gray-500">Sin imagen</div>
+                <div className="text-gray-500">{t('sinImagen')}</div>
               )}
             </div>
           </div>
@@ -419,9 +422,9 @@ export default function VerProducto() {
 
           {/* Descripción y atributos */}
           <div className="mt-6">
-            <h2 className="text-xl font-bold mb-2">Descripción</h2>
+            <h2 className="text-xl font-bold mb-2">{t('descripcion')}</h2>
             <p className="text-gray-700 leading-relaxed">
-              {producto.description || 'Sin descripción.'}
+              {producto.description || t('sinDescripcion')}
             </p>
 
             {}
@@ -436,7 +439,7 @@ export default function VerProducto() {
         {/* Sidebar: precio, stock, acciones */}
         <div className="w-1/2">
           <h1 className="text-2xl font-bold mb-2">{producto.name}</h1>
-          <div className="text-gray-600 mb-2">{producto.category || 'Categoría'}</div>
+          <div className="text-gray-600 mb-2">{producto.category || t('categoria')}</div>
 
           {/* Promedio de estrellas (solo si hay reseñas) */}
           {reviewsCount > 0 && (
@@ -459,7 +462,7 @@ export default function VerProducto() {
                 </div>
                 {discountPct !== null && (
                   <div className="text-red-600 font-semibold text-sm mt-1">
-                    Ahorra {discountPct}% vs. precio original
+                    {t('ahorra', { pct: discountPct })}
                   </div>
                 )}
               </div>
@@ -472,13 +475,13 @@ export default function VerProducto() {
                 producto.stock > 0 ? 'text-green-600' : 'text-red-600'
               }`}
             >
-              {producto.stock > 0 ? 'En stock' : 'Agotado'}
+              {producto.stock > 0 ? t('enStock') : t('agotado')}
             </div>
 
             {/* Selector de cantidad */}
             {producto.stock > 0 && (
               <div className="mt-3">
-                <div className="font-semibold mb-1">Cantidad</div>
+                <div className="font-semibold mb-1">{t('cantidad')}</div>
                 <div className="flex items-center justify-center gap-2">
                   <button
                     type="button"
@@ -520,7 +523,7 @@ export default function VerProducto() {
                 </div>
                 {qty > (Number(producto.stock) || 0) && (
                   <div className="text-red-600 font-semibold mt-1 text-sm">
-                    Máximo disponible: {Number(producto.stock)}
+                    {t('maximoDisponible')} {Number(producto.stock)}
                   </div>
                 )}
               </div>
@@ -536,24 +539,24 @@ export default function VerProducto() {
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
                       : 'bg-gray-400 text-white'
                 } ${isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-                title={noChangeDisabled ? 'Sin cambios' : undefined}
+                title={noChangeDisabled ? t('actualizarCantidad') : undefined}
                 disabled={isDisabled}
                 onClick={handleCartAction}
               >
                 {addLoading
                   ? inCart
-                    ? 'Actualizando...'
-                    : 'Añadiendo...'
+                    ? t('actualizando')
+                    : t('anadiendo')
                   : inCart
-                    ? 'Actualizar cantidad'
-                    : 'Añadir al carrito'}
+                    ? t('actualizarCantidad')
+                    : t('anadirCarrito')}
               </button>
 
               {inCart && (
                 <button
                   type="button"
                   className="w-11 rounded-lg border border-red-300 bg-red-50 text-red-700 font-bold cursor-pointer hover:bg-red-100"
-                  title="Quitar del carrito"
+                  title={t('quitarCarrito')}
                   onClick={handleRemoveFromCart}
                 >
                   ✕
@@ -566,9 +569,9 @@ export default function VerProducto() {
           <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="text-sm font-semibold text-gray-900">Compartir</div>
+                <div className="text-sm font-semibold text-gray-900">{t('compartir')}</div>
                 <div className="text-xs text-gray-500">
-                  Comparte este producto con tus clientes o amigos
+                  {t('compartirTexto')}
                 </div>
               </div>
 
@@ -586,9 +589,9 @@ export default function VerProducto() {
                         })
                         .catch(() => {})
                     }
-                    title="Compartir (nativo)"
+                    title={t('compartirNativo')}
                     className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
-                    aria-label="Compartir"
+                    aria-label={t('compartir')}
                   >
                     <svg
                       className="w-4 h-4"
@@ -619,7 +622,7 @@ export default function VerProducto() {
                         strokeLinejoin="round"
                       />
                     </svg>
-                    Compartir
+                    {t('compartir')}
                   </button>
                 ) : null}
               </div>
@@ -630,11 +633,11 @@ export default function VerProducto() {
                 type="button"
                 onClick={() => {
                   navigator.clipboard.writeText(shareLink);
-                  toast.success('Enlace copiado al portapapeles');
+                  toast.success(t('enlaceCopiado'));
                 }}
-                title="Copiar enlace"
+                title={t('copiar')}
                 className="flex items-center gap-2 justify-center px-3 py-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-gray-100 transition text-sm"
-                aria-label="Copiar enlace"
+                aria-label={t('copiar')}
               >
                 <svg
                   className="w-4 h-4 text-gray-700"
@@ -658,7 +661,7 @@ export default function VerProducto() {
                     strokeLinejoin="round"
                   />
                 </svg>
-                Copiar
+                {t('copiar')}
               </button>
 
               <button
@@ -666,9 +669,9 @@ export default function VerProducto() {
                 onClick={() =>
                   window.open(`https://wa.me/?text=${encodeURIComponent(shareLink)}`, '_blank')
                 }
-                title="Compartir por WhatsApp"
+                title={t('whatsapp')}
                 className="flex items-center gap-2 justify-center px-3 py-2 rounded-lg border border-gray-100 bg-green-50 hover:bg-green-100 transition text-sm text-green-700"
-                aria-label="WhatsApp"
+                aria-label={t('whatsapp')}
               >
                 <svg
                   className="w-4 h-4"
@@ -692,7 +695,7 @@ export default function VerProducto() {
                     strokeLinejoin="round"
                   />
                 </svg>
-                WhatsApp
+                {t('whatsapp')}
               </button>
 
               <button
@@ -703,9 +706,9 @@ export default function VerProducto() {
                     '_blank'
                   )
                 }
-                title="Compartir en Facebook"
+                title={t('facebook')}
                 className="flex items-center gap-2 justify-center px-3 py-2 rounded-lg border border-gray-100 bg-blue-50 hover:bg-blue-100 transition text-sm text-blue-700"
-                aria-label="Facebook"
+                aria-label={t('facebook')}
               >
                 <svg
                   className="w-4 h-4"
@@ -722,7 +725,7 @@ export default function VerProducto() {
                     strokeLinejoin="round"
                   />
                 </svg>
-                Facebook
+                {t('facebook')}
               </button>
 
               <button
@@ -730,9 +733,9 @@ export default function VerProducto() {
                 onClick={() => {
                   window.location.href = `mailto:?subject=${encodeURIComponent(`Producto: ${producto.name}`)}&body=${encodeURIComponent(`Mira este producto: ${shareLink}`)}`;
                 }}
-                title="Enviar por email"
+                title={t('email')}
                 className="flex items-center gap-2 justify-center px-3 py-2 rounded-lg border border-gray-100 bg-indigo-50 hover:bg-indigo-100 transition text-sm text-indigo-700"
-                aria-label="Email"
+                aria-label={t('email')}
               >
                 <svg
                   className="w-4 h-4"
@@ -756,7 +759,7 @@ export default function VerProducto() {
                     strokeLinejoin="round"
                   />
                 </svg>
-                Email
+                {t('email')}
               </button>
             </div>
           </div>

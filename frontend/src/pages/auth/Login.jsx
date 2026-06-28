@@ -3,16 +3,19 @@ import { useAuth } from '@/context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
+import { locPath } from '@/utils/localePath';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 function GoogleLoginButton() {
+  const { t } = useTranslation('auth');
   const googleLogin = useGoogleLogin({
     onSuccess: async () => {
-      toast.info('Google OAuth será migrado a BetterAuth próximamente.');
+      toast.info(t('login.googleMigrate'));
     },
     onError: () => {
-      toast.error('El inicio de sesión con Google falló.');
+      toast.error(t('login.googleError'));
     },
   });
 
@@ -29,12 +32,13 @@ function GoogleLoginButton() {
         <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
         <path fill="none" d="M0 0h48v48H0z" />
       </svg>
-      Iniciar sesión con Google
+      {t('login.google')}
     </button>
   );
 }
 
 function Login() {
+  const { t } = useTranslation('auth');
   const { login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -52,8 +56,8 @@ function Login() {
     try {
       await login(email, password);
       setSuccess(true);
-      toast.success('¡Inicio de sesión exitoso!');
-      setTimeout(() => navigate('/'), 1000);
+      toast.success(t('login.success'));
+      setTimeout(() => navigate(locPath('/')), 1000);
     } catch (err) {
       const data = err?.response?.data;
       const msg =
@@ -62,7 +66,7 @@ function Login() {
         data?.detail ||
         (typeof data === 'object' ? Object.entries(data).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join(' | ') : String(data || '')) ||
         err.message ||
-        'Error de autenticación. Verifica tus credenciales.';
+        t('login.error');
       setError(msg);
     } finally {
       setLoading(false);
@@ -73,19 +77,19 @@ function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 p-5 font-sans">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
         <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white p-8 text-center">
-          <h2 className="text-2xl font-bold mb-2">Bienvenido de nuevo</h2>
-          <p className="opacity-90 text-sm">Ingresa a tu cuenta para continuar</p>
+          <h2 className="text-2xl font-bold mb-2">{t('login.titulo')}</h2>
+          <p className="opacity-90 text-sm">{t('login.subtitulo')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8">
           <div className="mb-5">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Correo Electrónico
+              {t('login.email')}
             </label>
             <input
               id="email"
               type="email"
-              placeholder="tu.correo@ejemplo.com"
+              placeholder={t('login.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -96,12 +100,12 @@ function Login() {
 
           <div className="mb-6">
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Contraseña
+              {t('login.password')}
             </label>
             <input
               id="password"
               type="password"
-              placeholder="Tu contraseña"
+              placeholder={t('login.passwordPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -123,10 +127,10 @@ function Login() {
             {loading ? (
               <>
                 <div className="w-4 h-4 border-2 border-transparent border-t-white rounded-full animate-spin"></div>
-                Iniciando sesión...
+                {t('login.loading')}
               </>
             ) : (
-              'Iniciar Sesión'
+              t('login.submit')
             )}
           </button>
 
@@ -164,7 +168,7 @@ function Login() {
                   clipRule="evenodd"
                 />
               </svg>
-              ¡Inicio de sesión exitoso! Redirigiendo...
+              {t('login.successRedirect')}
             </div>
           )}
         </form>
@@ -173,7 +177,7 @@ function Login() {
           <div className="px-8 pt-4 pb-2 text-center">
             <div className="relative flex items-center">
               <div className="flex-grow border-t border-gray-300"></div>
-              <span className="flex-shrink mx-4 text-sm text-gray-500">O continúa con</span>
+              <span className="flex-shrink mx-4 text-sm text-gray-500">{t('login.orContinue')}</span>
               <div className="flex-grow border-t border-gray-300"></div>
             </div>
             <div className="mt-4">
@@ -185,16 +189,16 @@ function Login() {
         <div className="px-8 py-6 text-center border-t border-gray-200">
           <div className="flex flex-col gap-3">
             <Link
-              to="/register"
+              to={locPath('/register')}
               className="text-indigo-600 font-medium text-sm transition-colors duration-200 hover:text-purple-600 hover:underline"
             >
-              ¿No tienes cuenta? Regístrate
+              {t('login.noAccount')}
             </Link>
             <Link
-              to="/password-reset"
+              to={locPath('/password-reset')}
               className="text-indigo-600 font-medium text-sm transition-colors duration-200 hover:text-purple-600 hover:underline"
             >
-              ¿Olvidaste tu contraseña?
+              {t('login.forgotPassword')}
             </Link>
           </div>
         </div>

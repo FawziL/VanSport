@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { authService } from '@/services/routes';
+import { useTranslation } from 'react-i18next';
+import { locPath } from '@/utils/localePath';
 
 function useQuery() {
   const { search } = useLocation();
@@ -8,6 +10,7 @@ function useQuery() {
 }
 
 export default function PasswordResetConfirm() {
+  const { t } = useTranslation('auth');
   const q = useQuery();
   const navigate = useNavigate();
   const token = q.get('token') || '';
@@ -27,9 +30,8 @@ export default function PasswordResetConfirm() {
     setSubmitting(true);
     try {
       await authService.passwordResetConfirm(token, password);
-      setOkMsg('Tu contraseña se actualizó correctamente. Ahora puedes iniciar sesión.');
-      // Opcional: redirigir automático al login
-      setTimeout(() => navigate('/login'), 1500);
+      setOkMsg(t('resetConfirm.success'));
+      setTimeout(() => navigate(locPath('/login')), 1500);
     } catch (err) {
       const data = err?.response?.data;
       const msg =
@@ -37,7 +39,7 @@ export default function PasswordResetConfirm() {
           ? Object.entries(data)
               .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : String(v)}`)
               .join(' | ')
-          : err?.message || 'No se pudo restablecer la contraseña';
+          : err?.message || t('resetConfirm.error');
       setErrMsg(msg);
     } finally {
       setSubmitting(false);
@@ -47,16 +49,16 @@ export default function PasswordResetConfirm() {
   if (!token) {
     return (
       <div style={{ maxWidth: 460, margin: '2rem auto', padding: '0 1rem' }}>
-        <h2>Restablecer contraseña</h2>
+        <h2>{t('resetConfirm.titulo')}</h2>
         <div style={{ color: '#c62828', marginTop: 8, fontWeight: 700 }}>
-          Falta el token de recuperación. Vuelve a solicitar el enlace.
+          {t('resetConfirm.noToken')}
         </div>
         <div style={{ marginTop: 12 }}>
           <Link
-            to="/password-reset"
+            to={locPath('/password-reset')}
             style={{ color: '#1e88e5', fontWeight: 700, textDecoration: 'none' }}
           >
-            Ir a recuperar contraseña
+            {t('resetConfirm.goToReset')}
           </Link>
         </div>
       </div>
@@ -65,12 +67,12 @@ export default function PasswordResetConfirm() {
 
   return (
     <div style={{ maxWidth: 460, margin: '2rem auto', padding: '0 1rem' }}>
-      <h2>Define tu nueva contraseña</h2>
+      <h2>{t('resetConfirm.subtitulo')}</h2>
       <form onSubmit={onSubmit} style={{ marginTop: 12 }}>
-        <label style={{ display: 'block', marginBottom: 6 }}>Nueva contraseña</label>
+        <label style={{ display: 'block', marginBottom: 6 }}>{t('resetConfirm.newPassword')}</label>
         <input
           type="password"
-          placeholder="Mínimo 8 caracteres"
+          placeholder={t('resetConfirm.passwordPlaceholder')}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           minLength={8}
@@ -84,10 +86,10 @@ export default function PasswordResetConfirm() {
             borderRadius: 8,
           }}
         />
-        <label style={{ display: 'block', marginBottom: 6 }}>Repetir contraseña</label>
+        <label style={{ display: 'block', marginBottom: 6 }}>{t('resetConfirm.repeatPassword')}</label>
         <input
           type="password"
-          placeholder="Repítela"
+          placeholder={t('resetConfirm.repeatPlaceholder')}
           value={password2}
           onChange={(e) => setPassword2(e.target.value)}
           minLength={8}
@@ -103,7 +105,7 @@ export default function PasswordResetConfirm() {
         />
         {password && password2 && password !== password2 && (
           <div style={{ color: '#c62828', marginBottom: 8, fontWeight: 700 }}>
-            Las contraseñas no coinciden.
+            {t('resetConfirm.mismatch')}
           </div>
         )}
         <button
@@ -120,7 +122,7 @@ export default function PasswordResetConfirm() {
             cursor: !canSubmit || submitting ? 'not-allowed' : 'pointer',
           }}
         >
-          {submitting ? 'Guardando…' : 'Guardar nueva contraseña'}
+          {submitting ? t('resetConfirm.saving') : t('resetConfirm.submit')}
         </button>
       </form>
 
@@ -128,8 +130,8 @@ export default function PasswordResetConfirm() {
       {errMsg && <div style={{ color: '#c62828', marginTop: 10, fontWeight: 700 }}>{errMsg}</div>}
 
       <div style={{ marginTop: 14 }}>
-        <Link to="/login" style={{ color: '#1e88e5', fontWeight: 700, textDecoration: 'none' }}>
-          Volver a iniciar sesión
+        <Link to={locPath('/login')} style={{ color: '#1e88e5', fontWeight: 700, textDecoration: 'none' }}>
+          {t('resetConfirm.backToLogin')}
         </Link>
       </div>
     </div>

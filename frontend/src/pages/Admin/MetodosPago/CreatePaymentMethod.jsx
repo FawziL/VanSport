@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
 
 export default function CreatePaymentMethod() {
+  const { t } = useTranslation('admin');
   const [form, setForm] = useState({
     codigo: '',
     nombre: '',
@@ -26,7 +28,7 @@ export default function CreatePaymentMethod() {
     try {
       cfg = form.config ? JSON.parse(form.config) : {};
     } catch {
-      setError('Config debe ser JSON válido');
+      setError(t('createPaymentMethod.errorConfig'));
       return;
     }
 
@@ -45,7 +47,7 @@ export default function CreatePaymentMethod() {
       });
       navigate('/admin/metodos-pago');
     } catch (e) {
-      setError(e?.response?.data?.detail || 'No se pudo crear el método');
+      setError(e?.response?.data?.detail || t('createPaymentMethod.error'));
     } finally {
       setSaving(false);
     }
@@ -53,7 +55,7 @@ export default function CreatePaymentMethod() {
 
   return (
     <div style={{ maxWidth: 840, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 12 }}>Crear método de pago</h1>
+      <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 12 }}>{t('createPaymentMethod.titulo')}</h1>
       {error && <div style={{ color: '#d32f2f', marginBottom: 12, fontWeight: 700 }}>{error}</div>}
       <div
         style={{
@@ -66,7 +68,7 @@ export default function CreatePaymentMethod() {
         }}
       >
         <div>
-          <label>Código</label>
+          <label>{t('createPaymentMethod.codigo')}</label>
           <input
             value={form.codigo}
             onChange={(e) => onChange('codigo', e.target.value)}
@@ -74,7 +76,7 @@ export default function CreatePaymentMethod() {
           />
         </div>
         <div>
-          <label>Nombre</label>
+          <label>{t('createPaymentMethod.nombre')}</label>
           <input
             value={form.nombre}
             onChange={(e) => onChange('nombre', e.target.value)}
@@ -82,16 +84,16 @@ export default function CreatePaymentMethod() {
           />
         </div>
         <div>
-          <label>Tipo</label>
+          <label>{t('createPaymentMethod.tipo')}</label>
           <input
             value={form.tipo}
             onChange={(e) => onChange('tipo', e.target.value)}
             className="input"
-            placeholder="paypal | pago_movil | efectivo | ..."
+            placeholder={t('createPaymentMethod.tipoPlaceholder')}
           />
         </div>
         <div>
-          <label>Orden</label>
+          <label>{t('createPaymentMethod.orden')}</label>
           <input
             type="number"
             value={form.orden}
@@ -100,7 +102,7 @@ export default function CreatePaymentMethod() {
           />
         </div>
         <div>
-          <label>Activo</label>
+          <label>{t('createPaymentMethod.activo')}</label>
           <input
             type="checkbox"
             checked={form.activo}
@@ -108,7 +110,7 @@ export default function CreatePaymentMethod() {
           />
         </div>
         <div>
-          <label>Descripción</label>
+          <label>{t('createPaymentMethod.descripcion')}</label>
           <textarea
             value={form.descripcion}
             onChange={(e) => onChange('descripcion', e.target.value)}
@@ -117,7 +119,7 @@ export default function CreatePaymentMethod() {
           />
         </div>
         <div>
-          <label>Instrucciones</label>
+          <label>{t('createPaymentMethod.instrucciones')}</label>
           <textarea
             value={form.instrucciones}
             onChange={(e) => onChange('instrucciones', e.target.value)}
@@ -126,7 +128,7 @@ export default function CreatePaymentMethod() {
           />
         </div>
         <div>
-          <label>Icono</label>
+          <label>{t('createPaymentMethod.icono')}</label>
           <input
             value={form.icono}
             onChange={(e) => onChange('icono', e.target.value)}
@@ -134,13 +136,13 @@ export default function CreatePaymentMethod() {
           />
         </div>
         <div>
-          <label>Config (JSON)</label>
+          <label>{t('createPaymentMethod.config')}</label>
           <textarea
             value={form.config}
             onChange={(e) => onChange('config', e.target.value)}
             rows={6}
             className="input"
-            placeholder='{"banco":"BANESCO","telefono":"+58-..."}'
+            placeholder={t('createPaymentMethod.configPlaceholder')}
           />
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -156,7 +158,7 @@ export default function CreatePaymentMethod() {
               border: 'none',
             }}
           >
-            {saving ? 'Guardando…' : 'Crear'}
+            {saving ? t('createPaymentMethod.guardando') : t('createPaymentMethod.crear')}
           </button>
           <button
             onClick={() => navigate('/admin/metodos-pago')}
@@ -169,7 +171,7 @@ export default function CreatePaymentMethod() {
               fontWeight: 800,
             }}
           >
-            Cancelar
+            {t('createPaymentMethod.cancelar')}
           </button>
         </div>
       </div>

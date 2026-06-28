@@ -1,9 +1,11 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
 import PhoneInput from '@/components/PhoneInput';
 
 export default function CreateUser() {
+  const { t } = useTranslation('admin');
   const [form, setForm] = useState({
     name: '',
     lastName: '',
@@ -31,7 +33,7 @@ export default function CreateUser() {
       await adminService.users.create({ ...form, phone: phoneRef.current?.getValue() || '' });
       navigate('/admin/usuarios');
     } catch (err) {
-      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.detail || err?.message || 'No se pudo crear el usuario';
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.detail || err?.message || t('createUser.error');
       setError(msg);
     } finally {
       setLoading(false);
@@ -107,7 +109,7 @@ export default function CreateUser() {
               color: '#1a1a1a',
             }}
           >
-            Crear nuevo usuario
+            {t('createUser.titulo')}
           </h1>
         </div>
 
@@ -155,7 +157,7 @@ export default function CreateUser() {
                   marginBottom: '4px',
                 }}
               >
-                Nombre *
+                {t('createUser.nombre')}
               </label>
               <input
                 name="name"
@@ -189,7 +191,7 @@ export default function CreateUser() {
                   marginBottom: '4px',
                 }}
               >
-                Apellido *
+                {t('createUser.apellido')}
               </label>
               <input
                 name="lastName"
@@ -225,7 +227,7 @@ export default function CreateUser() {
                 marginBottom: '4px',
               }}
             >
-              Email *
+              {t('createUser.email')}
             </label>
             <input
               type="email"
@@ -261,7 +263,7 @@ export default function CreateUser() {
                 marginBottom: '4px',
               }}
             >
-              Contraseña *
+              {t('createUser.contrasena')}
             </label>
             <input
               type="password"
@@ -298,7 +300,7 @@ export default function CreateUser() {
                   marginBottom: '4px',
                 }}
               >
-                Teléfono
+                {t('createUser.telefono')}
               </label>
               <PhoneInput ref={phoneRef} />
             </div>
@@ -311,7 +313,7 @@ export default function CreateUser() {
                   marginBottom: '4px',
                 }}
               >
-                Dirección
+                {t('createUser.direccion')}
               </label>
               <input
                 name="address"
@@ -366,7 +368,7 @@ export default function CreateUser() {
                   cursor: 'pointer',
                 }}
               />
-              <span style={{ fontWeight: 500 }}>Usuario activo</span>
+              <span style={{ fontWeight: 500 }}>{t('createUser.usuarioActivo')}</span>
             </label>
             <label
               style={{
@@ -387,7 +389,7 @@ export default function CreateUser() {
                   cursor: 'pointer',
                 }}
               />
-              <span style={{ fontWeight: 500 }}>Administrador</span>
+              <span style={{ fontWeight: 500 }}>{t('createUser.administrador')}</span>
             </label>
           </div>
 
@@ -423,7 +425,7 @@ export default function CreateUser() {
                 e.target.style.borderColor = '#ddd';
               }}
             >
-              Cancelar
+              {t('createUser.cancelar')}
             </button>
             <button
               type="submit"
@@ -493,10 +495,10 @@ export default function CreateUser() {
                       strokeLinecap="round"
                     />
                   </svg>
-                  Creando usuario...
+                  {t('createUser.creando')}
                 </div>
               ) : (
-                'Crear usuario'
+                t('createUser.crear')
               )}
             </button>
           </div>

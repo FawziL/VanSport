@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
@@ -15,6 +16,7 @@ import {
 import StatusBadge from '@/components/StatusBadge';
 
 export default function ListShipments() {
+  const { t } = useTranslation('admin');
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -39,7 +41,7 @@ export default function ListShipments() {
         setPages(totalPages);
         setPage((prev) => Math.min(prev, totalPages));
       })
-      .catch(() => setError('No se pudieron cargar los envíos'))
+      .catch(() => setError(t('listShipments.errorCargar')))
       .finally(() => setLoading(false));
     // eslint-disable-next-line
   }, [pageSize]);
@@ -66,15 +68,7 @@ export default function ListShipments() {
     money: (n) => (n != null ? `$${Number(n).toFixed(2)}` : '-'),
   };
 
-  const getUserLabel = (e) => {
-    const nombre = e.userName || '';
-    const apellido = e.userLastName || '';
-    const email = e.usuario_email || '';
-    const base = `${nombre} ${apellido}`.trim();
-    const id = e.userId != null ? e.userId : null;
-    const emailPart = email ? ` - ${email}` : '';
-    return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
-  };
+  const getUserLabel = (e) => e.userId ?? '-';
 
   const handleExportExcel = async () => {
     try {
@@ -95,7 +89,7 @@ export default function ListShipments() {
       a.remove();
       URL.revokeObjectURL(a.href);
     } catch (e) {
-      setError('No se pudo exportar envíos');
+      setError(t('listShipments.errorExportar'));
       console.error(e);
     } finally {
       setExporting(false);
@@ -106,11 +100,11 @@ export default function ListShipments() {
     <div className="max-w-[1200px] mx-auto my-10 px-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-extrabold">Envíos</h1>
+        <h1 className="text-2xl font-extrabold">{t('listShipments.titulo')}</h1>
         <div className="flex flex-col sm:flex-row gap-4 items-end mb-4">
           <div className="flex flex-col sm:flex-row gap-4 flex-1">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Desde</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">{t('listShipments.desde')}</label>
               <input
                 type="date"
                 value={startDate}
@@ -119,7 +113,7 @@ export default function ListShipments() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Hasta</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">{t('listShipments.hasta')}</label>
               <input
                 type="date"
                 value={endDate}
@@ -136,9 +130,9 @@ export default function ListShipments() {
                 ? 'bg-blue-50 border-blue-200 text-blue-400 cursor-not-allowed'
                 : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 cursor-pointer'
             }`}
-            title="Exportar envíos a Excel"
+            title={t('listShipments.exportTitle')}
           >
-            {exporting ? 'Exportando…' : 'Exportar Excel'}
+            {exporting ? t('listShipments.exportando') : t('listShipments.exportar')}
           </button>
         </div>
       </div>
@@ -152,22 +146,22 @@ export default function ListShipments() {
           value={pageSize}
           onChange={setPageSize}
           options={[5, 10, 20, 50]}
-          label="Por página"
+          label={t('listShipments.porPagina')}
         />
       </div>
 
       {/* Table */}
       <Table>
         <TableHead>
-          <TableHeader width="5%">ID</TableHeader>
-          <TableHeader width="5%">Pedido</TableHeader>
-          <TableHeader width="30%">Usuario</TableHeader>
-          <TableHeader width="14%">Método</TableHeader>
-          <TableHeader width="14%">Estado</TableHeader>
-          <TableHeader width="10%">Costo</TableHeader>
-          <TableHeader width="15%">Fecha envío</TableHeader>
+          <TableHeader width="5%">{t('listShipments.colId')}</TableHeader>
+          <TableHeader width="5%">{t('listShipments.colPedido')}</TableHeader>
+          <TableHeader width="30%">{t('listShipments.colUsuario')}</TableHeader>
+          <TableHeader width="14%">{t('listShipments.colMetodo')}</TableHeader>
+          <TableHeader width="14%">{t('listShipments.colEstado')}</TableHeader>
+          <TableHeader width="10%">{t('listShipments.colCosto')}</TableHeader>
+          <TableHeader width="15%">{t('listShipments.colFechaEnvio')}</TableHeader>
           <TableHeader width="10%" align="center">
-            Acciones
+            {t('listShipments.colAcciones')}
           </TableHeader>
         </TableHead>
 
@@ -175,26 +169,26 @@ export default function ListShipments() {
           loading={loading}
           empty={pageItems.length === 0}
           colSpan={8}
-          loadingText="Cargando envíos..."
-          emptyText="No hay envíos."
+          loadingText={t('listShipments.cargando')}
+          emptyText={t('listShipments.vacio')}
         >
           {pageItems.map((e) => (
-            <TableRow key={e.envio_id}>
-              <TableCell className="whitespace-nowrap">{e.envio_id}</TableCell>
-              <TableCell className="whitespace-nowrap">{e.pedido ?? '-'}</TableCell>
+            <TableRow key={e.id}>
+              <TableCell className="whitespace-nowrap">{e.id}</TableCell>
+              <TableCell className="whitespace-nowrap">{e.orderId ?? '-'}</TableCell>
               <TableCell className="break-words">{getUserLabel(e)}</TableCell>
-              <TableCell className="break-words">{e.metodo_envio}</TableCell>
+              <TableCell className="break-words">{e.shippingMethod}</TableCell>
               <TableCell className="break-words">
                 <StatusBadge estado={e.status} variant="order" />
               </TableCell>
-              <TableCell className="whitespace-nowrap">{fmt.money(e.costo_envio)}</TableCell>
-              <TableCell className="whitespace-nowrap">{fmt.date(e.fecha_envio)}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.money(e.cost)}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.date(e.shippedAt)}</TableCell>
               <TableCell align="center">
                 <ActionButton
                   variant="edit"
-                  onClick={() => navigate(`/admin/envios/editar/${e.envio_id}`)}
+                  onClick={() => navigate(`/admin/envios/editar/${e.id}`)}
                 >
-                  Editar
+                  {t('listShipments.editar')}
                 </ActionButton>
               </TableCell>
             </TableRow>

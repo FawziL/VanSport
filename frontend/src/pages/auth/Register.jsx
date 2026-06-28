@@ -1,11 +1,14 @@
 import { useState, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { authService } from '@/services/routes';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import PhoneInput from '@/components/PhoneInput';
+import { useTranslation } from 'react-i18next';
+import { locPath } from '@/utils/localePath';
 import './Auth.css';
 
 function Register() {
+  const { t } = useTranslation('auth');
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -36,11 +39,11 @@ function Register() {
     const { email, password, confirmPassword, name, lastName } = form;
 
     if (password.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres.');
+      setError(t('register.passwordError'));
       return;
     }
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
+      setError(t('register.passwordMismatch'));
       return;
     }
 
@@ -52,7 +55,7 @@ function Register() {
       await authService.signUp(payload);
       await login(email, password);
       setSuccess(true);
-      navigate('/');
+      navigate(locPath('/'));
     } catch (err) {
       const data = err?.response?.data;
       if (data) {
@@ -65,7 +68,7 @@ function Register() {
           setError(data);
         }
       } else {
-        setError(err?.message || 'Error al registrar usuario');
+        setError(err?.message || t('register.error'));
       }
     } finally {
       setSubmitting(false);
@@ -76,33 +79,33 @@ function Register() {
     <div className="register-container">
       <div className="register-card">
         <div className="register-header">
-          <h2>Crear Cuenta</h2>
-          <p>Completa tus datos para comenzar</p>
+          <h2>{t('register.titulo')}</h2>
+          <p>{t('register.subtitulo')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="register-form">
           <div className="form-section">
-            <h3 className="section-title">Información Personal</h3>
+            <h3 className="section-title">{t('register.personalInfo')}</h3>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="name">Nombre</label>
+                <label htmlFor="name">{t('register.name')}</label>
                 <input
                   type="text"
                   id="name"
                   name="name"
-                  placeholder="Tu nombre"
+                  placeholder={t('register.namePlaceholder')}
                   value={form.name}
                   onChange={handleChange}
                   required
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="lastName">Apellido</label>
+                <label htmlFor="lastName">{t('register.lastName')}</label>
                 <input
                   type="text"
                   id="lastName"
                   name="lastName"
-                  placeholder="Tu apellido"
+                  placeholder={t('register.lastNamePlaceholder')}
                   value={form.lastName}
                   onChange={handleChange}
                   required
@@ -111,12 +114,12 @@ function Register() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="email">Correo Electrónico</label>
+              <label htmlFor="email">{t('register.email')}</label>
               <input
                 type="email"
                 id="email"
                 name="email"
-                placeholder="ejemplo@correo.com"
+                placeholder={t('register.emailPlaceholder')}
                 value={form.email}
                 onChange={handleChange}
                 required
@@ -124,35 +127,35 @@ function Register() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="phone">Teléfono</label>
+              <label htmlFor="phone">{t('register.phone')}</label>
               <PhoneInput ref={phoneRef} />
             </div>
           </div>
 
           <div className="form-section">
-            <h3 className="section-title">Seguridad</h3>
+            <h3 className="section-title">{t('register.security')}</h3>
             <div className="form-group">
-              <label htmlFor="password">Contraseña</label>
+              <label htmlFor="password">{t('register.password')}</label>
               <input
                 type="password"
                 id="password"
                 name="password"
-                placeholder="Mínimo 8 caracteres"
+                placeholder={t('register.passwordPlaceholder')}
                 value={form.password}
                 onChange={handleChange}
                 required
                 minLength={8}
               />
-              <div className="password-hint">La contraseña debe tener al menos 8 caracteres</div>
+              <div className="password-hint">{t('register.passwordHint')}</div>
             </div>
 
             <div className="form-group">
-              <label htmlFor="confirmPassword">Confirmar Contraseña</label>
+              <label htmlFor="confirmPassword">{t('register.confirmPassword')}</label>
               <input
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"
-                placeholder="Repite tu contraseña"
+                placeholder={t('register.confirmPlaceholder')}
                 value={form.confirmPassword}
                 onChange={handleChange}
                 required
@@ -169,23 +172,23 @@ function Register() {
             {submitting ? (
               <>
                 <span className="spinner"></span>
-                Procesando...
+                {t('register.loading')}
               </>
             ) : (
-              'Crear Cuenta'
+              t('register.submit')
             )}
           </button>
 
           {error && <div className="error-message">{error}</div>}
-          {success && <div className="success-message">¡Registro exitoso! Redirigiendo...</div>}
+          {success && <div className="success-message">{t('register.success')}</div>}
         </form>
 
         <div className="register-footer">
           <p>
-            ¿Ya tienes una cuenta?{' '}
-            <a href="/login" className="login-link">
-              Inicia Sesión
-            </a>
+            {t('register.hasAccount')}{' '}
+            <Link to={locPath('/login')} className="login-link">
+              {t('register.login')}
+            </Link>
           </p>
         </div>
       </div>

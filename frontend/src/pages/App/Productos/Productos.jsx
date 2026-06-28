@@ -4,6 +4,7 @@ import CardProduct from '@/components/CardProduct';
 import { appService } from '@/services/routes';
 import Pagination from '@/components/Pagination';
 import ProductFilters from '@/components/ProductFilters';
+import { useTranslation, Trans } from 'react-i18next';
 
 const fetchProductos = async ({ page, filters }) => {
   const params = {
@@ -38,6 +39,7 @@ const fetchProductos = async ({ page, filters }) => {
 };
 
 export default function Productos() {
+  const { t } = useTranslation('productos');
   const [searchParams, setSearchParams] = useSearchParams();
 
   const parseFiltersFromSearch = (sp) => {
@@ -85,7 +87,7 @@ export default function Productos() {
       })
       .catch((err) => {
         console.error('Error cargando productos:', err);
-        setError(err?.message || 'No se pudieron cargar los productos');
+        setError(err?.message || t('errorCargar'));
         setProductos([]);
         setPages(1);
       });
@@ -114,9 +116,9 @@ export default function Productos() {
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Nuestros Productos</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{t('titulo')}</h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Descubre nuestra amplia selección de productos de calidad
+          {t('subtitulo')}
         </p>
       </div>
 
@@ -139,19 +141,26 @@ export default function Productos() {
           {/* Resultados y estadísticas */}
           <div className="flex justify-between items-center mb-6">
             <div className="text-sm text-gray-600">
-              Mostrando <span className="font-semibold text-gray-900">{productos.length}</span>{' '}
-              productos
+              <Trans
+                i18nKey="mostrando"
+                values={{ count: productos.length }}
+                components={{ bold: <span className="font-semibold text-gray-900" /> }}
+              />
               {filters.q && (
-                <span>
-                  {' '}
-                  para "<span className="font-semibold text-gray-900">{filters.q}</span>"
-                </span>
+                <Trans
+                  i18nKey="para"
+                  values={{ query: filters.q }}
+                  components={{ bold: <span className="font-semibold text-gray-900" /> }}
+                />
               )}
             </div>
             {pages > 1 && (
               <div className="text-sm text-gray-600">
-                Página <span className="font-semibold text-gray-900">{page}</span> de{' '}
-                <span className="font-semibold text-gray-900">{pages}</span>
+                <Trans
+                  i18nKey="pagina"
+                  values={{ page, pages }}
+                  components={{ bold: <span className="font-semibold text-gray-900" /> }}
+                />
               </div>
             )}
           </div>
@@ -191,7 +200,7 @@ export default function Productos() {
                   />
                 </svg>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  No se encontraron productos
+                  {t('noEncontrados')}
                 </h3>
                 <p className="text-gray-600 mb-6">
                   {filters.q ||
@@ -199,8 +208,8 @@ export default function Productos() {
                   filters.min_price ||
                   filters.max_price ||
                   filters.oferta
-                    ? 'Intenta ajustar los filtros para ver más resultados.'
-                    : 'Pronto agregaremos nuevos productos a nuestro catálogo.'}
+                    ? t('conFiltros')
+                    : t('sinFiltros')}
                 </p>
                 {(filters.q ||
                   filters.categoryId ||
@@ -221,7 +230,7 @@ export default function Productos() {
                     }}
                     className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    Ver todos los productos
+                    {t('verTodos')}
                   </button>
                 )}
               </div>

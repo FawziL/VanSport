@@ -1,0 +1,18 @@
+{
+  "titulo": "User Profile",
+  "admin": "Admin",
+  "subtitulo": "View and update your personal information",
+  "userId": "User ID",
+  "email": "Email",
+  "nombre": "Name",
+  "nombrePlaceholder": "Your name",
+  "apellido": "Last Name",
+  "apellidoPlaceholder": "Your last name",
+  "telefono": "Phone",
+  "guardando": "Saving...",
+  "guardar": "Save changes",
+  "volverInicio": "Back to home",
+  "success": "Profile updated successfully.",
+  "errorCargar": "Error loading profile",
+  "errorGuardar": "Error saving changes"
+}

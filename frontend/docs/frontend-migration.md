@@ -8,10 +8,11 @@
 | 2 | Route mapping (Django → NestJS) | ✅ Done |
 | 3 | Image URLs (R2) | ✅ Done |
 | 4 | Login / Register (BetterAuth) | ✅ Done |
-| 5 | Admin CRUD pages (field mapping) | ⬜ Pending |
-| 6 | Public pages (field mapping) | ⬜ Pending |
+| 5 | Admin CRUD pages (field mapping) | ✅ Done |
+| 6 | Public pages (field mapping) | ✅ Done |
 | 7 | Google OAuth (BetterAuth redirect) | ⬜ Pending |
 | 8 | Password Reset (BetterAuth) | ⬜ Pending |
+| 9 | Internacionalización (i18n ES/EN) | 🔄 En Progreso |
 
 ## Phase Details
 
@@ -78,31 +79,40 @@
 ### Phase 5 — Admin CRUD pages ✅
 - [x] `CreateProduct.jsx` — fields: `name`, `description`, `price`, `isActive`, `categoryId`
 - [x] `EditProduct.jsx` — fields: `name`, `description`, `price`, `isActive`, `categoryId`
-- [x] `ListProduct.jsx` — service: `products.listAdmin()`, fields: `imageUrl`, `isActive`, `isFeatured`
+- [x] `ListProduct.jsx` — fields: `imageUrl`, `isActive`, `isFeatured`, `productId`
 - [x] `CreateCategory.jsx` — fields: `name`, `description`, `imageUrl`
 - [x] `EditCategory.jsx` — fields: `name`, `description`, `imageUrl`
 - [x] `ListCategory.jsx` — fields: `imageUrl`, `isFeatured`
 - [x] `CreateUser.jsx` — fields: `name`, `lastName`, `phone`, `isActive`, `isStaff`
 - [x] `EditUser.jsx` — fields: `name`, `lastName`, `phone`, `isActive`, `isStaff`
 - [x] `ListUsers.jsx` — fields: `id`, `name`, `lastName`, `isActive`, `isStaff`
-- [x] `CreateReport.jsx` — service: `bugReports`, fields: `category`, `title`, `description`, `section`
+- [x] `CreateReport.jsx` — fields: `category`, `title`, `description`, `section`
 - [x] `EditReport.jsx` — same
-- [x] `ListReport.jsx` — fields: `imageUrl`, `videoUrl`, `createdAt`, `status`
+- [x] `ListReport.jsx` — fields: `title`, `status`, `createdAt`
 - [x] `Dashboard.jsx` — service references updated
-- [x] All remaining admin pages: service references + field names updated
+- [x] `CreatePaymentMethod.jsx` — fields: `code`, `name`, `type`, `isActive`, `sortOrder`
+- [x] `EditPaymentMethod.jsx` — fields: `code`, `name`, `type`, `isActive`, `sortOrder`
+- [x] `ListPaymentMethods.jsx` — fields: `code`, `name`, `type`, `sortOrder`, `isActive`
+- [x] `ListSales.jsx` — fields: `id`, `orderId`, `amount`, `reference`, `createdAt`, `status`
+- [x] `PendingPayments.jsx` — fields: `id`, `orderId`, `amount`, `createdAt`, `status`
+- [x] `EditSale.jsx` — WRITE: sends `status`, `paymentMethod`
+- [x] `ListOrders.jsx` — fields: `id`, `status`, `total`, `createdAt`
+- [x] `EditOrder.jsx` — WRITE: sends `status`, `shippingAddress`, `notes`
+- [x] `ListShipments.jsx` — fields: `id`, `orderId`, `shippingMethod`, `cost`, `shippedAt`
+- [x] `EditShipment.jsx` — WRITE: sends `status`, `shippingMethod`, `trackingCode`
 
 ### Phase 6 — Public pages ✅
 - [x] `Productos.jsx` — fields: `price`, `name`, `imageUrl`, `id`
 - [x] `VerProducto.jsx` — fields: `name`, `description`, `price`, `salePrice`, `categoryId`, `imageUrl`, `additionalImages`, `stock`
 - [x] `CardProduct.jsx` — fields: `name`, `price`, `salePrice`, `imageUrl`, `id`, `stock`
-- [x] `ProductReviews.jsx` — service: `reviews`, fields: `rating`
-- [x] `Carrito.jsx` — service: `cart`, fields: `id`, `name`, `price`, `quantity`, `productId`
+- [x] `ProductReviews.jsx` — fields: `rating`, `comment`, `createdAt`
+- [x] `Carrito.jsx` — fields: `id`, `name`, `price`, `quantity`, `productId`
 - [x] `Checkout.jsx` — fields: `price`, `name`, `quantity`, `stock`
 - [x] `MisPedidos.jsx` — fields: `id`, `status`, `total`, `createdAt`
-- [x] `VerPedido.jsx` — fields: `status`, `total`, `createdAt`
+- [x] `VerPedido.jsx` — fields: `status`, `total`, `createdAt`, `notes`
 - [x] `NuevoReporte.jsx` — fields: `category`, `title`, `description`, `section`
-- [x] `VerReporte.jsx` — fields: `imageUrl`, `videoUrl`, `createdAt`, `status`
-- [x] `MisReportes.jsx` — fields: `status`, `createdAt`
+- [x] `VerReporte.jsx` — fields: `title`, `status`, `createdAt`, `section`
+- [x] `MisReportes.jsx` — fields: `title`, `status`, `createdAt`
 - [x] `Perfil.jsx` — fields: `id`, `name`, `lastName`, `phone`, `isStaff`
 - [x] `NavBar.jsx` — fields: `name`, `lastName`, `isStaff`
 - [x] `AdminSideBar.jsx` — fields: `name`, `lastName`
@@ -121,6 +131,23 @@ BetterAuth has built-in password reset:
 - `POST /api/auth/forget-password` with `{ email, redirectTo }`
 - `POST /api/auth/reset-password` with `{ newPassword, token }`
 - Need to create/reset password pages
+
+### Phase 9 — Internacionalización (i18n) 🔄 En Progreso
+- [x] Instalar dependencias: `react-i18next`, `i18next`, `i18next-http-backend`, `i18next-browser-languagedetector`
+- [x] Configurar `src/i18n.js` con HttpBackend + LanguageDetector + fallbackLng: 'es'
+- [x] Crear archivos de traducción en `public/locales/{es,en}/`
+- [x] Separar por namespaces: `common` (compartido), `home` (página de inicio)
+- [x] Crear componente `LanguageToggle.jsx` (selector ES/EN)
+- [x] Importar i18n en `main.jsx`
+- [x] Traducir `NavBar.jsx` (~15 strings: enlaces, botones, aria-labels)
+- [x] Traducir `Footer.jsx` (~12 strings: títulos, copyright, descripciones)
+- [x] Traducir `Home.jsx` (~20 strings: hero, categorías, beneficios, populares, CTA)
+- [x] Traducir `HomeBanner.jsx` (labels de botones CTA + "Termina en")
+- [ ] Traducir páginas de autenticación (Login, Register, PasswordReset)
+- [ ] Traducir páginas de usuario (Productos, VerProducto, Carrito, Checkout, Pedidos, Perfil, Reportes)
+- [ ] Traducir páginas Admin (Dashboard, CRUDs, Sidebar)
+- [ ] Traducir componentes compartidos (StatusBadge, Pagination, ConfirmModal, etc.)
+- [ ] Traducir `utils/adminSections.jsx` (labels del menú admin)
 
 ## Backend Gaps Found
 

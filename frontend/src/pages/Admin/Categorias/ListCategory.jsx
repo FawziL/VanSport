@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { resolveImageUrl } from '@/utils/resolveUrl';
+import { locPath } from '@/utils/localePath';
 import { adminService } from '@/services/routes';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
@@ -28,6 +30,7 @@ export default function ListCategory() {
   const [deleteId, setDeleteId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [togglingId, setTogglingId] = useState(null);
+  const { t } = useTranslation('admin');
   const navigate = useNavigate();
 
   // Fetch categorías
@@ -44,8 +47,8 @@ export default function ListCategory() {
         setPage((prev) => Math.min(prev, Math.max(1, Math.ceil(items.length / pageSize))));
       })
       .catch(() => {
-        setError('No se pudieron cargar las categorías');
-        toast.error('No se pudieron cargar las categorías');
+        setError(t('category.errorCargar'));
+        toast.error(t('category.errorCargar'));
       })
       .finally(() => setLoading(false));
     // eslint-disable-next-line
@@ -65,9 +68,9 @@ export default function ListCategory() {
       setCategorias((prev) => prev.filter((c) => c.id !== deleteId));
       setModalOpen(false);
       setDeleteId(null);
-      toast.success('Categoría eliminada correctamente');
+      toast.success(t('category.successEliminar'));
     } catch (err) {
-      const msg = err?.response?.data?.detail || 'No se pudo eliminar la categoría';
+      const msg = err?.response?.data?.detail || t('category.errorEliminar');
       setError(msg);
       toast.error(msg);
     }
@@ -91,9 +94,7 @@ export default function ListCategory() {
 
       await adminService.categories.partialUpdate(cat.id, { isFeatured: !cat.isFeatured });
 
-      toast.success(
-        `Categoría ${!cat.isFeatured ? 'destacada' : 'quitada de destacados'} correctamente`
-      );
+      toast.success(t('category.successDestacar'));
     } catch (err) {
       // Revertir cambio en caso de error
       setCategorias((prev) =>
@@ -102,7 +103,7 @@ export default function ListCategory() {
         )
       );
 
-      const msg = err?.response?.data?.detail || 'No se pudo actualizar destacado';
+      const msg = err?.response?.data?.detail || t('category.errorDestacar');
       setError(msg);
       toast.error(msg);
     } finally {
@@ -114,12 +115,12 @@ export default function ListCategory() {
     <div className="max-w-[1100px] mx-auto my-10 px-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-extrabold">Categorías</h1>
+        <h1 className="text-2xl font-extrabold">{t('category.titulo')}</h1>
         <Link
-          to="/admin/categorias/crear"
+          to={locPath('/admin/categorias/crear')}
           className="px-4 py-2 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
         >
-          + Crear Categoría
+          {t('category.crear')}
         </Link>
       </div>
 
@@ -129,7 +130,7 @@ export default function ListCategory() {
           value={pageSize}
           onChange={setPageSize}
           options={[5, 10, 20, 50]}
-          label="Por página"
+          label={t('category.porPagina')}
         />
       </div>
 
@@ -139,20 +140,20 @@ export default function ListCategory() {
       {/* Table */}
       <Table minWidth="min-w-[800px]">
         <TableHead>
-          <TableHeader>ID</TableHeader>
-          <TableHeader>Imagen</TableHeader>
-          <TableHeader>Nombre</TableHeader>
-          <TableHeader>Descripción</TableHeader>
-          <TableHeader align="center">Destacar</TableHeader>
-          <TableHeader align="center">Acciones</TableHeader>
+          <TableHeader>{t('category.colId')}</TableHeader>
+          <TableHeader>{t('category.colImagen')}</TableHeader>
+          <TableHeader>{t('category.colNombre')}</TableHeader>
+          <TableHeader>{t('category.colDescripcion')}</TableHeader>
+          <TableHeader align="center">{t('category.colDestacar')}</TableHeader>
+          <TableHeader align="center">{t('category.colAcciones')}</TableHeader>
         </TableHead>
 
         <TableBody
           loading={loading}
           empty={categoriasPage.length === 0}
           colSpan={6}
-          loadingText="Cargando categorías..."
-          emptyText="No hay categorías."
+          loadingText={t('category.cargando')}
+          emptyText={t('category.vacio')}
         >
           {categoriasPage.map((cat) => (
             <TableRow key={cat.id}>
@@ -183,9 +184,9 @@ export default function ListCategory() {
                 <div className="flex justify-center gap-2">
                   <ActionButton
                     variant="edit"
-                    onClick={() => navigate(`/admin/categorias/editar/${cat.id}`)}
+                    onClick={() => navigate(locPath(`/admin/categorias/editar/${cat.id}`))}
                   >
-                    Editar
+                    {t('category.editar')}
                   </ActionButton>
                   <ActionButton
                     variant="delete"
@@ -194,7 +195,7 @@ export default function ListCategory() {
                       setModalOpen(true);
                     }}
                   >
-                    Eliminar
+                    {t('category.eliminar')}
                   </ActionButton>
                 </div>
               </TableCell>
@@ -209,10 +210,10 @@ export default function ListCategory() {
       {/* Confirm Modal */}
       <ConfirmModal
         open={modalOpen}
-        title="¿Estás seguro de eliminar esta categoría?"
-        message="Esta acción no se puede deshacer."
-        confirmText="Sí, eliminar"
-        cancelText="Cancelar"
+        title={t('category.confirmarTitulo')}
+        message={t('category.confirmarMensaje')}
+        confirmText={t('category.confirmarSi')}
+        cancelText={t('category.confirmarNo')}
         danger
         onCancel={() => setModalOpen(false)}
         onConfirm={handleDelete}

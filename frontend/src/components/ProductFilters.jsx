@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ListCategories from '@/components/ListCategories';
 
 export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 12, 24, 48] }) {
+  const { t } = useTranslation('admin');
   const [local, setLocal] = useState(() => ({
     q: value?.q ?? '',
     categoryId: value?.categoryId ?? '',
@@ -57,17 +59,17 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
             d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
           />
         </svg>
-        <h3 className="text-lg font-semibold text-gray-900">Filtros</h3>
+        <h3 className="text-lg font-semibold text-gray-900">{t('filtros.titulo')}</h3>
       </div>
 
       {/* Filters Stack */}
       <div className="space-y-6">
         {/* Búsqueda */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Buscar producto</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('filtros.buscar')}</label>
           <input
             type="text"
-            placeholder="Nombre del producto..."
+            placeholder={t('filtros.buscarPlaceholder')}
             value={local.q}
             onChange={(e) => setLocal((p) => ({ ...p, q: e.target.value }))}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -76,23 +78,23 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
 
         {/* Categoría */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('filtros.categoria')}</label>
           <ListCategories
             value={local.categoryId}
             onChange={(val) => setLocal((p) => ({ ...p, categoryId: val }))}
-            placeholder="Todas las categorías"
+            placeholder={t('filtros.todasCategorias')}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
         </div>
 
         {/* Rango de Precio */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">Rango de Precio</label>
+          <label className="block text-sm font-medium text-gray-700 mb-3">{t('filtros.rangoPrecio')}</label>
           <div className="space-y-3">
             <div className="relative flex">
               <input
                 type="number"
-                placeholder="Mínimo"
+                placeholder={t('filtros.minimo')}
                 value={local.min_price}
                 onChange={(e) => setLocal((p) => ({ ...p, min_price: e.target.value }))}
                 className="w-1/2 pl-8 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
@@ -101,7 +103,7 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
               />
               <input
                 type="number"
-                placeholder="Máximo"
+                placeholder={t('filtros.maximo')}
                 value={local.max_price}
                 onChange={(e) => setLocal((p) => ({ ...p, max_price: e.target.value }))}
                 className="w-1/2 pl-8 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
@@ -114,22 +116,20 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
 
         {/* Oferta */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Oferta</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('filtros.oferta')}</label>
           <select
             value={local.oferta}
             onChange={(e) => setLocal((p) => ({ ...p, oferta: e.target.value }))}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-sm"
           >
-            <option value="">Todos los productos</option>
-            <option value="1">Solo en oferta</option>
+            <option value="">{t('filtros.todos')}</option>
+            <option value="1">{t('filtros.soloOferta')}</option>
           </select>
         </div>
 
         {/* Items por página */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Productos por página
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('filtros.porPagina')}</label>
           <select
             value={local.pageSize}
             onChange={(e) => {
@@ -141,7 +141,7 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
           >
             {pageSizeOptions.map((n) => (
               <option key={n} value={n}>
-                {n} productos
+                {t('filtros.nProductos', { n })}
               </option>
             ))}
           </select>
@@ -154,13 +154,13 @@ export default function ProductFilters({ value, onChange, pageSizeOptions = [6, 
           onClick={reset}
           className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors text-sm active:bg-blue-800 active:scale-95 transition-all cursor-pointer"
         >
-          Limpiar
+          {t('filtros.limpiar')}
         </button>
         <button
           onClick={apply}
           className="flex-1 px-4 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-sm active:bg-gray-200 active:scale-95 transition-all cursor-pointer"
         >
-          Aplicar
+          {t('filtros.aplicar')}
         </button>
       </div>
     </div>

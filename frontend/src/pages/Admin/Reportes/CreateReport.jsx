@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { appService } from '@/services/routes';
 import { CATEGORIAS_FALLA } from '@/utils/categorias';
 import { Link } from 'react-router-dom';
 
 export default function CreateReport() {
-  const [form, setForm] = useState({ categoria: 'ui', titulo: '', descripcion: '', seccion: '' });
+  const { t } = useTranslation('admin');
+  const [form, setForm] = useState({ category: 'ui', title: '', description: '', section: '' });
   const [imagen, setImagen] = useState(null);
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -32,23 +34,23 @@ export default function CreateReport() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-8">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Reportar una Falla</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('createReport.titulo')}</h1>
 
             <Link
               to="/admin/reportes"
               className="px-4 py-2 bg-gray-600 text-white! font-bold rounded-lg hover:bg-gray-700 transition-colors no-underline"
             >
-              Volver a Reportes
+              {t('createReport.volver')}
             </Link>
           </div>
 
           <form onSubmit={onSubmit} className="space-y-6">
             {/* Categoría */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Categoría *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('createReport.categoria')}</label>
               <select
                 value={form.category}
-                onChange={(e) => setForm((f) => ({ ...f, categoria: e.target.value }))}
+                onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 required
               >
@@ -62,12 +64,12 @@ export default function CreateReport() {
 
             {/* Título */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Título *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('createReport.tituloLabel')}</label>
               <input
                 type="text"
-                value={form.titulo}
-                onChange={(e) => setForm((f) => ({ ...f, titulo: e.target.value }))}
-                placeholder="Describe brevemente el problema..."
+                value={form.title}
+                onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                placeholder={t('createReport.tituloPlaceholder')}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 required
               />
@@ -75,14 +77,12 @@ export default function CreateReport() {
 
             {/* Descripción */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Descripción *
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('createReport.descripcion')}</label>
               <textarea
                 value={form.description}
-                onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value }))}
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                 rows={4}
-                placeholder="Proporciona todos los detalles relevantes sobre la falla..."
+                placeholder={t('createReport.descripcionPlaceholder')}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical"
                 required
               />
@@ -90,14 +90,12 @@ export default function CreateReport() {
 
             {/* Sección */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Sección de la página *
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('createReport.seccion')}</label>
               <input
                 type="text"
-                placeholder="/productos, /checkout, etc."
-                value={form.seccion}
-                onChange={(e) => setForm((f) => ({ ...f, seccion: e.target.value }))}
+                placeholder={t('createReport.seccionPlaceholder')}
+                value={form.section}
+                onChange={(e) => setForm((f) => ({ ...f, section: e.target.value }))}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 required
               />
@@ -107,9 +105,7 @@ export default function CreateReport() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Imagen */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Imagen (opcional)
-                </label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('createReport.imagen')}</label>
                 <input
                   type="file"
                   accept="image/*"
@@ -120,9 +116,7 @@ export default function CreateReport() {
 
               {/* Video */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Video (opcional)
-                </label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('createReport.video')}</label>
                 <input
                   type="file"
                   accept="video/*"
@@ -161,17 +155,17 @@ export default function CreateReport() {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
-                    Enviando reporte...
+                    {t('createReport.enviando')}
                   </div>
                 ) : (
-                  'Enviar Reporte'
+                  t('createReport.enviar')
                 )}
               </button>
             </div>
 
             {/* Información adicional */}
             <div className="text-center text-sm text-gray-500 pt-2">
-              Todos los campos marcados con * son obligatorios
+              {t('createReport.camposObligatorios')}
             </div>
           </form>
         </div>

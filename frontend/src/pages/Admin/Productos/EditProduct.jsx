@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import ListCategories from '@/components/ListCategories';
 import { resolveImageUrl } from '@/utils/resolveUrl';
 
 export default function EditProduct() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -48,7 +51,7 @@ export default function EditProduct() {
           Array.isArray(data?.additionalImages) ? data.additionalImages : []
         );
       } catch (err) {
-        setError(err?.response?.data?.detail || err?.message || 'No se pudo cargar el producto');
+        setError(err?.response?.data?.detail || err?.message || t('editProduct.errorCargar'));
       } finally {
         if (!ignore) setLoading(false);
       }
@@ -107,9 +110,9 @@ export default function EditProduct() {
       });
 
       await adminService.products.update(id, fd);
-      navigate('/admin/productos');
+      navigate(locPath('/admin/productos'));
     } catch (err) {
-      setError(err?.response?.data?.detail || err?.message || 'Error al actualizar producto');
+      setError(err?.response?.data?.detail || err?.message || t('editProduct.errorGuardar'));
     } finally {
       setSubmitting(false);
     }
@@ -120,7 +123,7 @@ export default function EditProduct() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando producto...</p>
+          <p className="mt-4 text-gray-600">{t('editProduct.cargando')}</p>
         </div>
       </div>
     );
@@ -128,45 +131,45 @@ export default function EditProduct() {
   return (
     <div className="p-4 max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Editar producto #{id}</h1>
-        <Link to="/admin/productos" className="text-blue-600 hover:underline">Volver</Link>
+        <h1 className="text-2xl font-bold">{t('editProduct.titulo')}{id}</h1>
+        <Link to={locPath('/admin/productos')} className="text-blue-600 hover:underline">{t('editProduct.volver')}</Link>
       </div>
 
       {error && <div className="mb-3 p-3 rounded bg-red-50 text-red-700">{String(error)}</div>}
 
       <form onSubmit={handleSubmit} className="grid gap-4 bg-white p-4 rounded shadow-sm">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium mb-1">Nombre</label>
+          <label htmlFor="name" className="block text-sm font-medium mb-1">{t('editProduct.nombre')}</label>
           <input id="name" name="name" value={form.name} onChange={handleChange} required className="border rounded px-3 py-2 w-full" />
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium mb-1">Descripción</label>
+          <label htmlFor="description" className="block text-sm font-medium mb-1">{t('editProduct.descripcion')}</label>
           <textarea id="description" name="description" value={form.description} onChange={handleChange} rows={4} className="border rounded px-3 py-2 w-full" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label htmlFor="price" className="block text-sm font-medium mb-1">Precio</label>
+            <label htmlFor="price" className="block text-sm font-medium mb-1">{t('editProduct.precio')}</label>
             <input id="price" name="price" type="number" step="0.01" min="0" value={form.price} onChange={handleChange} required className="border rounded px-3 py-2 w-full" />
           </div>
           <div>
-            <label htmlFor="salePrice" className="block text-sm font-medium mb-1">Precio oferta (opcional)</label>
+            <label htmlFor="salePrice" className="block text-sm font-medium mb-1">{t('editProduct.precioOferta')}</label>
             <input id="salePrice" name="salePrice" type="number" step="0.01" min="0" value={form.salePrice} onChange={handleChange} className="border rounded px-3 py-2 w-full" />
           </div>
           <div>
-            <label htmlFor="stock" className="block text-sm font-medium mb-1">Stock</label>
+            <label htmlFor="stock" className="block text-sm font-medium mb-1">{t('editProduct.stock')}</label>
             <input id="stock" name="stock" type="number" min="0" value={form.stock} onChange={handleChange} required className="border rounded px-3 py-2 w-full" />
           </div>
         </div>
 
         <div>
-          <label htmlFor="categoryId" className="block text-sm font-medium mb-1">Categoría</label>
-          <ListCategories name="categoryId" value={form.categoryId} onChange={handleCategoriaChange} required placeholder="Seleccione una categoría" className="border rounded px-3 py-2" />
+          <label htmlFor="categoryId" className="block text-sm font-medium mb-1">{t('editProduct.categoria')}</label>
+          <ListCategories name="categoryId" value={form.categoryId} onChange={handleCategoriaChange} required placeholder={t('editProduct.categoriaPlaceholder')} className="border rounded px-3 py-2" />
         </div>
 
         <div>
-          <label htmlFor="imagen" className="block text-sm font-medium mb-1">Imagen principal (opcional)</label>
+          <label htmlFor="imagen" className="block text-sm font-medium mb-1">{t('editProduct.imagenPrincipal')}</label>
           {form.imageUrl && (
             <div className="mb-2 text-sm text-gray-600">
               <div className="w-28 h-20 rounded overflow-hidden border">
@@ -179,7 +182,7 @@ export default function EditProduct() {
 
         {existingExtras?.length > 0 && (
           <div>
-            <div className="text-sm font-medium mb-1">Imágenes adicionales actuales</div>
+            <div className="text-sm font-medium mb-1">{t('editProduct.imagenesActuales')}</div>
             <div className="flex flex-wrap gap-8">
               {existingExtras.map((p, idx) => (
                 <div key={idx} className="flex flex-col items-center gap-2">
@@ -187,32 +190,32 @@ export default function EditProduct() {
                     <img src={resolveImageUrl(p)} alt={`extra-${idx}`} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex gap-2">
-                    <button type="button" className="px-2 py-1 text-xs border rounded" onClick={() => moveExtra(idx, -1)} disabled={idx === 0} title="Subir">↑</button>
-                    <button type="button" className="px-2 py-1 text-xs border rounded" onClick={() => moveExtra(idx, 1)} disabled={idx === existingExtras.length - 1} title="Bajar">↓</button>
-                    <button type="button" className="px-2 py-1 text-xs border rounded text-red-600" onClick={() => removeExtra(idx)} title="Eliminar">Eliminar</button>
+                    <button type="button" className="px-2 py-1 text-xs border rounded" onClick={() => moveExtra(idx, -1)} disabled={idx === 0} title={t('editProduct.subir')}>↑</button>
+                    <button type="button" className="px-2 py-1 text-xs border rounded" onClick={() => moveExtra(idx, 1)} disabled={idx === existingExtras.length - 1} title={t('editProduct.bajar')}>↓</button>
+                    <button type="button" className="px-2 py-1 text-xs border rounded text-red-600" onClick={() => removeExtra(idx)} title={t('editProduct.eliminar')}>{t('editProduct.eliminar')}</button>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="text-xs text-gray-500 mt-1">Reordena con ↑/↓ y elimina con "Eliminar". Las nuevas imágenes que agregues se añadirán al final.</div>
+            <div className="text-xs text-gray-500 mt-1">{t('editProduct.reordenar')}</div>
           </div>
         )}
 
         <div>
-          <label htmlFor="extras" className="block text-sm font-medium mb-1">Agregar nuevas imágenes adicionales</label>
+          <label htmlFor="extras" className="block text-sm font-medium mb-1">{t('editProduct.agregarImagenes')}</label>
           <input id="extras" name="imagenes_adicionales" type="file" accept="image/*" multiple onChange={(e) => setExtras(Array.from(e.target.files || []))} className="border rounded px-3 py-2 w-full" />
         </div>
 
         <div className="flex items-center gap-2">
           <input id="isActive" name="isActive" type="checkbox" checked={!!form.isActive} onChange={handleChange} />
-          <label htmlFor="isActive">Activo</label>
+          <label htmlFor="isActive">{t('editProduct.activo')}</label>
         </div>
 
         <div className="flex gap-2">
           <button type="submit" disabled={submitting} className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-60">
-            {submitting ? 'Guardando…' : 'Guardar cambios'}
+            {submitting ? t('editProduct.guardando') : t('editProduct.guardar')}
           </button>
-          <Link to="/admin/productos" className="px-4 py-2 rounded border">Cancelar</Link>
+          <Link to={locPath('/admin/productos')} className="px-4 py-2 rounded border">{t('editProduct.cancelar')}</Link>
         </div>
       </form>
     </div>

@@ -4,8 +4,11 @@ import { appService } from '@/services/routes';
 import { resolveImageUrl } from '@/utils/resolveUrl';
 import HomeBanner from '@/components/HomeBanner';
 import { StarRow } from '@/utils/reviews';
+import { useTranslation } from 'react-i18next';
+import { locPath } from '@/utils/localePath';
 
 export default function Home() {
+  const { t } = useTranslation('home');
   const [cats, setCats] = useState([]);
   const [catsLoading, setCatsLoading] = useState(true);
   const [catsError, setCatsError] = useState('');
@@ -47,7 +50,7 @@ export default function Home() {
 
         if (alive) setFeatured(enriched);
       } catch (e) {
-        if (alive) setError('No se pudieron cargar los destacados');
+        if (alive) setError(t('error.cargarDestacados'));
       } finally {
         if (alive) setLoading(false);
       }
@@ -73,7 +76,7 @@ export default function Home() {
         }));
         if (alive) setCats(mapped);
       } catch (e) {
-        if (alive) setCatsError('No se pudieron cargar las categorías destacadas');
+        if (alive) setCatsError(t('error.cargarCategorias'));
       } finally {
         if (alive) setCatsLoading(false);
       }
@@ -104,13 +107,13 @@ export default function Home() {
               <span className="text-orange-400">Sport</span>!
             </h1>
             <p className="text-xl md:text-2xl text-gray-100 mb-8 font-medium">
-              Todo lo que necesitas para tu hogar, en un solo lugar.
+              {t('hero.subtitulo')}
             </p>
             <Link
-              to="/productos"
+              to={locPath('/productos')}
               className="bg-gradient-to-r from-yellow-400 to-orange-500 !text-white font-black py-4 px-12 rounded-full text-lg no-underline shadow-2xl shadow-orange-500/30 transition-all duration-300 inline-block hover:scale-105 hover:shadow-orange-500/50"
             >
-              Explorar Productos
+              {t('hero.explorar')}
             </Link>
           </div>
         </section>
@@ -120,10 +123,10 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-black text-gray-900 mb-4">
-                Categorías <span className="text-blue-600">Destacadas</span>
+                {t('categorias.titulo')}
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Descubre nuestra amplia gama de equipamiento deportivo para cada disciplina
+                {t('categorias.subtitulo')}
               </p>
               <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-green-500 mx-auto mt-4 rounded-full"></div>
             </div>
@@ -137,7 +140,7 @@ export default function Home() {
             <div className="flex justify-center gap-8">
               {(catsLoading ? Array.from({ length: 6 }) : cats).map((cat, idx) => (
                 <Link
-                  to={cat ? `/productos?categoryId=${encodeURIComponent(cat.id)}` : '#'}
+                  to={cat ? `${locPath('/productos')}?categoryId=${encodeURIComponent(cat.id)}` : '#'}
                   key={cat ? cat.id : idx}
                   className="group block bg-white rounded-2xl overflow-hidden shadow-lg shadow-gray-200/50 no-underline text-gray-800 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 border border-gray-100"
                 >
@@ -175,22 +178,22 @@ export default function Home() {
                 <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
                   <span className="text-2xl">🚚</span>
                 </div>
-                <h3 className="text-xl font-black mb-2">Envío Rápido</h3>
-                <p className="text-blue-100">Entrega en 24-48 horas</p>
+                <h3 className="text-xl font-black mb-2">{t('beneficios.envioTitulo')}</h3>
+                <p className="text-blue-100">{t('beneficios.envioDesc')}</p>
               </div>
               <div className="flex flex-col items-center">
                 <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
                   <span className="text-2xl">✅</span>
                 </div>
-                <h3 className="text-xl font-black mb-2">Calidad Garantizada</h3>
-                <p className="text-blue-100">Productos de primeras marcas</p>
+                <h3 className="text-xl font-black mb-2">{t('beneficios.calidadTitulo')}</h3>
+                <p className="text-blue-100">{t('beneficios.calidadDesc')}</p>
               </div>
               <div className="flex flex-col items-center">
                 <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
                   <span className="text-2xl">💯</span>
                 </div>
-                <h3 className="text-xl font-black mb-2">Satisfacción</h3>
-                <p className="text-blue-100">30 días de devolución</p>
+                <h3 className="text-xl font-black mb-2">{t('beneficios.satisfaccionTitulo')}</h3>
+                <p className="text-blue-100">{t('beneficios.satisfaccionDesc')}</p>
               </div>
             </div>
           </div>
@@ -201,10 +204,10 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-black text-gray-900 mb-4">
-                Productos <span className="text-red-600">Populares</span>
+                {t('populares.titulo')}
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Los artículos más vendidos y mejor valorados por nuestra comunidad deportiva
+                {t('populares.subtitulo')}
               </p>
               <div className="w-24 h-1 bg-gradient-to-r from-red-600 to-orange-500 mx-auto mt-4 rounded-full"></div>
             </div>
@@ -218,7 +221,7 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {(loading ? Array.from({ length: 3 }) : featured).map((prod, idx) => (
                 <Link
-                  to={prod ? `/productos/${prod.id}` : '#'}
+                  to={prod ? locPath(`/productos/${prod.id}`) : '#'}
                   key={prod ? prod.id : idx}
                   className="group block bg-white rounded-2xl overflow-hidden shadow-lg shadow-gray-200/50 no-underline text-gray-800 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-red-500/20 border border-gray-100"
                 >
@@ -232,7 +235,7 @@ export default function Home() {
                         className="w-full h-48 object-cover block group-hover:scale-110 transition-transform duration-500"
                       />
                       <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                        POPULAR
+                        {t('populares.badge')}
                       </div>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                     </div>
@@ -263,10 +266,10 @@ export default function Home() {
                               <span className="text-gray-800 font-bold">
                                 {(prod.avgRating || 0).toFixed(1)}
                               </span>
-                              <span className="ml-2">({prod.reviewsCount} Reseñas)</span>
+                              <span className="ml-2">{t('populares.resenas', { count: prod.reviewsCount })}</span>
                             </div>
                           ) : (
-                            <div className="mt-4 text-sm text-gray-500">Sin reseñas</div>
+                            <div className="mt-4 text-sm text-gray-500">{t('populares.sinResenas')}</div>
                           )}
                         </div>
                       </>
@@ -279,10 +282,10 @@ export default function Home() {
             {/* Botón ver más productos */}
             <div className="text-center mt-12">
               <Link
-                to="/productos"
+                to={locPath('/productos')}
                 className="bg-gradient-to-r from-gray-800 to-gray-900 text-white font-bold py-3 px-8 rounded-full text-lg no-underline shadow-lg transition-all duration-300 inline-flex items-center hover:scale-105 hover:shadow-xl"
               >
-                Ver Todos los Productos
+                {t('populares.verTodos')}
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -308,23 +311,23 @@ export default function Home() {
 
           <div className="max-w-3xl mx-auto px-4 relative z-10">
             <h2 className="text-4xl md:text-5xl font-black mb-6">
-              ¿Listo para tu <span className="text-yellow-300">próxima meta</span>?
+              {t('cta.titulo')}
             </h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Únete a miles de deportistas que ya confían en nosotros para alcanzar sus objetivos
+              {t('cta.subtitulo')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                to="/productos"
+                to={locPath('/productos')}
                 className="bg-gradient-to-r from-green-500 to-green-600 !text-white font-black py-4 px-10 rounded-full text-lg no-underline shadow-2xl shadow-green-500/30 transition-all duration-300 inline-flex items-center hover:scale-105 hover:shadow-green-500/50"
               >
-                Comprar Ahora 🏅
+                {t('cta.comprar')} 🏅
               </Link>
               <Link
-                to="/productos?oferta=1&page_size=6"
+                to={`${locPath('/productos')}?oferta=1&page_size=6`}
                 className="border-2 border-white !text-white font-bold py-4 px-10 rounded-full text-lg no-underline transition-all duration-300 inline-flex items-center hover:bg-gray-800"
               >
-                Ver Ofertas
+                {t('cta.ofertas')}
               </Link>
             </div>
           </div>

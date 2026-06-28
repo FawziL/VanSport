@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminService } from '@/services/routes';
 import { resolveImageUrl } from '@/utils/resolveUrl';
+import { locPath } from '@/utils/localePath';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
 import ConfirmModal from '@/components/ConfirmModal';
@@ -30,6 +32,7 @@ export default function ListProduct() {
   const [togglingId, setTogglingId] = useState(null);
   const [exporting, setExporting] = useState(false);
   const [togglingActivoId, setTogglingActivoId] = useState(null);
+  const { t } = useTranslation('admin');
   const navigate = useNavigate();
 
   // Fetch productos
@@ -45,8 +48,8 @@ export default function ListProduct() {
         setPage((prev) => Math.min(prev, Math.max(1, Math.ceil(items.length / pageSize))));
       })
       .catch(() => {
-        setError('No se pudieron cargar los productos');
-        toast.error('No se pudieron cargar los productos');
+        setError(t('listProduct.errorCargar'));
+        toast.error(t('listProduct.errorCargar'));
       })
       .finally(() => setLoading(false));
     // eslint-disable-next-line
@@ -66,9 +69,9 @@ export default function ListProduct() {
       setProductos((prev) => prev.filter((p) => p.productId !== deleteId));
       setModalOpen(false);
       setDeleteId(null);
-      toast.success('Producto eliminado correctamente');
+      toast.success(t('listProduct.successEliminar'));
     } catch (err) {
-      const msg = err?.response?.data?.detail || 'No se pudo eliminar el producto';
+      const msg = err?.response?.data?.detail || t('listProduct.errorEliminar');
       setError(msg);
       toast.error(msg);
     }
@@ -88,9 +91,9 @@ export default function ListProduct() {
       a.click();
       a.remove();
       URL.revokeObjectURL(a.href);
-      toast.success('Excel exportado correctamente');
+      toast.success(t('listProduct.successExportar'));
     } catch (err) {
-      const msg = err?.response?.data?.detail || 'No se pudo exportar a Excel';
+      const msg = err?.response?.data?.detail || t('listProduct.errorExportar');
       setError(msg);
       toast.error(msg);
       console.error(err);
@@ -111,24 +114,22 @@ export default function ListProduct() {
       // Actualización optimista
       setProductos((prev) =>
         prev.map((it) =>
-          it.productId === p.productId ? { ...it, destacado: !p.isFeatured } : it
+          it.productId === p.productId ? { ...it, isFeatured: !p.isFeatured } : it
         )
       );
 
-      await adminService.products.partialUpdate(p.productId, { destacado: !p.isFeatured });
+      await adminService.products.partialUpdate(p.productId, { isFeatured: !p.isFeatured });
 
-      toast.success(
-        `Producto ${!p.isFeatured ? 'destacado' : 'quitado de destacados'} correctamente`
-      );
+      toast.success(t('listProduct.successDestacar'));
     } catch (err) {
       // Revertir cambio en caso de error
       setProductos((prev) =>
         prev.map((it) =>
-          it.productId === p.productId ? { ...it, destacado: p.isFeatured } : it
+          it.productId === p.productId ? { ...it, isFeatured: p.isFeatured } : it
         )
       );
 
-      const msg = err?.response?.data?.detail || 'No se pudo actualizar destacado';
+      const msg = err?.response?.data?.detail || t('listProduct.errorDestacar');
       setError(msg);
       toast.error(msg);
     } finally {
@@ -142,19 +143,19 @@ export default function ListProduct() {
 
       // Actualización optimista
       setProductos((prev) =>
-        prev.map((it) => (it.productId === p.productId ? { ...it, activo: !p.isActive } : it))
+        prev.map((it) => (it.productId === p.productId ? { ...it, isActive: !p.isActive } : it))
       );
 
-      await adminService.products.partialUpdate(p.productId, { activo: !p.isActive });
+      await adminService.products.partialUpdate(p.productId, { isActive: !p.isActive });
 
-      toast.success(`Producto ${!p.isActive ? 'activado' : 'desactivado'} correctamente`);
+      toast.success(t('listProduct.successEstado'));
     } catch (err) {
       // Revertir cambio en caso de error
       setProductos((prev) =>
-        prev.map((it) => (it.productId === p.productId ? { ...it, activo: p.isActive } : it))
+        prev.map((it) => (it.productId === p.productId ? { ...it, isActive: p.isActive } : it))
       );
 
-      const msg = err?.response?.data?.detail || 'No se pudo actualizar el estado';
+      const msg = err?.response?.data?.detail || t('listProduct.errorEstado');
       setError(msg);
       toast.error(msg);
     } finally {
@@ -173,27 +174,27 @@ export default function ListProduct() {
   return (
     <div className="max-w-[1100px] mx-auto my-10 px-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-extrabold">Productos</h1>
+        <h1 className="text-2xl font-extrabold">{t('listProduct.titulo')}</h1>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={handleExportExcel}
             disabled={exporting || loading}
-            title="Descargar Excel de productos"
+            title={t('listProduct.exportar')}
             className={`px-4 py-2 rounded-lg border font-bold transition-colors ${
               exporting || loading
                 ? 'bg-blue-50 border-blue-200 text-blue-400 cursor-not-allowed'
                 : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 cursor-pointer'
             }`}
           >
-            {exporting ? 'Exportando…' : 'Exportar Excel'}
+            {exporting ? t('listProduct.exportando') : t('listProduct.exportar')}
           </button>
 
           <Link
-            to="/admin/productos/crear"
+            to={locPath('/admin/productos/crear')}
             className="px-4 py-2 rounded-lg bg-blue-600 !text-white font-bold no-underline hover:bg-blue-700 transition-colors"
           >
-            + Crear producto
+            {t('listProduct.crear')}
           </Link>
         </div>
       </div>
@@ -203,7 +204,7 @@ export default function ListProduct() {
           value={pageSize}
           onChange={setPageSize}
           options={[5, 10, 20, 50]}
-          label="Por página"
+          label={t('listProduct.porPagina')}
         />
       </div>
 
@@ -211,23 +212,23 @@ export default function ListProduct() {
 
       <Table>
         <TableHead>
-          <TableHeader>ID</TableHeader>
-          <TableHeader>Nombre</TableHeader>
-          <TableHeader>Categoría</TableHeader>
-          <TableHeader>Imagen</TableHeader>
-          <TableHeader>Precio</TableHeader>
-          <TableHeader>Stock</TableHeader>
-          <TableHeader align="center">Destacar</TableHeader>
-          <TableHeader>Estado</TableHeader>
-          <TableHeader align="center">Acciones</TableHeader>
+          <TableHeader>{t('listProduct.colId')}</TableHeader>
+          <TableHeader>{t('listProduct.colNombre')}</TableHeader>
+          <TableHeader>{t('listProduct.colCategoria')}</TableHeader>
+          <TableHeader>{t('listProduct.colImagen')}</TableHeader>
+          <TableHeader>{t('listProduct.colPrecio')}</TableHeader>
+          <TableHeader>{t('listProduct.colStock')}</TableHeader>
+          <TableHeader align="center">{t('listProduct.colDestacar')}</TableHeader>
+          <TableHeader>{t('listProduct.colEstado')}</TableHeader>
+          <TableHeader align="center">{t('listProduct.colAcciones')}</TableHeader>
         </TableHead>
 
         <TableBody
           loading={loading}
           empty={productosPage.length === 0}
           colSpan={9}
-          loadingText="Cargando productos..."
-          emptyText="No hay productos."
+          loadingText={t('listProduct.cargando')}
+          emptyText={t('listProduct.vacio')}
         >
           {productosPage.map((p) => (
             <TableRow key={p.productId}>
@@ -237,7 +238,7 @@ export default function ListProduct() {
               <TableCell>
                 <ProductImage
                   src={p.imageUrl ? resolveImageUrl(p.imageUrl) : undefined}
-                  alt={p.name || 'Producto'}
+                  alt={p.name || t('listProduct.colNombre')}
                 />
               </TableCell>
               <TableCell>{fmtPrecio(p.price)}</TableCell>
@@ -259,16 +260,16 @@ export default function ListProduct() {
                       : 'bg-red-100 border-red-300 text-red-800 hover:bg-red-200'
                   } ${togglingActivoId === p.productId ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >
-                  {p.isActive ? 'Activo' : 'Inactivo'}
+                  {p.isActive ? t('listProduct.activo') : t('listProduct.inactivo')}
                 </button>
               </TableCell>
               <TableCell align="center">
                 <div className="flex justify-center gap-2">
                   <ActionButton
                     variant="edit"
-                    onClick={() => navigate(`/admin/productos/editar/${p.productId}`)}
+                    onClick={() => navigate(locPath(`/admin/productos/editar/${p.productId}`))}
                   >
-                    Editar
+                    {t('listProduct.editar')}
                   </ActionButton>
                   <ActionButton
                     variant="delete"
@@ -277,7 +278,7 @@ export default function ListProduct() {
                       setModalOpen(true);
                     }}
                   >
-                    Eliminar
+                    {t('listProduct.eliminar')}
                   </ActionButton>
                 </div>
               </TableCell>
@@ -290,10 +291,10 @@ export default function ListProduct() {
 
       <ConfirmModal
         open={modalOpen}
-        title="¿Estás seguro de eliminar este producto?"
-        message="Esta acción no se puede deshacer."
-        confirmText="Sí, eliminar"
-        cancelText="Cancelar"
+        title={t('listProduct.confirmarTitulo')}
+        message={t('listProduct.confirmarMensaje')}
+        confirmText={t('listProduct.confirmarSi')}
+        cancelText={t('listProduct.confirmarNo')}
         danger
         onCancel={() => setModalOpen(false)}
         onConfirm={handleDelete}

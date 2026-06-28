@@ -1,11 +1,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { authService } from '@/services/routes';
 import { http } from '@/config/api';
 import PhoneInput from '@/components/PhoneInput';
+import { locPath } from '@/utils/localePath';
 
 export default function Perfil() {
   const navigate = useNavigate();
+  const { t } = useTranslation('perfil');
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -29,7 +32,7 @@ export default function Perfil() {
       try {
         await authService.me();
       } catch {
-        navigate('/login');
+        navigate(locPath('/login'));
       }
     }
     checkAuth();
@@ -61,7 +64,7 @@ export default function Perfil() {
             ? Object.entries(backend)
                 .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
                 .join(' | ')
-            : backend || err.message || 'Error al cargar el perfil';
+            :             backend || err.message || t('errorCargar');
         setError(msg);
       } finally {
         if (alive) setLoading(false);
@@ -107,7 +110,7 @@ export default function Perfil() {
         lastName: updated.lastName ?? f.lastName,
       }));
       setInitialPhone(updated.phone || '');
-      setSuccess('Perfil actualizado correctamente.');
+      setSuccess(t('success'));
     } catch (err) {
       const backend = err?.response?.data;
       const msg =
@@ -115,7 +118,7 @@ export default function Perfil() {
           ? Object.entries(backend)
               .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
               .join(' | ')
-          : backend || err.message || 'Error al guardar cambios';
+          :           backend || err.message || t('errorGuardar');
       setError(msg);
     } finally {
       setSaving(false);
@@ -149,10 +152,10 @@ export default function Perfil() {
         </div>
         <div className="profile-info">
           <h1 className="profile-title">
-            Perfil de usuario
-            {form.isStaff && <span className="admin-badge">Admin</span>}
+            {t('titulo')}
+            {form.isStaff && <span className="admin-badge">{t('admin')}</span>}
           </h1>
-          <p className="profile-subtitle">Consulta y actualiza tus datos personales</p>
+          <p className="profile-subtitle">{t('subtitulo')}</p>
         </div>
       </div>
 
@@ -186,7 +189,7 @@ export default function Perfil() {
       <form onSubmit={handleSubmit} className="profile-form">
         <div className="form-grid">
           <div className="form-group">
-            <label className="form-label">ID de usuario</label>
+            <label className="form-label">{t('userId')}</label>
             <input
               type="text"
               value={form.id || '—'}
@@ -195,7 +198,7 @@ export default function Perfil() {
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Email</label>
+            <label className="form-label">{t('email')}</label>
             <input
               type="email"
               value={form.email || '—'}
@@ -207,22 +210,22 @@ export default function Perfil() {
 
         <div className="form-grid">
           <div className="form-group">
-            <label className="form-label">Nombre</label>
+            <label className="form-label">{t('nombre')}</label>
             <input
               name="name"
               type="text"
-              placeholder="Tu nombre"
+              placeholder={t('nombrePlaceholder')}
               value={form.name}
               onChange={handleChange}
               className="form-input"
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Apellido</label>
+            <label className="form-label">{t('apellido')}</label>
             <input
               name="lastName"
               type="text"
-              placeholder="Tu apellido"
+              placeholder={t('apellidoPlaceholder')}
               value={form.lastName}
               onChange={handleChange}
               className="form-input"
@@ -231,7 +234,7 @@ export default function Perfil() {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Teléfono</label>
+          <label className="form-label">{t('telefono')}</label>
           <PhoneInput ref={phoneRef} initialValue={initialPhone} />
         </div>
 
@@ -250,14 +253,14 @@ export default function Perfil() {
                     strokeDasharray="15.85 15.85"
                   />
                 </svg>
-                Guardando...
+                {t('guardando')}
               </>
             ) : (
-              'Guardar cambios'
+              t('guardar')
             )}
           </button>
-          <button type="button" onClick={() => navigate('/')} className="btn btn-secondary">
-            Volver al inicio
+          <button type="button" onClick={() => navigate(locPath('/'))} className="btn btn-secondary">
+            {t('volverInicio')}
           </button>
         </div>
       </form>

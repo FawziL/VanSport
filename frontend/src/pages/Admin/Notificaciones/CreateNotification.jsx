@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
 
 export default function CreateNotification() {
+  const { t } = useTranslation('admin');
   const [form, setForm] = useState({ title: '', message: '', type: 'banner', expiresAt: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,7 +35,7 @@ export default function CreateNotification() {
       navigate('/admin/notificaciones');
     } catch (err) {
       const data = err?.response?.data;
-      let msg = 'No se pudo crear la notificación';
+      let msg = t('createNotification.error');
       if (data && typeof data === 'object') {
         const parts = Object.entries(data).map(
           ([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : String(v)}`
@@ -115,7 +117,7 @@ export default function CreateNotification() {
               color: '#1a1a1a',
             }}
           >
-            Crear nueva notificación
+            {t('createNotification.titulo')}
           </h1>
         </div>
 
@@ -162,7 +164,7 @@ export default function CreateNotification() {
                 marginBottom: '4px',
               }}
             >
-              Título *
+              {t('createNotification.tituloLabel')}
             </label>
             <input
               name="title"
@@ -185,7 +187,7 @@ export default function CreateNotification() {
                 e.target.style.borderColor = '#ddd';
                 e.target.style.boxShadow = 'none';
               }}
-              placeholder="Ingrese el título de la notificación"
+              placeholder={t('createNotification.tituloPlaceholder')}
             />
           </div>
 
@@ -198,7 +200,7 @@ export default function CreateNotification() {
                 marginBottom: '4px',
               }}
             >
-              Mensaje *
+              {t('createNotification.mensaje')}
             </label>
             <textarea
               name="message"
@@ -225,7 +227,7 @@ export default function CreateNotification() {
                 e.target.style.borderColor = '#ddd';
                 e.target.style.boxShadow = 'none';
               }}
-              placeholder="Ingrese el mensaje de la notificación"
+              placeholder={t('createNotification.mensajePlaceholder')}
             />
           </div>
 
@@ -238,7 +240,7 @@ export default function CreateNotification() {
                 marginBottom: '4px',
               }}
             >
-              Tipo de notificación
+              {t('createNotification.tipo')}
             </label>
             <select
               name="type"
@@ -263,10 +265,10 @@ export default function CreateNotification() {
                 e.target.style.boxShadow = 'none';
               }}
             >
-              <option value="banner">Banner</option>
-              <option value="info">Información</option>
-              <option value="aviso">Aviso</option>
-              <option value="oferta">Oferta</option>
+              <option value="banner">{t('createNotification.banner')}</option>
+              <option value="info">{t('createNotification.info')}</option>
+              <option value="aviso">{t('createNotification.aviso')}</option>
+              <option value="oferta">{t('createNotification.oferta')}</option>
             </select>
           </div>
 
@@ -295,7 +297,7 @@ export default function CreateNotification() {
                     marginBottom: '4px',
                   }}
                 >
-                  Fecha de expiración (opcional)
+                  {t('createNotification.fechaExpiracion')}
                 </label>
                   <input
                     type="datetime-local"
@@ -327,9 +329,7 @@ export default function CreateNotification() {
                     marginTop: '4px',
                   }}
                 >
-                  Fecha y hora límite de la oferta. Al llegar, el banner se ocultará
-                  automáticamente. Si no se especifica, la oferta permanecerá activa
-                  indefinidamente.
+                  {t('createNotification.fechaAyuda')}
                 </small>
               </div>
 
@@ -356,7 +356,7 @@ export default function CreateNotification() {
                   onMouseOver={(e) => (e.target.style.backgroundColor = '#bbdefb')}
                   onMouseOut={(e) => (e.target.style.backgroundColor = '#e3f2fd')}
                 >
-                  +2 horas
+                  {t('createNotification.mas2Horas')}
                 </button>
                 <button
                   type="button"
@@ -380,7 +380,7 @@ export default function CreateNotification() {
                   onMouseOver={(e) => (e.target.style.backgroundColor = '#bbdefb')}
                   onMouseOut={(e) => (e.target.style.backgroundColor = '#e3f2fd')}
                 >
-                  +1 día
+                  {t('createNotification.mas1Dia')}
                 </button>
                 <button
                   type="button"
@@ -399,7 +399,7 @@ export default function CreateNotification() {
                   onMouseOver={(e) => (e.target.style.backgroundColor = '#ffcdd2')}
                   onMouseOut={(e) => (e.target.style.backgroundColor = '#ffebee')}
                 >
-                  Limpiar fecha
+                  {t('createNotification.limpiarFecha')}
                 </button>
               </div>
             </div>
@@ -491,7 +491,7 @@ export default function CreateNotification() {
                 e.target.style.borderColor = '#ddd';
               }}
             >
-              Cancelar
+              {t('createNotification.cancelar')}
             </button>
             <button
               type="submit"
@@ -561,10 +561,10 @@ export default function CreateNotification() {
                       strokeLinecap="round"
                     />
                   </svg>
-                  Creando notificación...
+                  {t('createNotification.creando')}
                 </div>
               ) : (
-                'Crear notificación'
+                t('createNotification.crear')
               )}
             </button>
           </div>

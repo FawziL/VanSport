@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { appService } from '@/services/routes';
 
 export default function ListCategories({
@@ -17,6 +18,7 @@ export default function ListCategories({
   placeholder = 'Seleccione una categoría',
   extraOptions = [],
 }) {
+  const { t } = useTranslation('admin');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -101,7 +103,7 @@ export default function ListCategories({
       >
         {!multiple && (
           <option value="" disabled={required && selectValue !== ''}>
-            {loading ? 'Cargando categorías…' : error ? 'Error al cargar' : placeholder}
+            {loading ? t('listCategories.cargando') : error ? t('listCategories.errorCargar') : placeholder}
           </option>
         )}
         {options.map((opt) => (
@@ -110,7 +112,7 @@ export default function ListCategories({
           </option>
         ))}
       </select>
-      {error && <span className="text-sm text-red-600">No se pudo cargar categorías.</span>}
+      {error && <span className="text-sm text-red-600">{t('listCategories.errorGeneral')}</span>}
     </div>
   );
 }

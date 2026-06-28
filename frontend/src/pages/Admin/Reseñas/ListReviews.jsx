@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
@@ -16,6 +17,7 @@ import {
 import { toast } from 'react-toastify';
 
 export default function ListReviews() {
+  const { t } = useTranslation('admin');
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -39,8 +41,8 @@ export default function ListReviews() {
         setPage((prev) => Math.min(prev, totalPages));
       })
       .catch(() => {
-        setError('No se pudieron cargar las reseñas');
-        toast.error('No se pudieron cargar las reseñas');
+        setError(t('listReviews.errorCargar'));
+        toast.error(t('listReviews.errorCargar'));
       })
       .finally(() => setLoading(false));
     // eslint-disable-next-line
@@ -87,9 +89,9 @@ export default function ListReviews() {
     try {
       await adminService.reviews.removeAdmin(deleteId);
       setItems((prev) => prev.filter((x) => x.id !== deleteId));
-      toast.success('Reseña eliminada correctamente');
+      toast.success(t('listReviews.successEliminar'));
     } catch (err) {
-      const msg = err?.response?.data?.detail || 'No se pudo eliminar la reseña';
+      const msg = err?.response?.data?.detail || t('listReviews.errorEliminar');
       setError(msg);
       toast.error(msg);
     } finally {
@@ -102,7 +104,7 @@ export default function ListReviews() {
     <div className="max-w-[1200px] mx-auto my-10 px-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-extrabold">Reseñas</h1>
+        <h1 className="text-2xl font-extrabold">{t('listReviews.titulo')}</h1>
       </div>
 
       {/* Page Size Selector */}
@@ -111,7 +113,7 @@ export default function ListReviews() {
           value={pageSize}
           onChange={setPageSize}
           options={[5, 10, 20, 50]}
-          label="Por página"
+          label={t('listReviews.porPagina')}
         />
       </div>
 
@@ -121,14 +123,14 @@ export default function ListReviews() {
       {/* Table */}
       <Table>
         <TableHead>
-          <TableHeader width="5%">ID</TableHeader>
-          <TableHeader width="5%">Producto</TableHeader>
-          <TableHeader width="20%">Usuario</TableHeader>
-          <TableHeader width="20%">Comentario</TableHeader>
-          <TableHeader width="10%">Calif.</TableHeader>
-          <TableHeader width="10%">Fecha</TableHeader>
+          <TableHeader width="5%">{t('listReviews.colId')}</TableHeader>
+          <TableHeader width="5%">{t('listReviews.colProducto')}</TableHeader>
+          <TableHeader width="20%">{t('listReviews.colUsuario')}</TableHeader>
+          <TableHeader width="20%">{t('listReviews.colComentario')}</TableHeader>
+          <TableHeader width="10%">{t('listReviews.colCalif')}</TableHeader>
+          <TableHeader width="10%">{t('listReviews.colFecha')}</TableHeader>
           <TableHeader width="10%" align="center">
-            Acciones
+            {t('listReviews.colAcciones')}
           </TableHeader>
         </TableHead>
 
@@ -136,8 +138,8 @@ export default function ListReviews() {
           loading={loading}
           empty={pageItems.length === 0}
           colSpan={7}
-          loadingText="Cargando reseñas..."
-          emptyText="No hay reseñas."
+          loadingText={t('listReviews.cargando')}
+          emptyText={t('listReviews.vacio')}
         >
           {pageItems.map((r) => (
             <TableRow key={r.id}>
@@ -155,7 +157,7 @@ export default function ListReviews() {
                     variant="edit"
                     onClick={() => navigate(`/admin/resenas/editar/${r.id}`)}
                   >
-                    Editar
+                    {t('listReviews.editar')}
                   </ActionButton>
                   <ActionButton
                     variant="delete"
@@ -164,7 +166,7 @@ export default function ListReviews() {
                       setModalOpen(true);
                     }}
                   >
-                    Eliminar
+                    {t('listReviews.eliminar')}
                   </ActionButton>
                 </div>
               </TableCell>
@@ -179,10 +181,10 @@ export default function ListReviews() {
       {/* Confirm Modal */}
       <ConfirmModal
         open={modalOpen}
-        title="¿Eliminar reseña?"
-        message="Esta acción no se puede deshacer."
-        confirmText="Sí, eliminar"
-        cancelText="Cancelar"
+        title={t('listReviews.confirmarTitulo')}
+        message={t('listReviews.confirmarMensaje')}
+        confirmText={t('listReviews.confirmarSi')}
+        cancelText={t('confirm.cancelar')}
         danger
         onCancel={() => setModalOpen(false)}
         onConfirm={handleDelete}

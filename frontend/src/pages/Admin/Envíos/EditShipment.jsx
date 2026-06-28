@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
 
 export default function EditShipment() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const [form, setForm] = useState(null);
   const [error, setError] = useState('');
@@ -17,12 +19,12 @@ export default function EditShipment() {
       .then((data) => {
         if (!active) return;
         setForm({
-          estado: data.status || '',
-          metodo_envio: data.metodo_envio || '',
-          codigo_seguimiento: data.codigo_seguimiento || '',
+          status: data.status || '',
+          shippingMethod: data.shippingMethod || '',
+          trackingCode: data.trackingCode || '',
         });
       })
-      .catch(() => setError('No se pudo cargar el envío'))
+      .catch(() => setError(t('editShipment.errorCargar')))
       .finally(() => active && setLoading(false));
     return () => (active = false);
   }, [id]);
@@ -39,7 +41,7 @@ export default function EditShipment() {
       await adminService.shipments.partialUpdate(id, form);
       navigate('/admin/envios');
     } catch (err) {
-      setError(err?.detail || 'No se pudo actualizar el envío');
+      setError(err?.detail || t('editShipment.errorGuardar'));
     }
   };
 
@@ -48,7 +50,7 @@ export default function EditShipment() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando datos del envío...</p>
+          <p className="mt-4 text-gray-600">{t('editShipment.cargando')}</p>
         </div>
       </div>
     );
@@ -78,7 +80,7 @@ export default function EditShipment() {
               />
             </svg>
           </button>
-          <h1 className="text-xl font-extrabold text-gray-900">Editar envío #{id}</h1>
+          <h1 className="text-xl font-extrabold text-gray-900">{t('editShipment.titulo')}{id}</h1>
         </div>
 
         {error && (
@@ -103,46 +105,42 @@ export default function EditShipment() {
 
         <form onSubmit={onSubmit} className="grid gap-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Estado *</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editShipment.estado')}</label>
             <select
-              name="estado"
+              name="status"
               value={form.status}
               onChange={onChange}
               required
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
             >
-              <option value="">Seleccionar estado</option>
-              <option value="pendiente">Pendiente</option>
-              <option value="pagado">Pagado</option>
-              <option value="en_transito">En transito</option>
-              <option value="entregado">Entregado</option>
-              <option value="cancelado">Cancelado</option>
+              <option value="">{t('editShipment.seleccionarEstado')}</option>
+              <option value="pendiente">{t('status.pendiente')}</option>
+              <option value="pagado">{t('status.pagado')}</option>
+              <option value="en_transito">{t('status.enTransito')}</option>
+              <option value="entregado">{t('status.entregado')}</option>
+              <option value="cancelado">{t('status.cancelado')}</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Método de envío
-            </label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editShipment.metodoEnvio')}</label>
             <input
-              name="metodo_envio"
-              value={form.metodo_envio}
+              name="shippingMethod"
+              value={form.shippingMethod}
               onChange={onChange}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-              placeholder="Ej: Correos, MRW, DHL"
+              placeholder={t('editShipment.metodoPlaceholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Código de seguimiento
-            </label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editShipment.codigoSeguimiento')}</label>
             <input
-              name="codigo_seguimiento"
-              value={form.codigo_seguimiento}
+              name="trackingCode"
+              value={form.trackingCode}
               onChange={onChange}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-              placeholder="Opcional"
+              placeholder={t('editShipment.codigoPlaceholder')}
             />
           </div>
 
@@ -152,13 +150,13 @@ export default function EditShipment() {
               onClick={() => navigate('/admin/envios')}
               className="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-colors"
             >
-              Cancelar
+              {t('editShipment.cancelar')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors"
             >
-              Guardar cambios
+              {t('editShipment.guardar')}
             </button>
           </div>
         </form>

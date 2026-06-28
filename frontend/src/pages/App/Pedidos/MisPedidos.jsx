@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { appService } from '@/services/routes';
 import { useAuth } from '@/context/AuthContext';
+import { locPath } from '@/utils/localePath';
 import {
   Table,
   TableHead,
@@ -35,6 +37,7 @@ function formatDate(d) {
 export default function MisPedidos() {
   const navigate = useNavigate();
   const { isAuthenticated, ensureUserLoaded } = useAuth();
+  const { t } = useTranslation('pedido');
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,12 +47,12 @@ export default function MisPedidos() {
     let alive = true;
     (async () => {
       if (!isAuthenticated) {
-        navigate('/login', { replace: true });
+        navigate(locPath('/login'), { replace: true });
         return;
       }
       const ok = await ensureUserLoaded();
       if (!ok) {
-        navigate('/login', { replace: true });
+        navigate(locPath('/login'), { replace: true });
         return;
       }
       setLoading(true);
@@ -59,7 +62,7 @@ export default function MisPedidos() {
         const results = Array.isArray(data) ? data : data.results || [];
         if (alive) setItems(results);
       } catch (e) {
-        if (alive) setErrMsg('No se pudieron cargar tus pedidos');
+        if (alive) setErrMsg(t('misPedidos.errorCargar'));
       } finally {
         if (alive) setLoading(false);
       }
@@ -71,7 +74,7 @@ export default function MisPedidos() {
 
   return (
     <div className="max-w-[1100px] mx-auto my-8 px-4">
-      <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-4">Mis Pedidos</h1>
+      <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-4">{t('misPedidos.titulo')}</h1>
 
       {errMsg && (
         <div className="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 mb-4 font-bold">
@@ -82,29 +85,29 @@ export default function MisPedidos() {
       {loading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Cargando pedidos...</p>
+          <p className="mt-2 text-gray-600">{t('misPedidos.cargando')}</p>
         </div>
       ) : items.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-          <p className="text-gray-600 mb-4">Aún no tienes pedidos.</p>
+          <p className="text-gray-600 mb-4">{t('misPedidos.vacio')}</p>
           <button
-            onClick={() => navigate('/productos')}
+            onClick={() => navigate(locPath('/productos'))}
             className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Ver Productos
+            {t('misPedidos.verProductos')}
           </button>
         </div>
       ) : (
         <Table>
           <TableHead>
-            <TableHeader width="15%">#</TableHeader>
-            <TableHeader width="25%">Fecha</TableHeader>
-            <TableHeader width="20%">Estado</TableHeader>
+            <TableHeader width="15%">{t('misPedidos.colId')}</TableHeader>
+            <TableHeader width="25%">{t('misPedidos.colFecha')}</TableHeader>
+            <TableHeader width="20%">{t('misPedidos.colEstado')}</TableHeader>
             <TableHeader width="20%" align="right">
-              Total
+              {t('misPedidos.colTotal')}
             </TableHeader>
             <TableHeader width="20%" align="center">
-              Acciones
+              {t('misPedidos.colAcciones')}
             </TableHeader>
           </TableHead>
 
@@ -120,8 +123,8 @@ export default function MisPedidos() {
                   {formatPrice(p.total)}
                 </TableCell>
                 <TableCell align="center">
-                  <ActionButton variant="edit" onClick={() => navigate(`/pedidos/${p.orderId}`)}>
-                    Ver Detalles
+                  <ActionButton variant="edit" onClick={() => navigate(locPath(`/pedidos/${p.orderId}`))}>
+                    {t('misPedidos.verDetalles')}
                   </ActionButton>
                 </TableCell>
               </TableRow>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import AdminSidebar from '@/components/AdminSidebar';
+import { locPath } from '@/utils/localePath';
 
 export default function AdminPage({ children }) {
   const { user, initialLoading } = useAuth();
@@ -10,7 +11,7 @@ export default function AdminPage({ children }) {
 
   useEffect(() => {
     if (initialLoading) return;
-    if (!user || !user.isStaff) navigate('/');
+    if (!user || !user.isStaff) navigate(locPath('/'));
   }, [user, navigate, initialLoading]);
 
   if (initialLoading) return null;

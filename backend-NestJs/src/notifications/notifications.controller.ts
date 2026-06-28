@@ -3,8 +3,8 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
-import { AuthGuard, RolesGuard } from '../common/guards';
-import { CurrentUser, Roles } from '../common/decorators';
+import { AuthGuard } from '../common/guards';
+import { CurrentUser } from '../common/decorators';
 
 @ApiTags('Notifications')
 @Controller('notifications')

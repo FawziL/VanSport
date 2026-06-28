@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from 'react-router-dom';
 import { adminService, appService } from '@/services/routes';
@@ -7,6 +8,7 @@ import StatCard from '@/components/admin/StatCard';
 import sections from '@/utils/adminSections';
 
 export default function Dashboard() {
+  const { t } = useTranslation('admin');
   const { user } = useAuth();
   const [pendingCount, setPendingCount] = useState(0);
   const [stats, setStats] = useState({
@@ -106,10 +108,10 @@ export default function Dashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-600">
-            Bienvenido{user?.name ? `, ${user.name}${user?.lastName ? ` ${user.lastName}` : ''}` : ''}
+            {t('dashboard.bienvenido')}{user?.name ? `, ${user.name}${user?.lastName ? ` ${user.lastName}` : ''}` : ''}
           </h1>
           <div className="text-gray-600 mt-1">
-            Gestiona tu tienda desde el panel de administración.
+            {t('dashboard.subtitulo')}
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -121,21 +123,21 @@ export default function Dashboard() {
       {/* Quick stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2">
         <StatCard
-          title="Dólar (BCV hoy)"
+          title={t('dashboard.dolar')}
           value={bcv ? `Bs ${Number(bcv.valor).toFixed(2)}` : '—'}
           note={bcv?.fecha}
         />
-        <StatCard title="Pagos pendientes" value={pendingCount} to="/admin/ventas/pendientes" />
-        <StatCard title="Productos" value={stats.productos} to="/admin/productos" />
+        <StatCard title={t('dashboard.pagosPendientes')} value={pendingCount} to="/admin/ventas/pendientes" />
+        <StatCard title={t('dashboard.productos')} value={stats.productos} to="/admin/productos" />
         <StatCard
-          title="Ventas totales"
+          title={t('dashboard.ventasTotales')}
           value={stats.ventasMes}
-          note={stats.ventasDesde ? `desde ${stats.ventasDesde}` : ''}
+          note={stats.ventasDesde ? `${t('dashboard.desde')}${stats.ventasDesde}` : ''}
         />
         <StatCard
-          title="Usuarios Registrados"
+          title={t('dashboard.usuarios')}
           value={stats.usuariosTotal}
-          note={stats.usuariosMes ? `${stats.usuariosMes} desde ${stats.ventasDesde}` : ''}
+          note={stats.usuariosMes ? `${stats.usuariosMes} ${t('dashboard.desde')}${stats.ventasDesde}` : ''}
         />
       </div>
 
@@ -151,7 +153,7 @@ export default function Dashboard() {
             <div className="text-gray-600 text-sm mb-4">{s.desc}</div>
             <div>
               <span className="w-20 inline-block px-3 py-2 bg-gray-900 text-white font-bold text-sm rounded-lg">
-                Ver
+                {t('dashboard.ver')}
               </span>
             </div>
           </Link>

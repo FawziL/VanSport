@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { locPath } from '@/utils/localePath';
 import { appService } from '@/services/routes';
 import { resolveImageUrl } from '@/utils/resolveUrl';
 import StatusBadge from '@/components/StatusBadge';
 
 export default function VerReporte() {
+  const { t } = useTranslation('reporte');
   const { id } = useParams();
   const [reporte, setReporte] = useState(null);
   const [mensaje, setMensaje] = useState('');
@@ -47,7 +50,7 @@ export default function VerReporte() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando reporte...</p>
+          <p className="mt-4 text-gray-600">{t('ver.cargando')}</p>
         </div>
       </div>
     );
@@ -58,14 +61,14 @@ export default function VerReporte() {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 text-start">Mi Reporte</h1>
-            <p className="text-gray-600 mt-1">Seguimiento de tu reporte de falla</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 text-start">{t('ver.titulo')}</h1>
+            <p className="text-gray-600 mt-1">{t('ver.subtitulo')}</p>
           </div>
           <Link
-            to="/reportes"
+            to={locPath('/reportes')}
             className="px-4 py-2 bg-gray-600 text-white! font-bold rounded-lg hover:bg-gray-700 transition-colors no-underline"
           >
-            Volver a Mis Reportes
+            {t('ver.volver')}
           </Link>
         </div>
 
@@ -78,30 +81,30 @@ export default function VerReporte() {
 
               {/* Estado y metadatos */}
               <div>
-                <span className="font-semibold">UUID:</span>{' '}
+                <span className="font-semibold">{t('ver.uuid')}</span>{' '}
                 <code className="font-mono px-2 py-1 rounded">{reporte.id}</code>
               </div>
 
               {/* Estado actual */}
               <div className="mb-4 mt-2">
-                <span className="text-sm font-semibold text-gray-700">Estado actual: </span>
+                <span className="text-sm font-semibold text-gray-700">{t('ver.estado')}</span>
                 <StatusBadge estado={reporte.status} />
               </div>
               <div className="mb-6">
                 <div className="text-sm text-gray-600 p-4 bg-gray-50 rounded-lg">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
-                      <span className="font-semibold">Fecha:</span>{' '}
+                      <span className="font-semibold">{t('ver.fecha')}</span>{' '}
                       {new Date(reporte.createdAt).toLocaleString('es-ES', {
                         dateStyle: 'short',
                         timeStyle: 'short',
                       })}
                     </div>
                     <div>
-                      <span className="font-semibold">Categoría:</span> {reporte.category}
+                      <span className="font-semibold">{t('ver.categoria')}</span> {reporte.category}
                     </div>
                     <div>
-                      <span className="font-semibold">Sección:</span> {reporte.section}
+                      <span className="font-semibold">{t('ver.seccion')}</span> {reporte.section}
                     </div>
                   </div>
                 </div>
@@ -110,7 +113,7 @@ export default function VerReporte() {
               {/* Descripción */}
               {reporte.description && (
                 <div className="mb-6">
-                  <h3 className="font-semibold text-gray-700 mb-2">Descripción</h3>
+                  <h3 className="font-semibold text-gray-700 mb-2">{t('ver.descripcion')}</h3>
                   <div className="p-4 bg-gray-50 rounded-lg whitespace-pre-wrap">
                     {reporte.description}
                   </div>
@@ -121,7 +124,7 @@ export default function VerReporte() {
               <div className="space-y-4">
                 {reporte.imageUrl && (
                   <div>
-                    <h3 className="font-semibold text-gray-700 mb-2">Imagen adjunta</h3>
+                    <h3 className="font-semibold text-gray-700 mb-2">{t('ver.imagen')}</h3>
                     <div className="flex justify-center">
                       <img
                         src={resolveImageUrl(reporte.imageUrl)}
@@ -133,7 +136,7 @@ export default function VerReporte() {
                 )}
                 {reporte.videoUrl && (
                   <div>
-                    <h3 className="font-semibold text-gray-700 mb-2">Video adjunto</h3>
+                    <h3 className="font-semibold text-gray-700 mb-2">{t('ver.video')}</h3>
                     <div className="flex justify-center">
                       <video
                         src={resolveImageUrl(reporte.videoUrl)}
@@ -151,7 +154,7 @@ export default function VerReporte() {
             {/* Historial de mensajes */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-                Historial de Mensajes
+                {t('ver.historial')}
               </h3>
 
               {isFinalizado && (
@@ -164,7 +167,7 @@ export default function VerReporte() {
                         clipRule="evenodd"
                       />
                     </svg>
-                    Este reporte está finalizado. No se pueden enviar nuevos mensajes.
+                    {t('ver.finalizado')}
                   </div>
                 </div>
               )}
@@ -190,9 +193,7 @@ export default function VerReporte() {
                               isSupport ? 'text-blue-700' : 'text-green-700'
                             }`}
                           >
-                            {isSupport
-                              ? 'Soporte'
-                              : `${reporte.userName} ${reporte.userLastName}`}
+                            {isSupport ? t('ver.soporte') : 'Tú'}
                           </span>
                           <span className="text-xs text-gray-500">
                             {new Date(followup.createdAt).toLocaleString('es-ES', {
@@ -235,7 +236,7 @@ export default function VerReporte() {
                         d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                       />
                     </svg>
-                    Aún no hay mensajes en este reporte.
+                    {t('ver.sinMensajes')}
                   </div>
                 )}
               </div>
@@ -243,11 +244,11 @@ export default function VerReporte() {
 
             {/* Formulario de respuesta */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">Enviar Mensaje</h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">{t('ver.enviarMensaje')}</h4>
               <form onSubmit={onSend} className={`space-y-4 ${isFinalizado ? 'opacity-50' : ''}`}>
                 <textarea
                   rows={3}
-                  placeholder="Escribe tu mensaje (opcional si adjuntas imagen)..."
+                  placeholder={t('ver.mensajePlaceholder')}
                   value={mensaje}
                   onChange={(e) => setMensaje(e.target.value)}
                   disabled={isFinalizado}
@@ -255,7 +256,7 @@ export default function VerReporte() {
                 />
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Imagen adjunta (opcional)
+                    {t('ver.imagenOpcional')}
                   </label>
                   <input
                     type="file"
@@ -291,10 +292,10 @@ export default function VerReporte() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      Enviando...
+                      {t('ver.enviando')}
                     </div>
                   ) : (
-                    'Enviar Mensaje'
+                    t('ver.enviar')
                   )}
                 </button>
               </form>

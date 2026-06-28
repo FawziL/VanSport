@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
@@ -15,6 +16,7 @@ import {
 import { toast } from 'react-toastify';
 
 export default function ListUsers() {
+  const { t } = useTranslation('admin');
   const [usuarios, setUsuarios] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -35,7 +37,7 @@ export default function ListUsers() {
         setPages(totalPages);
         setPage((prev) => Math.min(prev, totalPages));
       })
-      .catch(() => setError('No se pudieron cargar los usuarios'))
+      .catch(() => setError(t('listUsers.errorCargar')))
       .finally(() => setLoading(false));
   }, [pageSize]);
 
@@ -57,12 +59,12 @@ export default function ListUsers() {
 
       await adminService.users.partialUpdate(u.id, { isActive: !u.isActive });
 
-      toast.success(`${u.name ?? u.email} ${u.isActive ? 'desactivado' : 'activado'}`);
+      toast.success(`${u.name ?? u.email} ${u.isActive ? t('listUsers.desactivado') : t('listUsers.activado')}`);
     } catch (err) {
       setUsuarios((prev) =>
         prev.map((x) => (x.id === u.id ? { ...x, isActive: u.isActive } : x))
       );
-      const msg = err?.response?.data?.detail || 'No se pudo actualizar el estado del usuario';
+      const msg = err?.response?.data?.detail || t('listUsers.errorEstado');
       toast.error(msg);
       setError(msg);
     }
@@ -71,12 +73,12 @@ export default function ListUsers() {
   return (
     <div className="max-w-[1100px] mx-auto my-10 px-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-extrabold">Usuarios</h1>
+        <h1 className="text-2xl font-extrabold">{t('listUsers.titulo')}</h1>
         <Link
           to="/admin/usuarios/crear"
           className="px-4 py-2 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
         >
-          + Crear Usuario
+          {t('listUsers.crear')}
         </Link>
       </div>
 
@@ -85,7 +87,7 @@ export default function ListUsers() {
           value={pageSize}
           onChange={setPageSize}
           options={[5, 10, 20, 50]}
-          label="Por página"
+          label={t('listUsers.porPagina')}
         />
       </div>
 
@@ -93,21 +95,21 @@ export default function ListUsers() {
 
       <Table minWidth="min-w-[900px]">
         <TableHead>
-          <TableHeader>ID</TableHeader>
-          <TableHeader>Nombre</TableHeader>
-          <TableHeader>Email</TableHeader>
-          <TableHeader>Teléfono</TableHeader>
-          <TableHeader>Activo</TableHeader>
-          <TableHeader>Rol</TableHeader>
-          <TableHeader align="center">Acciones</TableHeader>
+          <TableHeader>{t('listUsers.colId')}</TableHeader>
+          <TableHeader>{t('listUsers.colNombre')}</TableHeader>
+          <TableHeader>{t('listUsers.colEmail')}</TableHeader>
+          <TableHeader>{t('listUsers.colTelefono')}</TableHeader>
+          <TableHeader>{t('listUsers.colActivo')}</TableHeader>
+          <TableHeader>{t('listUsers.colRol')}</TableHeader>
+          <TableHeader align="center">{t('listUsers.colAcciones')}</TableHeader>
         </TableHead>
 
         <TableBody
           loading={loading}
           empty={usuariosPage.length === 0}
           colSpan={7}
-          loadingText="Cargando usuarios..."
-          emptyText="No hay usuarios."
+          loadingText={t('listUsers.cargando')}
+          emptyText={t('listUsers.vacio')}
         >
           {usuariosPage.map((u) => (
             <TableRow key={u.id}>
@@ -123,7 +125,7 @@ export default function ListUsers() {
                     u.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}
                 >
-                  {u.isActive ? 'Sí' : 'No'}
+                  {u.isActive ? t('listUsers.si') : t('listUsers.no')}
                 </span>
               </TableCell>
               <TableCell>
@@ -132,7 +134,7 @@ export default function ListUsers() {
                     u.isStaff ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
                   }`}
                 >
-                  {u.isStaff ? 'Admin' : 'Cliente'}
+                  {u.isStaff ? t('listUsers.admin') : t('listUsers.cliente')}
                 </span>
               </TableCell>
               <TableCell align="center">
@@ -141,7 +143,7 @@ export default function ListUsers() {
                     variant="edit"
                     onClick={() => navigate(`/admin/usuarios/editar/${u.id}`)}
                   >
-                    Editar
+                    {t('listUsers.editar')}
                   </ActionButton>
                   <button
                     onClick={() => toggleActivo(u)}
@@ -151,7 +153,7 @@ export default function ListUsers() {
                         : 'bg-green-600 hover:bg-green-700'
                     }`}
                   >
-                    {u.isActive ? 'Desactivar' : 'Activar'}
+                    {u.isActive ? t('listUsers.desactivar') : t('listUsers.activar')}
                   </button>
                 </div>
               </TableCell>

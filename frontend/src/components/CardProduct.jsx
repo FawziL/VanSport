@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import { resolveImageUrl } from '@/utils/resolveUrl';
+import { useTranslation } from 'react-i18next';
+import { locPath } from '@/utils/localePath';
 
 export default function CardProduct({ producto }) {
+  const { t } = useTranslation('producto');
   const price = parseFloat(producto.price) || 0;
   const salePrice = parseFloat(producto.salePrice) || 0;
   const discount = salePrice > 0 && price > 0 ? Math.round(((price - salePrice) / price) * 100) : 0;
@@ -36,7 +39,7 @@ export default function CardProduct({ producto }) {
             zIndex: 2,
           }}
         >
-          {`${discount}% OFF`}
+          {t('card.descuento', { pct: discount })}
         </span>
       )}
       <Link to={`/productos/${producto.id}`}>
@@ -81,7 +84,7 @@ export default function CardProduct({ producto }) {
             {producto.categoryId || ''}
           </div>
           <div style={{ fontSize: 13, color: producto.stock > 0 ? '#43a047' : '#e53935' }}>
-            {producto.stock > 0 ? 'Disponible' : 'Agotado'}
+            {producto.stock > 0 ? t('card.disponible') : t('card.agotado')}
           </div>
         </div>
       </Link>
@@ -104,7 +107,7 @@ export default function CardProduct({ producto }) {
             marginTop: 8,
           }}
         >
-          Ver detalle
+          {t('card.verDetalle')}
         </Link>
       </div>
     </div>

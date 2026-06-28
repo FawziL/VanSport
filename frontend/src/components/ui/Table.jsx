@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 export function Table({ children, minWidth = 'min-w-[950px]' }) {
   return (
     <div className="overflow-x-auto bg-white rounded-xl shadow-sm">
@@ -29,9 +31,12 @@ export function TableBody({
   loading = false,
   empty = false,
   colSpan = 1,
-  loadingText = 'Cargando...',
-  emptyText = 'No hay datos.',
+  loadingText: loadingTextProp,
+  emptyText: emptyTextProp,
 }) {
+  const { t } = useTranslation('admin');
+  const loadingText = loadingTextProp ?? t('table.cargando');
+  const emptyText = emptyTextProp ?? t('table.vacio');
   if (loading) {
     return (
       <tbody>
@@ -77,8 +82,9 @@ export function TableCell({ children, align = 'left', className = '' }) {
 
 // Componente para imágenes de producto
 export function ProductImage({ src, alt, className = '' }) {
+  const { t } = useTranslation('admin');
   if (!src) {
-    return <span className="text-gray-500">Sin imagen</span>;
+    return <span className="text-gray-500">{t('table.sinImagen')}</span>;
   }
 
   return (
@@ -115,10 +121,11 @@ export function ActionButton({ onClick, variant, children, disabled = false, cla
 
 // Componente para el botón de destacado
 export function FavoriteButton({ isFavorite, onClick, disabled = false, className = '' }) {
+  const { t } = useTranslation('admin');
   return (
     <button
       onClick={onClick}
-      aria-label={isFavorite ? 'Quitar destacado' : 'Marcar como destacado'}
+      aria-label={isFavorite ? t('table.quitarDestacado') : t('table.marcarDestacado')}
       disabled={disabled}
       className={`bg-transparent border-none cursor-pointer text-xl transition-opacity ${
         disabled ? 'opacity-60 cursor-not-allowed' : 'opacity-100'

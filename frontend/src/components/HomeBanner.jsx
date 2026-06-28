@@ -1,14 +1,15 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { appService } from '@/services/routes';
+import { useTranslation } from 'react-i18next';
 
 function resolveCta(n) {
-  const t = String(n?.relacion_tipo || '').toLowerCase();
+  const tipo = String(n?.relacion_tipo || '').toLowerCase();
   const id = n?.relacion_id;
-  if (t === 'producto' && id != null) return { to: `/productos/${id}`, label: 'Ver producto' };
-  if (t === 'categoria' && id != null)
-    return { to: `/productos?categoryId=${id}`, label: 'Ver categoría' };
-  if (t === 'url' && typeof id === 'string') return { href: id, label: 'Ver más' };
+  if (tipo === 'producto' && id != null) return { to: `/productos/${id}`, labelKey: 'banner.verProducto' };
+  if (tipo === 'categoria' && id != null)
+    return { to: `/productos?categoryId=${id}`, labelKey: 'banner.verCategoria' };
+  if (tipo === 'url' && typeof id === 'string') return { href: id, labelKey: 'banner.verMas' };
   return null;
 }
 
@@ -39,6 +40,7 @@ function makeDismissKey(n) {
 }
 
 export default function HomeBanner() {
+  const { t } = useTranslation('home');
   const [banner, setBanner] = useState(null);
   const [now, setNow] = useState(Date.now());
   const [isAnimating, setIsAnimating] = useState(false);
@@ -157,7 +159,7 @@ export default function HomeBanner() {
                   fontWeight: 800,
                 }}
               >
-                Termina en {formatDuration(remainingMs)}
+                {t('banner.terminaEn', { time: formatDuration(remainingMs) })}
               </span>
             )}
             <span style={{ opacity: 0.5 }}>•</span>
@@ -182,7 +184,7 @@ export default function HomeBanner() {
                 textDecoration: 'none',
               }}
             >
-              {cta.label} →
+              {t(cta.labelKey)} →
             </Link>
           )}
           {cta && cta.href && (
@@ -199,7 +201,7 @@ export default function HomeBanner() {
                 textDecoration: 'none',
               }}
             >
-              {cta.label} ↗
+              {t(cta.labelKey)} ↗
             </a>
           )}
         </div>

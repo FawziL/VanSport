@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
 
 export default function EditReview() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const [form, setForm] = useState(null);
   const [error, setError] = useState('');
@@ -21,7 +23,7 @@ export default function EditReview() {
           comment: data.comment || '',
         });
       })
-      .catch(() => setError('No se pudo cargar la reseña'))
+      .catch(() => setError(t('editReview.errorCargar')))
       .finally(() => active && setLoading(false));
     return () => (active = false);
   }, [id]);
@@ -38,14 +40,14 @@ export default function EditReview() {
       await adminService.reviews.partialUpdate(id, form);
       navigate('/admin/resenas');
     } catch (err) {
-      setError(err?.detail || 'No se pudo actualizar la reseña');
+      setError(err?.detail || t('editReview.errorGuardar'));
     }
   };
 
   if (loading || !form) {
     return (
       <div className="flex items-center justify-center h-[50vh] text-gray-600">
-        Cargando reseña...
+        {t('editReview.cargando')}
       </div>
     );
   }
@@ -75,7 +77,7 @@ export default function EditReview() {
               />
             </svg>
           </button>
-          <h1 className="text-xl font-extrabold text-gray-900">Editar reseña #{id}</h1>
+          <h1 className="text-xl font-extrabold text-gray-900">{t('editReview.titulo')}{id}</h1>
         </div>
 
         {error && (
@@ -100,7 +102,7 @@ export default function EditReview() {
 
         <form onSubmit={onSubmit} className="grid gap-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Calificación *</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editReview.calificacion')}</label>
             <select
               name="rating"
               value={form.rating}
@@ -108,24 +110,24 @@ export default function EditReview() {
               required
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
             >
-              <option value={0}>Seleccionar calificación</option>
-              <option value={1}>1 - Muy mala</option>
-              <option value={2}>2 - Mala</option>
-              <option value={3}>3 - Regular</option>
-              <option value={4}>4 - Buena</option>
-              <option value={5}>5 - Excelente</option>
+              <option value={0}>{t('editReview.seleccionarCalificacion')}</option>
+              <option value={1}>{t('editReview.muyMala')}</option>
+              <option value={2}>{t('editReview.mala')}</option>
+              <option value={3}>{t('editReview.regular')}</option>
+              <option value={4}>{t('editReview.buena')}</option>
+              <option value={5}>{t('editReview.excelente')}</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Comentario</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editReview.comentario')}</label>
             <textarea
               name="comment"
               value={form.comment}
               onChange={onChange}
               rows={4}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-              placeholder="Escribe un comentario (opcional)"
+              placeholder={t('editReview.comentarioPlaceholder')}
             />
           </div>
 
@@ -135,13 +137,13 @@ export default function EditReview() {
               onClick={() => navigate('/admin/resenas')}
               className="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-colors"
             >
-              Cancelar
+              {t('editReview.cancelar')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors"
             >
-              Guardar cambios
+              {t('editReview.guardar')}
             </button>
           </div>
         </form>
