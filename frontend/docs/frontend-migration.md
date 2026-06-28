@@ -12,7 +12,7 @@
 | 6 | Public pages (field mapping) | ✅ Done |
 | 7 | Google OAuth (BetterAuth redirect) | ⬜ Pending |
 | 8 | Password Reset (BetterAuth) | ⬜ Pending |
-| 9 | Internacionalización (i18n ES/EN) | 🔄 En Progreso |
+| 9 | Internacionalización (i18n ES/EN) | ✅ Done |
 
 ## Phase Details
 
@@ -132,22 +132,23 @@ BetterAuth has built-in password reset:
 - `POST /api/auth/reset-password` with `{ newPassword, token }`
 - Need to create/reset password pages
 
-### Phase 9 — Internacionalización (i18n) 🔄 En Progreso
+### Phase 9 — Internacionalización (i18n) ✅ Done
 - [x] Instalar dependencias: `react-i18next`, `i18next`, `i18next-http-backend`, `i18next-browser-languagedetector`
 - [x] Configurar `src/i18n.js` con HttpBackend + LanguageDetector + fallbackLng: 'es'
-- [x] Crear archivos de traducción en `public/locales/{es,en}/`
-- [x] Separar por namespaces: `common` (compartido), `home` (página de inicio)
-- [x] Crear componente `LanguageToggle.jsx` (selector ES/EN)
-- [x] Importar i18n en `main.jsx`
-- [x] Traducir `NavBar.jsx` (~15 strings: enlaces, botones, aria-labels)
-- [x] Traducir `Footer.jsx` (~12 strings: títulos, copyright, descripciones)
-- [x] Traducir `Home.jsx` (~20 strings: hero, categorías, beneficios, populares, CTA)
-- [x] Traducir `HomeBanner.jsx` (labels de botones CTA + "Termina en")
-- [ ] Traducir páginas de autenticación (Login, Register, PasswordReset)
-- [ ] Traducir páginas de usuario (Productos, VerProducto, Carrito, Checkout, Pedidos, Perfil, Reportes)
-- [ ] Traducir páginas Admin (Dashboard, CRUDs, Sidebar)
-- [ ] Traducir componentes compartidos (StatusBadge, Pagination, ConfirmModal, etc.)
-- [ ] Traducir `utils/adminSections.jsx` (labels del menú admin)
+- [x] Crear archivos de traducción en `public/locales/{es,en}/` con namespaces: `common`, `home`, `productos`, `producto`, `auth`, `carrito`, `pedido`, `perfil`, `reporte`, `admin`
+- [x] Routing con prefijo de idioma (`/:lang/ruta`) estilo Next.js — `/es/productos`, `/en/productos`, etc.
+- [x] Componente `LanguageRouter.jsx` que sincroniza URL ↔ i18next
+- [x] `main.jsx` espera `initPromise` antes de montar React (cero flash de keys)
+- [x] `LanguageToggle.jsx` navega a la misma ruta con el nuevo idioma
+- [x] Helper `locPath()` para prefijar rutas con el idioma actual
+- [x] Traducir `NavBar.jsx` (~15 strings)
+- [x] Traducir `Footer.jsx` (~12 strings)
+- [x] Traducir `Home.jsx` + `HomeBanner.jsx` (~25 strings)
+- [x] Traducir `NotFound.jsx`
+- [x] Traducir páginas de autenticación (Login, Register, PasswordReset, PasswordResetConfirm) — namespace `auth`
+- [x] Traducir páginas de usuario (VerProducto, Carrito, Checkout, MisPedidos, VerPedido, Perfil, MisReportes, NuevoReporte, VerReporte) — namespaces `producto`, `carrito`, `pedido`, `perfil`, `reporte`
+- [x] Traducir páginas Admin (Dashboard, CRUDs completos) — namespace `admin`
+- [x] Traducir componentes compartidos (StatusBadge, Pagination, ConfirmModal, Table, PageSizeSelector, ProductFilters, ListCategories, ThemeToggleButton, AdminSideBar)
 
 ## Backend Gaps Found
 

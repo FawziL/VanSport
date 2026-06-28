@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { authService } from '@/services/routes';
-import { http } from '@/config/api';
 import PhoneInput from '@/components/PhoneInput';
 import { locPath } from '@/utils/localePath';
 
@@ -46,8 +45,9 @@ export default function Perfil() {
       setError('');
       setSuccess('');
       try {
-        const data = await authService.me();
+        const res = await authService.me();
         if (!alive) return;
+        const data = res?.user || res;
         setForm({
           id: data.id ?? '',
           email: data.email ?? '',
@@ -74,7 +74,7 @@ export default function Perfil() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [t]);
 
   const initials =
     ((form.name || '') + ' ' + (form.lastName || ''))
