@@ -31,7 +31,6 @@ export default function Home() {
           img: resolveImageUrl(p.imageUrl || p.imagen),
         }));
 
-        // Enriquecer cada producto con promedio y conteo de reseñas
         const enriched = await Promise.all(
           top3.map(async (p) => {
             try {
@@ -49,7 +48,7 @@ export default function Home() {
         );
 
         if (alive) setFeatured(enriched);
-      } catch (e) {
+      } catch {
         if (alive) setError(t('error.cargarDestacados'));
       } finally {
         if (alive) setLoading(false);
@@ -59,7 +58,7 @@ export default function Home() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     let alive = true;
@@ -75,7 +74,7 @@ export default function Home() {
           img: c.imageUrl ? resolveImageUrl(c.imageUrl) : '/img/cat-placeholder.svg',
         }));
         if (alive) setCats(mapped);
-      } catch (e) {
+      } catch {
         if (alive) setCatsError(t('error.cargarCategorias'));
       } finally {
         if (alive) setCatsLoading(false);
@@ -85,254 +84,250 @@ export default function Home() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [t]);
 
   return (
     <>
       <HomeBanner />
 
-      <div className="min-h-screen">
-        {/* Hero Section - Con colores deportivos */}
-        <section className="bg-gradient-to-br from-[#1e3a8a] via-[#dc2626] to-[#16a34a] text-white py-20 pb-16 text-center relative overflow-hidden">
-          {/* Elementos deportivos decorativos */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-10 left-10 w-20 h-20 border-4 border-white rounded-full"></div>
-            <div className="absolute bottom-20 right-16 w-16 h-16 border-2 border-white rotate-45"></div>
-            <div className="absolute top-1/2 left-1/4 w-8 h-8 bg-white rounded-full"></div>
-          </div>
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-slate-900">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_#d97706_0%,_transparent_60%)] opacity-15" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_#d97706_0%,_transparent_50%)] opacity-10" />
+        <div className="absolute top-1/4 -left-20 w-72 h-72 bg-amber-600/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-amber-600/5 rounded-full blur-3xl" />
+        <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32 text-center">
+          <span className="inline-block text-xs font-semibold tracking-[0.3em] uppercase text-white mb-6">
+            {t('hero.subtitulo')}
+          </span>
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
+            {t('hero.titulo')}
+          </h1>
+          <Link
+            to={locPath('/productos')}
+            className="inline-flex items-center gap-3 bg-amber-600 hover:bg-amber-500 !text-white font-semibold px-8 py-4 rounded-lg text-base no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-amber-600/30"
+          >
+            {t('hero.explorar')}
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </Link>
+        </div>
+      </section>
 
-          <div className="max-w-4xl mx-auto px-4 relative z-10">
-            <h1 className="text-5xl md:text-6xl font-black mb-6 tracking-tight">
-              ¡<span className="text-yellow-300">Van</span>
-              <span className="text-orange-400">Sport</span>!
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-100 mb-8 font-medium">
-              {t('hero.subtitulo')}
+      {/* Categorías */}
+      <section className="py-20 bg-gradient-to-b from-white to-slate-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
+              {t('categorias.titulo')}
+            </h2>
+            <p className="text-slate-900/60 max-w-xl mx-auto">
+              {t('categorias.subtitulo')}
             </p>
-            <Link
-              to={locPath('/productos')}
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 !text-white font-black py-4 px-12 rounded-full text-lg no-underline shadow-2xl shadow-orange-500/30 transition-all duration-300 inline-block hover:scale-105 hover:shadow-orange-500/50"
-            >
-              {t('hero.explorar')}
-            </Link>
           </div>
-        </section>
 
-        {/* Categorías destacadas */}
-        <section className="bg-gradient-to-b from-gray-50 to-white py-16">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-black text-gray-900 mb-4">
-                {t('categorias.titulo')}
-              </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                {t('categorias.subtitulo')}
-              </p>
-              <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-green-500 mx-auto mt-4 rounded-full"></div>
+          {catsError && (
+            <div className="text-center text-red-600 mb-8 font-medium bg-red-50 py-3 px-6 rounded-lg max-w-md mx-auto">
+              {catsError}
             </div>
+          )}
 
-            {catsError && (
-              <div className="text-center text-red-600 mb-6 font-bold bg-red-50 py-3 px-6 rounded-lg max-w-md mx-auto">
-                {catsError}
-              </div>
-            )}
-
-            <div className="flex justify-center gap-8">
-              {(catsLoading ? Array.from({ length: 6 }) : cats).map((cat, idx) => (
-                <Link
-                  to={cat ? `${locPath('/productos')}?categoryId=${encodeURIComponent(cat.id)}` : '#'}
-                  key={cat ? cat.id : idx}
-                  className="group block bg-white rounded-2xl overflow-hidden shadow-lg shadow-gray-200/50 no-underline text-gray-800 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 border border-gray-100"
-                >
-                  {catsLoading ? (
-                    <div className="w-50 h-40 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />
-                  ) : (
-                    <div className="relative overflow-hidden">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {(catsLoading ? Array.from({ length: 6 }) : cats).map((cat, idx) => (
+              <Link
+                to={cat ? `${locPath('/productos')}?categoryId=${encodeURIComponent(cat.id)}` : '#'}
+                key={cat ? cat.id : idx}
+                className="group relative flex flex-col items-center bg-white rounded-xl overflow-hidden no-underline transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-600/15 border border-slate-200 hover:border-amber-500"
+              >
+                {catsLoading ? (
+                  <div className="w-full aspect-square bg-slate-100 animate-pulse" />
+                ) : (
+                  <>
+                    <div className="w-full aspect-square overflow-hidden bg-slate-50">
                       <img
                         src={cat.img}
                         alt={cat.name}
-                        className="w-50 h-40 object-cover block group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                     </div>
-                  )}
-                  <div className="p-3 text-center">
-                    {catsLoading ? (
-                      <div className="h-6 bg-gray-200 rounded-lg animate-pulse" />
-                    ) : (
-                      <span className="font-bold text-gray-800 group-hover:text-blue-600 transition-colors duration-200 text-sm md:text-base">
+                    <div className="w-full px-3 py-3 text-center bg-slate-900">
+                      <span className="text-sm font-semibold text-white transition-colors">
                         {cat.name}
                       </span>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-red-600 text-white py-12">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-2xl">🚚</span>
-                </div>
-                <h3 className="text-xl font-black mb-2">{t('beneficios.envioTitulo')}</h3>
-                <p className="text-blue-100">{t('beneficios.envioDesc')}</p>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-2xl">✅</span>
-                </div>
-                <h3 className="text-xl font-black mb-2">{t('beneficios.calidadTitulo')}</h3>
-                <p className="text-blue-100">{t('beneficios.calidadDesc')}</p>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-2xl">💯</span>
-                </div>
-                <h3 className="text-xl font-black mb-2">{t('beneficios.satisfaccionTitulo')}</h3>
-                <p className="text-blue-100">{t('beneficios.satisfaccionDesc')}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Productos destacados */}
-        <section className="bg-gradient-to-b from-white to-gray-50 py-16">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-black text-gray-900 mb-4">
-                {t('populares.titulo')}
-              </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                {t('populares.subtitulo')}
-              </p>
-              <div className="w-24 h-1 bg-gradient-to-r from-red-600 to-orange-500 mx-auto mt-4 rounded-full"></div>
-            </div>
-
-            {error && (
-              <div className="text-center text-red-600 mb-6 font-bold bg-red-50 py-3 px-6 rounded-lg max-w-md mx-auto">
-                {error}
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {(loading ? Array.from({ length: 3 }) : featured).map((prod, idx) => (
-                <Link
-                  to={prod ? locPath(`/productos/${prod.id}`) : '#'}
-                  key={prod ? prod.id : idx}
-                  className="group block bg-white rounded-2xl overflow-hidden shadow-lg shadow-gray-200/50 no-underline text-gray-800 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-red-500/20 border border-gray-100"
-                >
-                  {loading ? (
-                    <div className="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />
-                  ) : (
-                    <div className="relative overflow-hidden">
-                      <img
-                        src={prod.img}
-                        alt={prod.name}
-                        className="w-full h-48 object-cover block group-hover:scale-110 transition-transform duration-500"
-                      />
-                      <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                        {t('populares.badge')}
-                      </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                     </div>
-                  )}
-                  <div className="p-6">
-                    {loading ? (
-                      <>
-                        <div className="h-6 bg-gray-200 rounded-lg animate-pulse mb-3" />
-                        <div className="h-7 bg-gray-200 rounded-lg animate-pulse" />
-                      </>
-                    ) : (
-                      <>
-                        <div className="font-bold text-xl mb-3 text-gray-900 group-hover:text-red-600 transition-colors duration-200 line-clamp-2">
-                          {prod.name}
-                        </div>
-                        <div className="text-green-600 font-black text-2xl">
-                          {Number(prod.price).toLocaleString('es-ES', {
-                            style: 'currency',
-                            currency: 'USD',
-                          })}
-                        </div>
-                        <div className="mt-4">
-                          {loading ? (
-                            <div className="h-4 bg-gray-200 rounded animate-pulse w-32" />
-                          ) : prod.reviewsCount > 0 ? (
-                            <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
-                              <StarRow value={prod.avgRating || 0} size={14} />
-                              <span className="text-gray-800 font-bold">
-                                {(prod.avgRating || 0).toFixed(1)}
-                              </span>
-                              <span className="ml-2">{t('populares.resenas', { count: prod.reviewsCount })}</span>
-                            </div>
-                          ) : (
-                            <div className="mt-4 text-sm text-gray-500">{t('populares.sinResenas')}</div>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
+                  </>
+                )}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            {/* Botón ver más productos */}
-            <div className="text-center mt-12">
-              <Link
-                to={locPath('/productos')}
-                className="bg-gradient-to-r from-gray-800 to-gray-900 text-white font-bold py-3 px-8 rounded-full text-lg no-underline shadow-lg transition-all duration-300 inline-flex items-center hover:scale-105 hover:shadow-xl"
-              >
-                {t('populares.verTodos')}
-                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
+      {/* Beneficios */}
+      <section className="relative overflow-hidden bg-slate-900">
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_#d97706_0%,_transparent_70%)] opacity-5" />
+        <div className="relative max-w-7xl mx-auto px-6 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="flex items-start gap-5">
+              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-1 ring-1 ring-white/20">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                 </svg>
-              </Link>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-1">{t('beneficios.envioTitulo')}</h3>
+                <p className="text-sm text-white">{t('beneficios.envioDesc')}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-5">
+              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-1 ring-1 ring-white/20">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-1">{t('beneficios.calidadTitulo')}</h3>
+                <p className="text-sm text-white">{t('beneficios.calidadDesc')}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-5">
+              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-1 ring-1 ring-white/20">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-1">{t('beneficios.satisfaccionTitulo')}</h3>
+                <p className="text-sm text-white">{t('beneficios.satisfaccionDesc')}</p>
+              </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Banner de características */}
-
-        {/* CTA final */}
-        <section className="bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white py-20 text-center relative overflow-hidden">
-          {/* Elementos decorativos */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-1/4 right-1/4 w-32 h-32 border-4 border-white rounded-full animate-pulse"></div>
-            <div className="absolute bottom-1/3 left-1/3 w-24 h-24 border-2 border-white rotate-45"></div>
-          </div>
-
-          <div className="max-w-3xl mx-auto px-4 relative z-10">
-            <h2 className="text-4xl md:text-5xl font-black mb-6">
-              {t('cta.titulo')}
+      {/* Productos Destacados */}
+      <section className="py-20 bg-gradient-to-b from-slate-50 to-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
+              {t('populares.titulo')}
             </h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              {t('cta.subtitulo')}
+            <p className="text-slate-900/60 max-w-xl mx-auto">
+              {t('populares.subtitulo')}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to={locPath('/productos')}
-                className="bg-gradient-to-r from-green-500 to-green-600 !text-white font-black py-4 px-10 rounded-full text-lg no-underline shadow-2xl shadow-green-500/30 transition-all duration-300 inline-flex items-center hover:scale-105 hover:shadow-green-500/50"
-              >
-                {t('cta.comprar')} 🏅
-              </Link>
-              <Link
-                to={`${locPath('/productos')}?oferta=1&page_size=6`}
-                className="border-2 border-white !text-white font-bold py-4 px-10 rounded-full text-lg no-underline transition-all duration-300 inline-flex items-center hover:bg-gray-800"
-              >
-                {t('cta.ofertas')}
-              </Link>
-            </div>
           </div>
-        </section>
-      </div>
+
+          {error && (
+            <div className="text-center text-red-600 mb-8 font-medium bg-red-50 py-3 px-6 rounded-lg max-w-md mx-auto">
+              {error}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {(loading ? Array.from({ length: 3 }) : featured).map((prod, idx) => (
+              <Link
+                to={prod ? locPath(`/productos/${prod.id}`) : '#'}
+                key={prod ? prod.id : idx}
+                className="group block bg-white rounded-xl overflow-hidden no-underline transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-600/15 border border-slate-200 hover:border-amber-500"
+              >
+                {loading ? (
+                  <div className="w-full aspect-[4/3] bg-slate-100 animate-pulse" />
+                ) : (
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={prod.img}
+                      alt={prod.name}
+                      className="w-full aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                    <div className="absolute top-3 left-3 bg-amber-600 text-white text-[11px] font-bold px-3 py-1 rounded-full tracking-wider uppercase shadow-lg shadow-amber-600/20">
+                      {t('populares.badge')}
+                    </div>
+                  </div>
+                )}
+                <div className="p-6 bg-slate-900">
+                  {loading ? (
+                    <>
+                      <div className="h-5 bg-white/10 rounded animate-pulse mb-3" />
+                      <div className="h-6 bg-white/10 rounded animate-pulse w-1/2" />
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="font-semibold text-white text-lg mb-3 leading-snug line-clamp-2">
+                        {prod.name}
+                      </h3>
+                      <div className="text-2xl font-bold text-white">
+                        {Number(prod.price).toLocaleString('es-ES', {
+                          style: 'currency',
+                          currency: 'USD',
+                        })}
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-white/10">
+                        {prod.reviewsCount > 0 ? (
+                          <div className="flex items-center gap-2 text-sm">
+                            <StarRow value={prod.avgRating || 0} size={14} />
+                            <span className="text-white font-semibold">
+                              {(prod.avgRating || 0).toFixed(1)}
+                            </span>
+                            <span className="text-white/40">·</span>
+                            <span className="text-white/70">{t('populares.resenas', { count: prod.reviewsCount })}</span>
+                          </div>
+                        ) : (
+                          <span className="text-sm text-white/70">{t('populares.sinResenas')}</span>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="text-center mt-14">
+            <Link
+              to={locPath('/productos')}
+              className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-500 !text-white font-semibold px-8 py-3 rounded-lg text-sm no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-600/25"
+            >
+              {t('populares.verTodos')}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="relative overflow-hidden bg-slate-900">
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900 to-slate-800" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_#d97706_0%,_transparent_60%)] opacity-10" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-600/5 rounded-full blur-3xl" />
+        <div className="relative max-w-3xl mx-auto px-6 py-24 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            {t('cta.titulo')}
+          </h2>
+          <p className="text-white text-lg mb-10 max-w-xl mx-auto">
+            {t('cta.subtitulo')}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to={locPath('/productos')}
+              className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-500 !text-white font-semibold px-8 py-4 rounded-lg text-base no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-amber-600/30"
+            >
+              {t('cta.comprar')}
+            </Link>
+            <Link
+              to={`${locPath('/productos')}?oferta=1&page_size=6`}
+              className="inline-flex items-center gap-2 border-2 border-white/30 hover:border-white/60 !text-white hover:!text-white font-semibold px-8 py-4 rounded-lg text-base no-underline transition-all duration-300 hover:-translate-y-0.5"
+            >
+              {t('cta.ofertas')}
+            </Link>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

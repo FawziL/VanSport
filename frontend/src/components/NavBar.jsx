@@ -99,7 +99,7 @@ export default function NavBar() {
                 to={locPath('/productos')}
                 className={({ isActive }) =>
                   `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                    isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                    isActive ? 'bg-white/10' : 'hover:bg-white/10'
                   }`
                 }
               >
@@ -114,7 +114,7 @@ export default function NavBar() {
                 to={locPath('/carrito')}
                 className={({ isActive }) =>
                   `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                    isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                    isActive ? 'bg-white/10' : 'hover:bg-white/10'
                   }`
                 }
               >
@@ -123,7 +123,7 @@ export default function NavBar() {
                   {cartCount > 0 && (
                     <span
                       aria-label={t('nav.ariaLabelCarrito', { count: cartCount })}
-                      className="bg-red-600 text-white! rounded-full px-2 py-0 text-xs font-black h-5 min-w-5 flex items-center justify-center"
+                    className="bg-amber-600 text-white rounded-full px-2 py-0 text-xs font-black h-5 min-w-5 flex items-center justify-center"
                     >
                       {cartCount}
                     </span>
@@ -138,8 +138,8 @@ export default function NavBar() {
                     className={({ isActive }) =>
                       `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
                         isActive
-                          ? 'bg-gray-800 bg-opacity-10'
-                          : 'hover:bg-gray-800 hover:bg-opacity-10'
+                          ? 'bg-white/10'
+                          : 'hover:bg-white/10'
                       }`
                     }
                   >
@@ -150,8 +150,8 @@ export default function NavBar() {
                     className={({ isActive }) =>
                       `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
                         isActive
-                          ? 'bg-gray-800 bg-opacity-10'
-                          : 'hover:bg-gray-800 hover:bg-opacity-10'
+                          ? 'bg-white/10'
+                          : 'hover:bg-white/10'
                       }`
                     }
                   >
@@ -165,11 +165,11 @@ export default function NavBar() {
                     onClick={() => setUserMenuOpen((p) => !p)}
                     aria-haspopup="menu"
                     aria-expanded={userMenuOpen}
-                    className="flex items-center gap-2 bg-transparent text-white! cursor-pointer px-3 py-2 rounded-lg hover:bg-gray-800 hover:bg-opacity-10 transition-colors"
+                    className="flex items-center gap-2 bg-transparent text-white! cursor-pointer px-3 py-2 rounded-lg hover:bg-white/10 transition-colors"
                   >
                     <div
                       aria-hidden
-                      className="w-7 h-7 rounded-full bg-gray-800 flex items-center justify-center font-bold"
+                      className="w-7 h-7 rounded-full bg-amber-600 flex items-center justify-center font-bold"
                     >
                       {(user.name || 'U')[0].toUpperCase()}
                     </div>
@@ -181,7 +181,7 @@ export default function NavBar() {
                   {userMenuOpen && (
                     <div
                       role="menu"
-                      className="absolute left-0 mt-2 bg-black rounded-xl min-w-48 shadow-2xl overflow-hidden border-none"
+                      className="absolute left-0 mt-2 bg-black rounded-xl min-w-48 shadow-2xl overflow-hidden border border-white/10"
                     >
                       <button
                         type="button"
@@ -189,7 +189,7 @@ export default function NavBar() {
                           setUserMenuOpen(false);
                           handleNav('/perfil');
                         }}
-                        className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-gray-700 transition-colors"
+                        className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-white/10 transition-colors"
                       >
                         {t('nav.perfil')}
                       </button>
@@ -200,7 +200,7 @@ export default function NavBar() {
                           setUserMenuOpen(false);
                           handleNav('/pedidos');
                         }}
-                        className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-gray-700 transition-colors"
+                        className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-white/10 transition-colors"
                       >
                         {t('nav.misPedidos')}
                       </button>
@@ -211,7 +211,7 @@ export default function NavBar() {
                           setUserMenuOpen(false);
                           handleNav('/reportes');
                         }}
-                        className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-gray-700 transition-colors"
+                        className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-white/10 transition-colors"
                       >
                         {t('nav.reporteFallas')}
                       </button>
@@ -223,7 +223,7 @@ export default function NavBar() {
                             setUserMenuOpen(false);
                             handleNav('/admin/dashboard');
                           }}
-                          className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-gray-700 transition-colors"
+                          className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-white/10 transition-colors"
                         >
                           {t('nav.dashboardAdmin')}
                         </button>
@@ -236,7 +236,7 @@ export default function NavBar() {
                           logout();
                           setCartCount(0);
                         }}
-                        className="w-full text-left px-4 py-2 bg-transparent text-red-300! border-none cursor-pointer hover:bg-gray-700 transition-colors"
+                        className="w-full text-left px-4 py-2 bg-transparent text-red-300! border-none cursor-pointer hover:bg-white/10 transition-colors"
                       >
                         {t('nav.cerrarSesion')}
                       </button>
@@ -263,12 +263,12 @@ export default function NavBar() {
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="md:hidden grid gap-2 px-4 py-3 border-t border-gray-800 bg-gray-950">
+          <div className="md:hidden grid gap-2 px-4 py-3 border-t border-white/10 bg-black">
             <NavLink
               to={locPath('/productos')}
               className={({ isActive }) =>
                 `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                  isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                  isActive ? 'bg-white/10' : 'hover:bg-white/10'
                 }`
               }
               onClick={() => setMobileOpen(false)}
@@ -280,7 +280,7 @@ export default function NavBar() {
               to={locPath('/carrito')}
               className={({ isActive }) =>
                 `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                  isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                  isActive ? 'bg-white/10' : 'hover:bg-white/10'
                 }`
               }
               onClick={() => setMobileOpen(false)}
@@ -306,95 +306,82 @@ export default function NavBar() {
                   className={({ isActive }) =>
                     `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
                       isActive
-                        ? 'bg-gray-800 bg-opacity-10'
-                        : 'hover:bg-gray-800 hover:bg-opacity-10'
-                    }`
-                  }
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {t('nav.iniciarSesion')}
-                </NavLink>
-                <NavLink
-                  to={locPath('/register')}
-                  className={({ isActive }) =>
-                    `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                      isActive
-                        ? 'bg-gray-800 bg-opacity-10'
-                        : 'hover:bg-gray-800 hover:bg-opacity-10'
-                    }`
-                  }
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {t('nav.crearCuenta')}
-                </NavLink>
-              </>
-            ) : (
-              <>
-                <NavLink
-                  to={locPath('/perfil')}
-                  className={({ isActive }) =>
-                    `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                      isActive
-                        ? 'bg-gray-800 bg-opacity-10'
-                        : 'hover:bg-gray-800 hover:bg-opacity-10'
-                    }`
-                  }
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {t('nav.perfil')}
-                </NavLink>
-                <NavLink
-                  to={locPath('/pedidos')}
-                  className={({ isActive }) =>
-                    `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                      isActive
-                        ? 'bg-gray-800 bg-opacity-10'
-                        : 'hover:bg-gray-800 hover:bg-opacity-10'
-                    }`
-                  }
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {t('nav.misPedidos')}
-                </NavLink>
-                <NavLink
-                  to={locPath('/reportes')}
-                  className={({ isActive }) =>
-                    `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                      isActive
-                        ? 'bg-gray-800 bg-opacity-10'
-                        : 'hover:bg-gray-800 hover:bg-opacity-10'
-                    }`
-                  }
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {t('nav.reporteFallas')}
-                </NavLink>
-                {user?.isStaff && (
-                  <NavLink
-                    to={locPath('/admin/dashboard')}
-                    className={({ isActive }) =>
-                      `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                        isActive
-                          ? 'bg-gray-800 bg-opacity-10'
-                          : 'hover:bg-gray-800 hover:bg-opacity-10'
+                        ? 'bg-white/10'
+                        : 'hover:bg-white/10'
                       }`
                     }
                     onClick={() => setMobileOpen(false)}
                   >
-                    {t('nav.dashboardAdmin')}
+                    {t('nav.iniciarSesion')}
                   </NavLink>
-                )}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    logout();
-                    setCartCount(0);
-                  }}
-                  className="text-center bg-transparent text-red-300! border-none px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-800 hover:bg-opacity-10 transition-colors"
-                >
-                  {t('nav.cerrarSesion')}
-                </button>
+                </>
+              ) : (
+                <>
+                  <NavLink
+                    to={locPath('/perfil')}
+                    className={({ isActive }) =>
+                      `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
+                        isActive
+                        ? 'bg-white/10'
+                        : 'hover:bg-white/10'
+                      }`
+                    }
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {t('nav.perfil')}
+                  </NavLink>
+                  <NavLink
+                    to={locPath('/pedidos')}
+                    className={({ isActive }) =>
+                      `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
+                        isActive
+                          ? 'bg-white/10'
+                          : 'hover:bg-white/10'
+                      }`
+                    }
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {t('nav.misPedidos')}
+                  </NavLink>
+                  <NavLink
+                    to={locPath('/reportes')}
+                    className={({ isActive }) =>
+                      `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
+                        isActive
+                          ? 'bg-white/10'
+                          : 'hover:bg-white/10'
+                      }`
+                    }
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {t('nav.reporteFallas')}
+                  </NavLink>
+                  {user?.isStaff && (
+                    <NavLink
+                      to={locPath('/admin/dashboard')}
+                      className={({ isActive }) =>
+                        `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
+                          isActive
+                            ? 'bg-white/10'
+                            : 'hover:bg-white/10'
+                        }`
+                      }
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {t('nav.dashboardAdmin')}
+                    </NavLink>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileOpen(false);
+                      logout();
+                      setCartCount(0);
+                    }}
+                    className="text-center bg-transparent text-red-300! border-none px-3 py-2 rounded-lg cursor-pointer hover:bg-white/10 transition-colors"
+                  >
+                    {t('nav.cerrarSesion')}
+                  </button>
               </>
             )}
           </div>

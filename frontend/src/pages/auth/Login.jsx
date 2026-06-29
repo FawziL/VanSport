@@ -23,7 +23,7 @@ function GoogleLoginButton() {
     <button
       type="button"
       onClick={() => googleLogin()}
-      className="w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-gray-300 rounded-lg text-gray-700 font-medium text-sm transition-colors duration-200 hover:bg-gray-50"
+      className="w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-slate-200 rounded-lg text-slate-600 font-medium text-sm transition-colors duration-200 hover:bg-amber-50 hover:border-amber-200"
     >
       <svg className="w-5 h-5" viewBox="0 0 48 48" width="48px" height="48px">
         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
@@ -74,133 +74,106 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 p-5 font-sans">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
-        <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white p-8 text-center">
-          <h2 className="text-2xl font-bold mb-2">{t('login.titulo')}</h2>
-          <p className="opacity-90 text-sm">{t('login.subtitulo')}</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-slate-50 p-5">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-slate-900 mb-2">{t('login.titulo')}</h2>
+          <p className="text-slate-500">{t('login.subtitulo')}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8">
-          <div className="mb-5">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('login.email')}
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder={t('login.emailPlaceholder')}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base transition-all duration-200 focus:outline-none focus:ring-3 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-70"
-            />
-          </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-8">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-5">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+                {t('login.email')}
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder={t('login.emailPlaceholder')}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={loading}
+                className="w-full px-4 py-3 border border-slate-200 rounded-lg text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600 disabled:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70"
+              />
+            </div>
 
-          <div className="mb-6">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('login.password')}
-            </label>
-            <input
-              id="password"
-              type="password"
-              placeholder={t('login.passwordPlaceholder')}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loading}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base transition-all duration-200 focus:outline-none focus:ring-3 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-70"
-            />
-          </div>
+            <div className="mb-6">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
+                {t('login.password')}
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder={t('login.passwordPlaceholder')}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+                className="w-full px-4 py-3 border border-slate-200 rounded-lg text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600 disabled:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70"
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-3.5 px-4 bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-lg font-semibold text-base transition-all duration-200 flex items-center justify-center gap-2
-              ${
-                loading
-                  ? 'bg-gray-400 cursor-not-allowed opacity-70'
-                  : 'hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40'
-              } disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none`}
-          >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-transparent border-t-white rounded-full animate-spin"></div>
-                {t('login.loading')}
-              </>
-            ) : (
-              t('login.submit')
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-3.5 px-4 bg-amber-600 text-white rounded-lg font-semibold text-base transition-all duration-200 flex items-center justify-center gap-2
+                ${
+                  loading
+                    ? 'opacity-70 cursor-not-allowed'
+                    : 'hover:bg-amber-500 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-600/25'
+                } disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none`}
+            >
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-transparent border-t-white rounded-full animate-spin"></div>
+                  {t('login.loading')}
+                </>
+              ) : (
+                t('login.submit')
+              )}
+            </button>
+
+            {error && (
+              <div className="mt-4 bg-red-50 text-red-700 p-3 rounded-lg text-sm border-l-4 border-red-600 flex items-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className="flex-shrink-0">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+                </svg>
+                {error}
+              </div>
             )}
-          </button>
 
-          {error && (
-            <div className="mt-4 bg-red-50 text-red-700 p-3 rounded-lg text-sm border-l-4 border-red-600 flex items-center gap-2">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="flex-shrink-0"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="mt-4 bg-green-50 text-green-800 p-3 rounded-lg text-sm border-l-4 border-green-500 flex items-center gap-2">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="flex-shrink-0"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L7.28 10.22a.75.75 0 00-1.06 1.04l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {t('login.successRedirect')}
-            </div>
-          )}
-        </form>
+            {success && (
+              <div className="mt-4 bg-green-50 text-green-800 p-3 rounded-lg text-sm border-l-4 border-green-500 flex items-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className="flex-shrink-0">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L7.28 10.22a.75.75 0 00-1.06 1.04l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+                </svg>
+                {t('login.successRedirect')}
+              </div>
+            )}
+          </form>
 
           {GOOGLE_CLIENT_ID && (
-          <div className="px-8 pt-4 pb-2 text-center">
-            <div className="relative flex items-center">
-              <div className="flex-grow border-t border-gray-300"></div>
-              <span className="flex-shrink mx-4 text-sm text-gray-500">{t('login.orContinue')}</span>
-              <div className="flex-grow border-t border-gray-300"></div>
-            </div>
-            <div className="mt-4">
+            <div className="mt-6">
+              <div className="relative flex items-center mb-4">
+                <div className="flex-grow border-t border-slate-200"></div>
+                <span className="flex-shrink mx-4 text-sm text-slate-400">{t('login.orContinue')}</span>
+                <div className="flex-grow border-t border-slate-200"></div>
+              </div>
               <GoogleLoginButton />
             </div>
-          </div>
           )}
+        </div>
 
-        <div className="px-8 py-6 text-center border-t border-gray-200">
-          <div className="flex flex-col gap-3">
-            <Link
-              to={locPath('/register')}
-              className="text-indigo-600 font-medium text-sm transition-colors duration-200 hover:text-purple-600 hover:underline"
-            >
-              {t('login.noAccount')}
-            </Link>
-            <Link
-              to={locPath('/password-reset')}
-              className="text-indigo-600 font-medium text-sm transition-colors duration-200 hover:text-purple-600 hover:underline"
-            >
-              {t('login.forgotPassword')}
-            </Link>
-          </div>
+        <div className="mt-6 text-center">
+          <Link to={locPath('/register')} className="text-amber-700 hover:text-amber-600 font-medium text-sm transition-colors">
+            {t('login.noAccount')}
+          </Link>
+          <span className="mx-3 text-slate-300">·</span>
+          <Link to={locPath('/password-reset')} className="text-amber-700 hover:text-amber-600 font-medium text-sm transition-colors">
+            {t('login.forgotPassword')}
+          </Link>
         </div>
       </div>
     </div>

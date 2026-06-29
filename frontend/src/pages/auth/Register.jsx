@@ -5,7 +5,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import PhoneInput from '@/components/PhoneInput';
 import { useTranslation } from 'react-i18next';
 import { locPath } from '@/utils/localePath';
-import './Auth.css';
 
 function Register() {
   const { t } = useTranslation('auth');
@@ -76,120 +75,156 @@ function Register() {
   };
 
   return (
-    <div className="register-container">
-      <div className="register-card">
-        <div className="register-header">
-          <h2>{t('register.titulo')}</h2>
-          <p>{t('register.subtitulo')}</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-slate-50 p-5">
+      <div className="w-full max-w-lg">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-slate-900 mb-2">{t('register.titulo')}</h2>
+          <p className="text-slate-500">{t('register.subtitulo')}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="register-form">
-          <div className="form-section">
-            <h3 className="section-title">{t('register.personalInfo')}</h3>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="name">{t('register.name')}</label>
+        <div className="bg-white rounded-xl border border-slate-200 p-8">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4 pb-2 border-b border-slate-100">
+                {t('register.personalInfo')}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="form-group">
+                  <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+                    {t('register.name')}
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder={t('register.namePlaceholder')}
+                    value={form.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-slate-200 rounded-lg text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="lastName" className="block text-sm font-medium text-slate-700 mb-2">
+                    {t('register.lastName')}
+                  </label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    placeholder={t('register.lastNamePlaceholder')}
+                    value={form.lastName}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-slate-200 rounded-lg text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+                  {t('register.email')}
+                </label>
                 <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  placeholder={t('register.namePlaceholder')}
-                  value={form.name}
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder={t('register.emailPlaceholder')}
+                  value={form.email}
                   onChange={handleChange}
                   required
+                  className="w-full px-4 py-3 border border-slate-200 rounded-lg text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600"
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor="lastName">{t('register.lastName')}</label>
+
+              <div className="mt-4">
+                <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-2">
+                  {t('register.phone')}
+                </label>
+                <PhoneInput ref={phoneRef} />
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4 pb-2 border-b border-slate-100">
+                {t('register.security')}
+              </h3>
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
+                  {t('register.password')}
+                </label>
                 <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  placeholder={t('register.lastNamePlaceholder')}
-                  value={form.lastName}
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder={t('register.passwordPlaceholder')}
+                  value={form.password}
                   onChange={handleChange}
                   required
+                  minLength={8}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-lg text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600"
+                />
+                <p className="text-xs text-slate-400 mt-1">{t('register.passwordHint')}</p>
+              </div>
+
+              <div className="mt-4">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-2">
+                  {t('register.confirmPassword')}
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  placeholder={t('register.confirmPlaceholder')}
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  minLength={8}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-lg text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600"
                 />
               </div>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="email">{t('register.email')}</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder={t('register.emailPlaceholder')}
-                value={form.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            <button
+              type="submit"
+              disabled={submitting}
+              className={`w-full py-3.5 px-4 bg-amber-600 text-white rounded-lg font-semibold text-base transition-all duration-200 flex items-center justify-center gap-2
+                ${
+                  submitting
+                    ? 'opacity-70 cursor-not-allowed'
+                    : 'hover:bg-amber-500 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-600/25'
+                } disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none`}
+            >
+              {submitting ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-transparent border-t-white rounded-full animate-spin inline-block"></span>
+                  {t('register.loading')}
+                </>
+              ) : (
+                t('register.submit')
+              )}
+            </button>
 
-            <div className="form-group">
-              <label htmlFor="phone">{t('register.phone')}</label>
-              <PhoneInput ref={phoneRef} />
-            </div>
-          </div>
-
-          <div className="form-section">
-            <h3 className="section-title">{t('register.security')}</h3>
-            <div className="form-group">
-              <label htmlFor="password">{t('register.password')}</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                placeholder={t('register.passwordPlaceholder')}
-                value={form.password}
-                onChange={handleChange}
-                required
-                minLength={8}
-              />
-              <div className="password-hint">{t('register.passwordHint')}</div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="confirmPassword">{t('register.confirmPassword')}</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                placeholder={t('register.confirmPlaceholder')}
-                value={form.confirmPassword}
-                onChange={handleChange}
-                required
-                minLength={8}
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className={`submit-btn ${submitting ? 'submitting' : ''}`}
-          >
-            {submitting ? (
-              <>
-                <span className="spinner"></span>
-                {t('register.loading')}
-              </>
-            ) : (
-              t('register.submit')
+            {error && (
+              <div className="mt-4 bg-red-50 text-red-700 p-3 rounded-lg text-sm border-l-4 border-red-600">
+                {error}
+              </div>
             )}
-          </button>
+            {success && (
+              <div className="mt-4 bg-green-50 text-green-800 p-3 rounded-lg text-sm border-l-4 border-green-500">
+                {t('register.success')}
+              </div>
+            )}
+          </form>
 
-          {error && <div className="error-message">{error}</div>}
-          {success && <div className="success-message">{t('register.success')}</div>}
-        </form>
-
-        <div className="register-footer">
-          <p>
-            {t('register.hasAccount')}{' '}
-            <Link to={locPath('/login')} className="login-link">
-              {t('register.login')}
-            </Link>
-          </p>
+          <div className="mt-6 pt-6 border-t border-slate-200 text-center">
+            <p className="text-sm text-slate-500">
+              {t('register.hasAccount')}{' '}
+              <Link to={locPath('/login')} className="text-amber-700 hover:text-amber-600 font-medium transition-colors">
+                {t('register.login')}
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
