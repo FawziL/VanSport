@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import Pagination from '@/components/Pagination';
 import {
   Table,
@@ -13,7 +14,6 @@ import {
   ActionButton,
 } from '@/components/ui/Table';
 import StatusBadge from '@/components/StatusBadge';
-import { useNavigate } from 'react-router-dom';
 import PageSizeSelector from '@/components/PageSizeSelector';
 
 export default function ListReportes() {
@@ -74,7 +74,7 @@ export default function ListReportes() {
         <h1 className="text-2xl font-extrabold">{t('listReports.titulo')}</h1>
         <div className="flex gap-2">
           <Link
-            to="/admin/reportes/crear"
+            to={locPath('/admin/reportes/crear')}
             className="px-4 py-2 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
           >
             {t('listReports.crear')}
@@ -122,7 +122,7 @@ export default function ListReportes() {
               <TableCell align="center">
                 <ActionButton
                   variant="edit"
-                  onClick={() => navigate(`/admin/reportes/${report.id}`)}
+                    onClick={() => navigate(locPath(`/admin/reportes/${report.id}`))}
                 >
                   {t('listReports.ver')}
                 </ActionButton>

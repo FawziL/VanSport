@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 
 export default function EditPaymentMethod() {
   const { t } = useTranslation('admin');
@@ -60,7 +61,7 @@ export default function EditPaymentMethod() {
         icon: form.icono || '',
         config: cfg,
       });
-      navigate('/admin/metodos-pago');
+      navigate(locPath('/admin/metodos-pago'));
     } catch (e) {
       setError(e?.response?.data?.detail || t('editPaymentMethod.errorGuardar'));
     } finally {
@@ -89,7 +90,7 @@ export default function EditPaymentMethod() {
       <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
         <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
           <button
-            onClick={() => navigate('/admin/metodos-pago')}
+            onClick={() => navigate(locPath('/admin/metodos-pago'))}
             className="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
             aria-label={t('editPaymentMethod.ariaVolver')}
           >
@@ -229,7 +230,7 @@ export default function EditPaymentMethod() {
           <div className="flex gap-3 justify-end pt-3 border-t border-gray-100">
             <button
               type="button"
-              onClick={() => navigate('/admin/metodos-pago')}
+              onClick={() => navigate(locPath('/admin/metodos-pago'))}
               className="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-colors"
             >
               {t('editPaymentMethod.cancelar')}

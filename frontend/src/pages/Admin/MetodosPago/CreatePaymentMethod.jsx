@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 
 export default function CreatePaymentMethod() {
   const { t } = useTranslation('admin');
@@ -45,7 +46,7 @@ export default function CreatePaymentMethod() {
         icon: form.icono || '',
         config: cfg,
       });
-      navigate('/admin/metodos-pago');
+      navigate(locPath('/admin/metodos-pago'));
     } catch (e) {
       setError(e?.response?.data?.detail || t('createPaymentMethod.error'));
     } finally {
@@ -161,7 +162,7 @@ export default function CreatePaymentMethod() {
             {saving ? t('createPaymentMethod.guardando') : t('createPaymentMethod.crear')}
           </button>
           <button
-            onClick={() => navigate('/admin/metodos-pago')}
+            onClick={() => navigate(locPath('/admin/metodos-pago'))}
             type="button"
             style={{
               padding: '0.6rem 1.2rem',

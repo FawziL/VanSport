@@ -1,9 +1,10 @@
 import {
   Controller, Get, Post, Body, Param, Put, Patch, Delete,
-  ParseIntPipe, UseGuards, UseInterceptors, UploadedFiles, Query,
+  ParseIntPipe, UseGuards, UseInterceptors, UploadedFiles, Query, Res,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiQuery, ApiConsumes } from '@nestjs/swagger';
+import { Response } from 'express';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -28,6 +29,17 @@ export class ProductsController {
   @ApiOperation({ summary: 'List all products (admin, including inactive)' })
   findAllAdmin() {
     return this.productsService.findAllAdmin();
+  }
+
+  @Get('export')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Export products to Excel (admin)' })
+  async export(@Res() res: Response) {
+    const buffer = await this.productsService.exportExcel();
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="productos.xlsx"`);
+    res.send(buffer);
   }
 
   @Get(':id')

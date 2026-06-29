@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import PhoneInput from '@/components/PhoneInput';
 
 export default function EditUser() {
@@ -46,7 +47,7 @@ export default function EditUser() {
     setError('');
     try {
       await adminService.users.partialUpdate(id, { ...form, phone: phoneRef.current?.getValue() || '' });
-      navigate('/admin/usuarios');
+      navigate(locPath('/admin/usuarios'));
     } catch (err) {
       setError(err?.detail || t('editUser.errorGuardar'));
     }
@@ -90,7 +91,7 @@ export default function EditUser() {
           }}
         >
           <button
-            onClick={() => navigate('/admin/usuarios')}
+            onClick={() => navigate(locPath('/admin/usuarios'))}
             style={{
               background: 'none',
               border: 'none',
@@ -391,7 +392,7 @@ export default function EditUser() {
           >
             <button
               type="button"
-              onClick={() => navigate('/admin/usuarios')}
+              onClick={() => navigate(locPath('/admin/usuarios'))}
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',

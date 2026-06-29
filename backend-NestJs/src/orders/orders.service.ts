@@ -6,10 +6,41 @@ import { eq } from 'drizzle-orm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CheckoutDto } from './dto/checkout.dto';
+import * as ExcelJS from 'exceljs';
 
 @Injectable()
 export class OrdersService {
   constructor(@Inject('DRIZZLE') private db: NodePgDatabase<typeof schema>) {}
+
+  async exportExcel(): Promise<Buffer> {
+    const rows = await this.db.select().from(orders);
+
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet('Pedidos');
+
+    ws.columns = [
+      { header: 'ID', key: 'id', width: 10 },
+      { header: 'Usuario ID', key: 'userId', width: 30 },
+      { header: 'Estado', key: 'status', width: 15 },
+      { header: 'Total', key: 'total', width: 15 },
+      { header: 'Dirección', key: 'shippingAddress', width: 40 },
+      { header: 'Notas', key: 'notes', width: 30 },
+      { header: 'Fecha', key: 'orderedAt', width: 20 },
+    ];
+
+    ws.getRow(1).font = { bold: true };
+
+    for (const r of rows) {
+      ws.addRow({
+        ...r,
+        total: r.total ? parseFloat(r.total) : '',
+        orderedAt: r.orderedAt ? new Date(r.orderedAt).toISOString().slice(0, 19).replace('T', ' ') : '',
+      });
+    }
+
+    const buf = await wb.xlsx.writeBuffer();
+    return Buffer.from(buf);
+  }
 
   async findByUser(userId: string) {
     return this.db.select().from(orders).where(eq(orders.userId, userId));

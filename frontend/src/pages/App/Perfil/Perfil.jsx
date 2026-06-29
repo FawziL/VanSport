@@ -103,13 +103,13 @@ export default function Perfil() {
         lastName: form.lastName ?? '',
         phone: phoneRef.current?.getValue() || '',
       };
-      const updated = await authService.updateProfile(payload);
+      await authService.updateProfile(payload);
       setForm((f) => ({
         ...f,
-        name: updated.name ?? f.name,
-        lastName: updated.lastName ?? f.lastName,
+        name: payload.name ?? f.name,
+        lastName: payload.lastName ?? f.lastName,
       }));
-      setInitialPhone(updated.phone || '');
+      setInitialPhone(payload.phone || '');
       setSuccess(t('success'));
     } catch (err) {
       const backend = err?.response?.data;

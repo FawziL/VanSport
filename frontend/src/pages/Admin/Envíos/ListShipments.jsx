@@ -186,7 +186,7 @@ export default function ListShipments() {
               <TableCell align="center">
                 <ActionButton
                   variant="edit"
-                  onClick={() => navigate(`/admin/envios/editar/${e.id}`)}
+                  onClick={() => navigate(locPath(`/admin/envios/editar/${e.id}`))}
                 >
                   {t('listShipments.editar')}
                 </ActionButton>

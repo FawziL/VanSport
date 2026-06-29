@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import ConfirmModal from '@/components/ConfirmModal';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
@@ -52,7 +53,6 @@ export default function ListNotifications() {
     const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
     setPages(totalPages);
     setPage((prev) => Math.min(prev, totalPages));
-    // eslint-disable-next-line
   }, [items, pageSize]);
 
   const start = (page - 1) * pageSize;
@@ -68,8 +68,6 @@ export default function ListNotifications() {
           })
         : '-',
   };
-
-  const getUserLabel = (n) => n.userId ?? '-';
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -93,7 +91,7 @@ export default function ListNotifications() {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-extrabold">{t('listNotifications.titulo')}</h1>
         <button
-          onClick={() => navigate('/admin/notificaciones/crear')}
+          onClick={() => navigate(locPath('/admin/notificaciones/crear'))}
           className="px-4 py-2 rounded-lg bg-blue-600 text-white! font-bold hover:bg-blue-700 transition-colors"
         >
           {t('listNotifications.crear')}
@@ -146,7 +144,7 @@ export default function ListNotifications() {
                 <div className="flex justify-center gap-2">
                   <ActionButton
                     variant="edit"
-                    onClick={() => navigate(`/admin/notificaciones/editar/${n.id}`)}
+                    onClick={() => navigate(locPath(`/admin/notificaciones/editar/${n.id}`))}
                   >
                     {t('listNotifications.editar')}
                   </ActionButton>

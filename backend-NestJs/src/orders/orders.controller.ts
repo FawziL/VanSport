@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Patch, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Patch, Delete, ParseIntPipe, UseGuards, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -6,6 +6,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { CheckoutDto } from './dto/checkout.dto';
 import { AuthGuard, RolesGuard } from '../common/guards';
 import { CurrentUser, Roles } from '../common/decorators';
+import { Response } from 'express';
 
 @ApiTags('Orders')
 @Controller()
@@ -31,6 +32,17 @@ export class OrdersController {
   @ApiOperation({ summary: 'Checkout from cart' })
   checkout(@Body() dto: CheckoutDto, @CurrentUser('id') userId: string) {
     return this.ordersService.checkout(dto, userId);
+  }
+
+  @Get('orders/export')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Export orders to Excel (admin)' })
+  async export(@Res() res: Response) {
+    const buffer = await this.ordersService.exportExcel();
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="pedidos.xlsx"`);
+    res.send(buffer);
   }
 
   @Get('orders/:id')

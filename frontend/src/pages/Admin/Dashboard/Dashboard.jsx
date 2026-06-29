@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from 'react-router-dom';
 import { adminService, appService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 import StatCard from '@/components/admin/StatCard';
 import sections from '@/utils/adminSections';
@@ -127,8 +128,8 @@ export default function Dashboard() {
           value={bcv ? `Bs ${Number(bcv.valor).toFixed(2)}` : '—'}
           note={bcv?.fecha}
         />
-        <StatCard title={t('dashboard.pagosPendientes')} value={pendingCount} to="/admin/ventas/pendientes" />
-        <StatCard title={t('dashboard.productos')} value={stats.productos} to="/admin/productos" />
+        <StatCard title={t('dashboard.pagosPendientes')} value={pendingCount} to={locPath('/admin/ventas/pendientes')} />
+        <StatCard title={t('dashboard.productos')} value={stats.productos} to={locPath('/admin/productos')} />
         <StatCard
           title={t('dashboard.ventasTotales')}
           value={stats.ventasMes}
@@ -145,7 +146,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {sections.map((s) => (
           <Link
-            to={s.to}
+            to={locPath(s.to)}
             key={s.to}
             className="block bg-white border border-gray-200 rounded-xl p-6 no-underline text-gray-900 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
           >

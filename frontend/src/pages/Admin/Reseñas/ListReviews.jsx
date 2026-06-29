@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
 import ConfirmModal from '@/components/ConfirmModal';
@@ -155,7 +156,7 @@ export default function ListReviews() {
                 <div className="flex justify-center gap-2">
                   <ActionButton
                     variant="edit"
-                    onClick={() => navigate(`/admin/resenas/editar/${r.id}`)}
+                    onClick={() => navigate(locPath(`/admin/resenas/editar/${r.id}`))}
                   >
                     {t('listReviews.editar')}
                   </ActionButton>

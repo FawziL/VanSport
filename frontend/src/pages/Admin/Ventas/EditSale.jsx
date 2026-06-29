@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 
 export default function EditSale() {
   const { t } = useTranslation('admin');
@@ -35,7 +36,7 @@ export default function EditSale() {
     setError('');
     try {
       await adminService.transactions.partialUpdate(id, form);
-      navigate('/admin/ventas');
+      navigate(locPath('/admin/ventas'));
     } catch (err) {
       setError(err?.detail || t('editSale.errorGuardar'));
     }
@@ -79,7 +80,7 @@ export default function EditSale() {
           }}
         >
           <button
-            onClick={() => navigate('/admin/ventas')}
+            onClick={() => navigate(locPath('/admin/ventas'))}
             style={{
               background: 'none',
               border: 'none',
@@ -259,7 +260,7 @@ export default function EditSale() {
           >
             <button
               type="button"
-              onClick={() => navigate('/admin/ventas')}
+              onClick={() => navigate(locPath('/admin/ventas'))}
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import {
   Table,
   TableHead,
@@ -88,7 +89,7 @@ export default function ListPaymentMethods() {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-extrabold">{t('listPaymentMethods.titulo')}</h1>
         <Link
-          to="/admin/metodos-pago/crear"
+          to={locPath('/admin/metodos-pago/crear')}
           className="px-4 py-2 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
         >
           {t('listPaymentMethods.crear')}
@@ -171,7 +172,7 @@ export default function ListPaymentMethods() {
                 <div className="flex justify-center gap-2">
                   <ActionButton
                     variant="edit"
-                    onClick={() => navigate(`/admin/metodos-pago/editar/${m.id}`)}
+                    onClick={() => navigate(locPath(`/admin/metodos-pago/editar/${m.id}`))}
                   >
                     {t('listPaymentMethods.editar')}
                   </ActionButton>

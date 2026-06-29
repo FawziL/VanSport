@@ -5,6 +5,7 @@ import { shipments } from '../../db/schema';
 import { eq } from 'drizzle-orm';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { UpdateShipmentDto } from './dto/update-shipment.dto';
+import * as ExcelJS from 'exceljs';
 
 @Injectable()
 export class ShipmentsService {
@@ -20,6 +21,39 @@ export class ShipmentsService {
 
   async findAll() {
     return this.db.select().from(shipments);
+  }
+
+  async exportExcel(): Promise<Buffer> {
+    const rows = await this.db.select().from(shipments);
+
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet('Envíos');
+
+    ws.columns = [
+      { header: 'ID', key: 'id', width: 10 },
+      { header: 'Pedido ID', key: 'orderId', width: 12 },
+      { header: 'Método', key: 'shippingMethod', width: 20 },
+      { header: 'Dirección', key: 'address', width: 40 },
+      { header: 'Estado', key: 'status', width: 15 },
+      { header: 'Código Rastreo', key: 'trackingCode', width: 25 },
+      { header: 'Costo', key: 'cost', width: 12 },
+      { header: 'Enviado', key: 'shippedAt', width: 20 },
+      { header: 'Entrega Est.', key: 'estimatedDelivery', width: 20 },
+    ];
+
+    ws.getRow(1).font = { bold: true };
+
+    for (const r of rows) {
+      ws.addRow({
+        ...r,
+        cost: r.cost ? parseFloat(r.cost) : '',
+        shippedAt: r.shippedAt ? new Date(r.shippedAt).toISOString().slice(0, 19).replace('T', ' ') : '',
+        estimatedDelivery: r.estimatedDelivery ? new Date(r.estimatedDelivery).toISOString().slice(0, 19).replace('T', ' ') : '',
+      });
+    }
+
+    const buf = await wb.xlsx.writeBuffer();
+    return Buffer.from(buf);
   }
 
   async findByOrder(orderId: number) {

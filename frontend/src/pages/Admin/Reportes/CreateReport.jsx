@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { appService } from '@/services/routes';
 import { CATEGORIAS_FALLA } from '@/utils/categorias';
 import { Link } from 'react-router-dom';
+import { locPath } from '@/utils/localePath';
 
 export default function CreateReport() {
   const { t } = useTranslation('admin');
@@ -22,7 +23,7 @@ export default function CreateReport() {
       if (imagen) fd.append('imagen', imagen);
       if (video) fd.append('video', video);
       await appService.bugReports.create(fd);
-      navigate('/admin/reportes');
+      navigate(locPath('/admin/reportes'));
     } finally {
       setLoading(false);
     }
@@ -37,7 +38,7 @@ export default function CreateReport() {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('createReport.titulo')}</h1>
 
             <Link
-              to="/admin/reportes"
+              to={locPath('/admin/reportes')}
               className="px-4 py-2 bg-gray-600 text-white! font-bold rounded-lg hover:bg-gray-700 transition-colors no-underline"
             >
               {t('createReport.volver')}

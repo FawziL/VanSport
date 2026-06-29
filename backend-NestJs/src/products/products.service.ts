@@ -6,6 +6,7 @@ import { eq, and } from 'drizzle-orm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { R2Service } from '../storage/r2.service';
+import * as ExcelJS from 'exceljs';
 
 @Injectable()
 export class ProductsService {
@@ -16,6 +17,41 @@ export class ProductsService {
 
   async findAll() {
     return this.db.select().from(products).where(eq(products.isActive, true));
+  }
+
+  async exportExcel(): Promise<Buffer> {
+    const rows = await this.db.select().from(products);
+
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet('Productos');
+
+    ws.columns = [
+      { header: 'ID', key: 'id', width: 8 },
+      { header: 'Nombre', key: 'name', width: 40 },
+      { header: 'Precio', key: 'price', width: 12 },
+      { header: 'Precio Oferta', key: 'salePrice', width: 14 },
+      { header: 'Stock', key: 'stock', width: 8 },
+      { header: 'Categoría ID', key: 'categoryId', width: 12 },
+      { header: 'Activo', key: 'isActive', width: 8 },
+      { header: 'Destacado', key: 'isFeatured', width: 10 },
+      { header: 'Creado', key: 'createdAt', width: 20 },
+    ];
+
+    ws.getRow(1).font = { bold: true };
+
+    for (const r of rows) {
+      ws.addRow({
+        ...r,
+        price: r.price ? parseFloat(r.price) : '',
+        salePrice: r.salePrice ? parseFloat(r.salePrice) : '',
+        isActive: r.isActive ? 'Sí' : 'No',
+        isFeatured: r.isFeatured ? 'Sí' : 'No',
+        createdAt: r.createdAt ? new Date(r.createdAt).toISOString().slice(0, 19).replace('T', ' ') : '',
+      });
+    }
+
+    const buf = await wb.xlsx.writeBuffer();
+    return Buffer.from(buf);
   }
 
   async findAllAdmin() {

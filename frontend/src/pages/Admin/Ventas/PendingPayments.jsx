@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
 import {
@@ -123,7 +124,7 @@ export default function PendingPayments() {
               <TableCell align="center">
                 <ActionButton
                   variant="primary"
-                  onClick={() => navigate(`/admin/ventas/editar/${t.id}`)}
+                    onClick={() => navigate(locPath(`/admin/ventas/editar/${t.id}`))}
                 >
                   {t('pendingPayments.revisar')}
                 </ActionButton>

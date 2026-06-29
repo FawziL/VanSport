@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
 import {
@@ -188,7 +189,7 @@ export default function ListSales() {
               <TableCell align="center">
                 <ActionButton
                   variant="edit"
-                  onClick={() => navigate(`/admin/ventas/editar/${t.id}`)}
+                    onClick={() => navigate(locPath(`/admin/ventas/editar/${t.id}`))}
                 >
                   {t('listSales.editar')}
                 </ActionButton>

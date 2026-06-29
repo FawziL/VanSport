@@ -1,14 +1,15 @@
 import {
   Controller, Get, Post, Body, Param, Put, Patch, Delete,
-  ParseIntPipe, UseGuards, UseInterceptors, UploadedFile,
+  ParseIntPipe, UseGuards, UseInterceptors, UploadedFile, Res, Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiConsumes } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiConsumes, ApiQuery } from '@nestjs/swagger';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { PayTransactionDto } from './dto/pay-transaction.dto';
-import { AuthGuard } from '../common/guards';
-import { CurrentUser } from '../common/decorators';
+import { AuthGuard, RolesGuard } from '../common/guards';
+import { Roles, CurrentUser } from '../common/decorators';
+import { Response } from 'express';
 
 @ApiTags('Transactions')
 @Controller('transactions')
@@ -42,6 +43,23 @@ export class TransactionsController {
     @Body() dto: PayTransactionDto,
   ) {
     return this.transactionsService.pay(0, dto, file);
+  }
+
+  @Get('export')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Export transactions to Excel (admin)' })
+  @ApiQuery({ name: 'start_date', required: false })
+  @ApiQuery({ name: 'end_date', required: false })
+  async export(
+    @Res() res: Response,
+    @Query('start_date') startDate?: string,
+    @Query('end_date') endDate?: string,
+  ) {
+    const buffer = await this.transactionsService.exportExcel(startDate, endDate);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="transacciones.xlsx"`);
+    res.send(buffer);
   }
 
   @Get(':id')

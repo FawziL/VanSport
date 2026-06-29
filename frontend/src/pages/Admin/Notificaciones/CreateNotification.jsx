@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 
 export default function CreateNotification() {
   const { t } = useTranslation('admin');
@@ -32,7 +33,7 @@ export default function CreateNotification() {
         }
       }
       await adminService.notifications.create(payload);
-      navigate('/admin/notificaciones');
+      navigate(locPath('/admin/notificaciones'));
     } catch (err) {
       const data = err?.response?.data;
       let msg = t('createNotification.error');
@@ -76,7 +77,7 @@ export default function CreateNotification() {
           }}
         >
           <button
-            onClick={() => navigate('/admin/notificaciones')}
+            onClick={() => navigate(locPath('/admin/notificaciones'))}
             style={{
               background: 'none',
               border: 'none',
@@ -471,7 +472,7 @@ export default function CreateNotification() {
           >
             <button
               type="button"
-              onClick={() => navigate('/admin/notificaciones')}
+              onClick={() => navigate(locPath('/admin/notificaciones'))}
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',

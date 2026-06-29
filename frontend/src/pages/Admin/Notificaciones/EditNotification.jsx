@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 
 function toDatetimeLocalValue(isoOrNull) {
   if (!isoOrNull) return '';
@@ -57,7 +58,7 @@ export default function EditNotification() {
         delete payload.expiresAt;
       }
       await adminService.notifications.partialUpdate(id, payload);
-      navigate('/admin/notificaciones');
+      navigate(locPath('/admin/notificaciones'));
     } catch (err) {
       const msg = err?.response?.data
         ? Object.entries(err.response.data)
@@ -106,7 +107,7 @@ export default function EditNotification() {
           }}
         >
           <button
-            onClick={() => navigate('/admin/notificaciones')}
+            onClick={() => navigate(locPath('/admin/notificaciones'))}
             style={{
               background: 'none',
               border: 'none',
@@ -444,7 +445,7 @@ export default function EditNotification() {
           >
             <button
               type="button"
-              onClick={() => navigate('/admin/notificaciones')}
+              onClick={() => navigate(locPath('/admin/notificaciones'))}
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',

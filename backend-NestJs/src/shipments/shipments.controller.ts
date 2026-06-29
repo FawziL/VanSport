@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Param, Put, Patch, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Patch, Delete, ParseIntPipe, UseGuards, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ShipmentsService } from './shipments.service';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { UpdateShipmentDto } from './dto/update-shipment.dto';
-import { AuthGuard } from '../common/guards';
-import { CurrentUser } from '../common/decorators';
+import { AuthGuard, RolesGuard } from '../common/guards';
+import { Roles, CurrentUser } from '../common/decorators';
+import { Response } from 'express';
 
 @ApiTags('Shipments')
 @Controller('shipments')
@@ -28,6 +29,17 @@ export class ShipmentsController {
   @ApiOperation({ summary: 'Get shipments by order' })
   findByOrder(@Param('orderId', ParseIntPipe) orderId: number) {
     return this.shipmentsService.findByOrder(orderId);
+  }
+
+  @Get('export')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Export shipments to Excel (admin)' })
+  async export(@Res() res: Response) {
+    const buffer = await this.shipmentsService.exportExcel();
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="envios.xlsx"`);
+    res.send(buffer);
   }
 
   @Get(':id')

@@ -34,11 +34,13 @@ export const appService = {
     update: (id, data) => http.put(`/products/${id}`, data),
     partialUpdate: (id, data) => http.patch(`/products/${id}`, data),
     remove: (id) => http.delete(`/products/${id}`),
+    export: () => http.get('/products/export', { responseType: 'arraybuffer' }),
   },
   orders: {
     list: (params) => http.get('/orders', { params }),
     retrieve: (id) => http.get(`/orders/${id}`),
     checkout: (data) => http.post('/orders/checkout', data),
+    export: (params) => http.get('/orders/export', { params, responseType: 'arraybuffer' }),
   },
   orderItems: {
     list: (params) => http.get('/order-items', { params }),
@@ -81,11 +83,13 @@ export const appService = {
     update: (id, data) => http.put(`/transactions/${id}`, data),
     partialUpdate: (id, data) => http.patch(`/transactions/${id}`, data),
     remove: (id) => http.delete(`/transactions/${id}`),
+    export: (params) => http.get('/transactions/export', { params, responseType: 'arraybuffer' }),
   },
   shipments: {
     list: (params) => http.get('/shipments', { params }),
     retrieve: (id) => http.get(`/shipments/${id}`),
     create: (data) => http.post('/shipments', data),
+    export: (params) => http.get('/shipments/export', { params, responseType: 'arraybuffer' }),
   },
   bugReports: {
     list: () => http.get('/bug-reports'),

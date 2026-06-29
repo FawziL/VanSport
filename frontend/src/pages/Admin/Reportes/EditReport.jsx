@@ -6,6 +6,7 @@ import { CATEGORIAS_FALLA } from '@/utils/categorias';
 import { resolveImageUrl } from '@/utils/resolveUrl';
 import StatusBadge from '@/components/StatusBadge';
 import { Link } from 'react-router-dom';
+import { locPath } from '@/utils/localePath';
 import { toast } from 'react-toastify';
 
 export default function EditReporte() {
@@ -110,7 +111,7 @@ export default function EditReporte() {
             <p className="text-gray-600 mt-1">{t('editReport.subtitulo')}</p>
           </div>
           <Link
-            to="/admin/reportes"
+            to={locPath('/admin/reportes')}
             className="px-4 py-2 bg-gray-600 text-white! font-bold rounded-lg hover:bg-gray-700 transition-colors no-underline"
           >
             {t('editReport.volver')}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 
 export default function EditOrder() {
   const { t } = useTranslation('admin');
@@ -39,7 +40,7 @@ export default function EditOrder() {
     setError('');
     try {
       await adminService.orders.partialUpdate(id, form);
-      navigate('/admin/pedidos');
+      navigate(locPath('/admin/pedidos'));
     } catch (err) {
       setError(err?.detail || t('editOrder.errorGuardar'));
     }
@@ -83,7 +84,7 @@ export default function EditOrder() {
           }}
         >
           <button
-            onClick={() => navigate('/admin/pedidos')}
+            onClick={() => navigate(locPath('/admin/pedidos'))}
             style={{
               background: 'none',
               border: 'none',
@@ -290,7 +291,7 @@ export default function EditOrder() {
           >
             <button
               type="button"
-              onClick={() => navigate('/admin/pedidos')}
+              onClick={() => navigate(locPath('/admin/pedidos'))}
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',
