@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
 import {
@@ -15,6 +17,7 @@ import {
 import StatusBadge from '@/components/StatusBadge';
 
 export default function ListSales() {
+  const { t } = useTranslation('admin');
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -29,7 +32,7 @@ export default function ListSales() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.transacciones
+    adminService.transactions
       .list()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
@@ -38,7 +41,7 @@ export default function ListSales() {
         setPages(totalPages);
         setPage((prev) => Math.min(prev, totalPages));
       })
-      .catch(() => setError('No se pudieron cargar las ventas'))
+      .catch(() => setError(t('listSales.errorCargar')))
       .finally(() => setLoading(false));
     // eslint-disable-next-line
   }, [pageSize]);
@@ -65,13 +68,7 @@ export default function ListSales() {
     money: (n) => (n != null ? `$${Number(n).toFixed(2)}` : '-'),
   };
 
-  const getUserLabel = (t) => {
-    const nombre = t.usuario_nombre || '';
-    const apellido = t.usuario_apellido || '';
-    const base = `${nombre} ${apellido}`.trim();
-    const id = t.usuario_id != null ? t.usuario_id : null;
-    return base || id != null ? `${base}${id != null ? ` (ID ${id})` : ''}` : '-';
-  };
+  const getUserLabel = (t) => t.userId ?? '-';
 
   const handleExportExcel = async () => {
     try {
@@ -80,7 +77,7 @@ export default function ListSales() {
         ...(startDate ? { start_date: startDate } : {}),
         ...(endDate ? { end_date: endDate } : {}),
       };
-      const data = await adminService.transacciones.export(params); // ArrayBuffer
+      const data = await adminService.transactions.export(params); // ArrayBuffer
       const blob = new Blob([data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
@@ -93,7 +90,7 @@ export default function ListSales() {
       URL.revokeObjectURL(a.href);
     } catch (e) {
       console.error(e);
-      setError('No se pudo exportar ventas');
+      setError(t('listSales.errorExportar'));
     } finally {
       setExporting(false);
     }
@@ -103,12 +100,12 @@ export default function ListSales() {
     <div className="max-w-[1200px] mx-auto my-10 px-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-extrabold">Ventas</h1>
+        <h1 className="text-2xl font-extrabold">{t('listSales.titulo')}</h1>
         {/* Filters and Export */}
         <div className="flex flex-col sm:flex-row gap-4 items-end mb-4">
           <div className="flex flex-col sm:flex-row gap-4 flex-1">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Desde</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">{t('listSales.desde')}</label>
               <input
                 type="date"
                 value={startDate}
@@ -117,7 +114,7 @@ export default function ListSales() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Hasta</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">{t('listSales.hasta')}</label>
               <input
                 type="date"
                 value={endDate}
@@ -134,9 +131,9 @@ export default function ListSales() {
                 ? 'bg-blue-50 border-blue-200 text-blue-400 cursor-not-allowed'
                 : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 cursor-pointer'
             }`}
-            title="Exportar ventas a Excel"
+            title={t('listSales.exportTitle')}
           >
-            {exporting ? 'Exportando…' : 'Exportar Excel'}
+            {exporting ? t('listSales.exportando') : t('listSales.exportar')}
           </button>
         </div>
       </div>
@@ -147,7 +144,7 @@ export default function ListSales() {
           value={pageSize}
           onChange={setPageSize}
           options={[5, 10, 20, 50]}
-          label="Por página"
+          label={t('listSales.porPagina')}
         />
       </div>
 
@@ -157,16 +154,16 @@ export default function ListSales() {
       {/* Table */}
       <Table>
         <TableHead>
-          <TableHeader width="10%">ID</TableHeader>
-          <TableHeader width="12%">Pedido</TableHeader>
-          <TableHeader width="30%">Usuario</TableHeader>
-          <TableHeader width="12%">Monto</TableHeader>
-          <TableHeader width="14%">Método</TableHeader>
-          <TableHeader width="14%">Referencia</TableHeader>
-          <TableHeader width="12%">Estado</TableHeader>
-          <TableHeader width="10%">Fecha</TableHeader>
+          <TableHeader width="10%">{t('listSales.colId')}</TableHeader>
+          <TableHeader width="12%">{t('listSales.colPedido')}</TableHeader>
+          <TableHeader width="30%">{t('listSales.colUsuario')}</TableHeader>
+          <TableHeader width="12%">{t('listSales.colMonto')}</TableHeader>
+          <TableHeader width="14%">{t('listSales.colMetodo')}</TableHeader>
+          <TableHeader width="14%">{t('listSales.colReferencia')}</TableHeader>
+          <TableHeader width="12%">{t('listSales.colEstado')}</TableHeader>
+          <TableHeader width="10%">{t('listSales.colFecha')}</TableHeader>
           <TableHeader width="10%" align="center">
-            Acciones
+            {t('listSales.colAcciones')}
           </TableHeader>
         </TableHead>
 
@@ -174,27 +171,27 @@ export default function ListSales() {
           loading={loading}
           empty={pageItems.length === 0}
           colSpan={8}
-          loadingText="Cargando ventas..."
-          emptyText="No hay ventas."
+          loadingText={t('listSales.cargando')}
+          emptyText={t('listSales.vacio')}
         >
           {pageItems.map((t) => (
-            <TableRow key={t.transaccion_id}>
-              <TableCell className="whitespace-nowrap">{t.transaccion_id}</TableCell>
-              <TableCell className="whitespace-nowrap">{t.pedido ?? '-'}</TableCell>
+            <TableRow key={t.id}>
+              <TableCell className="whitespace-nowrap">{t.id}</TableCell>
+              <TableCell className="whitespace-nowrap">{t.orderId ?? '-'}</TableCell>
               <TableCell className="break-words">{getUserLabel(t)}</TableCell>
-              <TableCell className="whitespace-nowrap font-medium">{fmt.money(t.monto)}</TableCell>
-              <TableCell className="break-words">{t.metodo_pago}</TableCell>
-              <TableCell className="break-words">{t.referencia}</TableCell>
+              <TableCell className="whitespace-nowrap font-medium">{fmt.money(t.amount)}</TableCell>
+              <TableCell className="break-words">{t.paymentMethod}</TableCell>
+              <TableCell className="break-words">{t.reference}</TableCell>
               <TableCell className="break-words">
-                <StatusBadge estado={t.estado} variant="order" />
+                <StatusBadge estado={t.status} variant="order" />
               </TableCell>
-              <TableCell className="whitespace-nowrap">{fmt.date(t.fecha_transaccion)}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.date(t.createdAt)}</TableCell>
               <TableCell align="center">
                 <ActionButton
                   variant="edit"
-                  onClick={() => navigate(`/admin/ventas/editar/${t.transaccion_id}`)}
+                    onClick={() => navigate(locPath(`/admin/ventas/editar/${t.id}`))}
                 >
-                  Editar
+                  {t('listSales.editar')}
                 </ActionButton>
               </TableCell>
             </TableRow>

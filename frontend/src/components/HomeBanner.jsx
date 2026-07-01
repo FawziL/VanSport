@@ -1,14 +1,15 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { appService } from '@/services/routes';
+import { useTranslation } from 'react-i18next';
 
 function resolveCta(n) {
-  const t = String(n?.relacion_tipo || '').toLowerCase();
+  const tipo = String(n?.relacion_tipo || '').toLowerCase();
   const id = n?.relacion_id;
-  if (t === 'producto' && id != null) return { to: `/productos/${id}`, label: 'Ver producto' };
-  if (t === 'categoria' && id != null)
-    return { to: `/productos?categoria_id=${id}`, label: 'Ver categoría' };
-  if (t === 'url' && typeof id === 'string') return { href: id, label: 'Ver más' };
+  if (tipo === 'producto' && id != null) return { to: `/productos/${id}`, labelKey: 'banner.verProducto' };
+  if (tipo === 'categoria' && id != null)
+    return { to: `/productos?categoryId=${id}`, labelKey: 'banner.verCategoria' };
+  if (tipo === 'url' && typeof id === 'string') return { href: id, labelKey: 'banner.verMas' };
   return null;
 }
 
@@ -27,9 +28,9 @@ function formatDuration(ms) {
 function makeDismissKey(n) {
   const parts = [
     n.notificacion_id,
-    n.tipo || '',
+    n.type || '',
     n.titulo || '',
-    n.mensaje || '',
+    n.message || '',
     n.relacion_tipo || '',
     n.relacion_id != null ? String(n.relacion_id) : '',
     n.expira || '',
@@ -39,6 +40,7 @@ function makeDismissKey(n) {
 }
 
 export default function HomeBanner() {
+  const { t } = useTranslation('home');
   const [banner, setBanner] = useState(null);
   const [now, setNow] = useState(Date.now());
   const [isAnimating, setIsAnimating] = useState(false);
@@ -47,7 +49,7 @@ export default function HomeBanner() {
 
   useEffect(() => {
     let alive = true;
-    appService.notificaciones.latestBanner().then((n) => {
+    appService.notifications.latestBanner().then((n) => {
       if (!n || !n.notificacion_id) return;
       const key = makeDismissKey(n);
       if (localStorage.getItem(key)) return;
@@ -61,7 +63,7 @@ export default function HomeBanner() {
   // Tick solo si hay expira o es oferta
   useEffect(() => {
     const hasExpira = !!banner?.expira;
-    const isOffer = banner?.tipo === 'oferta';
+    const isOffer = banner?.type === 'oferta';
     if (!hasExpira && !isOffer) return;
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
@@ -104,8 +106,8 @@ export default function HomeBanner() {
   }, [banner]);
 
   // Calcular deadline/remaining
-  const isOffer = banner?.tipo === 'oferta';
-  const startMs = banner?.fecha_creacion ? new Date(banner.fecha_creacion).getTime() : Date.now();
+  const isOffer = banner?.type === 'oferta';
+  const startMs = banner?.createdAt ? new Date(banner.createdAt).getTime() : Date.now();
   const fallbackDurationMs = 2 * 60 * 60 * 1000;
   const deadlineMs = banner?.expira
     ? new Date(banner.expira).getTime()
@@ -146,7 +148,7 @@ export default function HomeBanner() {
 
           <div style={{ display: 'inline-flex', gap: 10, alignItems: 'center' }}>
             <strong style={{ fontWeight: 900 }}>{banner.titulo}</strong>
-            <span style={{ opacity: 0.9 }}>{banner.mensaje}</span>
+            <span style={{ opacity: 0.9 }}>{banner.message}</span>
             {remainingMs !== null && remainingMs > 0 && (
               <span
                 style={{
@@ -157,7 +159,7 @@ export default function HomeBanner() {
                   fontWeight: 800,
                 }}
               >
-                Termina en {formatDuration(remainingMs)}
+                {t('banner.terminaEn', { time: formatDuration(remainingMs) })}
               </span>
             )}
             <span style={{ opacity: 0.5 }}>•</span>
@@ -182,7 +184,7 @@ export default function HomeBanner() {
                 textDecoration: 'none',
               }}
             >
-              {cta.label} →
+              {t(cta.labelKey)} →
             </Link>
           )}
           {cta && cta.href && (
@@ -199,7 +201,7 @@ export default function HomeBanner() {
                 textDecoration: 'none',
               }}
             >
-              {cta.label} ↗
+              {t(cta.labelKey)} ↗
             </a>
           )}
         </div>

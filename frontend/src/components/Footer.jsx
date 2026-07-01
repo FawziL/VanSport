@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { locPath } from '@/utils/localePath';
 
 function SocialIcon({ type = 'facebook', href = '#', label, size = 22 }) {
   const icon = useMemo(() => {
@@ -54,7 +56,7 @@ function SocialIcon({ type = 'facebook', href = '#', label, size = 22 }) {
       className="
         inline-flex items-center justify-center
         w-9 h-9 rounded-lg
-        text-gray-300 bg-white/10 border border-white/20
+        text-white bg-white/10 border border-white/20
         transition-all duration-200 ease-in-out
         hover:bg-white/20 hover:border-white/30 hover:scale-105
         focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-slate-900
@@ -66,22 +68,22 @@ function SocialIcon({ type = 'facebook', href = '#', label, size = 22 }) {
 }
 
 export default function Footer({
-  brand = { name: 'VanSport', slogan: 'Todo lo que necesitas para tu hogar, en un solo lugar.' },
+  brand = { name: 'VanSport', slogan: '' },
   internalLinks = {
     tienda: [
-      { label: 'Inicio', to: '/' },
-      { label: 'Productos', to: '/productos' },
+      { to: '/' },
+      { to: '/productos' },
     ],
-    soporte: [{ label: 'Reporte de fallas', to: '/reportes' }],
+    soporte: [{ to: '/reportes' }],
   },
   externalLinks = {
     empresa: [
-      { label: 'Nosotros', href: 'https://example.com/nosotros' },
-      { label: 'Contacto', href: 'mailto:contacto@example.com' },
+      { href: 'https://example.com/nosotros' },
+      { href: 'mailto:contacto@example.com' },
     ],
     legal: [
-      { label: 'Términos', href: 'https://example.com/terminos' },
-      { label: 'Privacidad', href: 'https://example.com/privacidad' },
+      { href: 'https://example.com/terminos' },
+      { href: 'https://example.com/privacidad' },
     ],
   },
   socials = [
@@ -101,28 +103,28 @@ export default function Footer({
     email: 'contacto@example.com',
   },
 }) {
+  const { t } = useTranslation();
   const year = new Date().getFullYear();
 
   const colTitle = (text) => (
-    <div className="text-slate-100 font-bold mb-3 tracking-wide text-sm uppercase">{text}</div>
+    <div className="text-white font-bold mb-3 tracking-wide text-sm uppercase">{text}</div>
   );
 
   const linkStyle =
-    'text-slate-300 no-underline inline-flex items-center gap-2 py-1 transition-colors duration-200 hover:text-white';
+    'text-white no-underline inline-flex items-center gap-2 py-1 transition-colors duration-200';
 
   return (
-    <footer className="bg-slate-900 text-slate-200 border-t border-slate-700">
+    <footer className="bg-black text-white border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand + Socials */}
           <div className="lg:col-span-2">
             <div className="flex items-baseline gap-2 mb-2">
               <div className="text-2xl font-bold text-white">{brand.name}</div>
-              {brand.slogan && <div className="text-slate-400 text-sm">· {brand.slogan}</div>}
+              <div className="text-white/70 text-sm">· {t('footer.slogan')}</div>
             </div>
-            <p className="text-slate-400 mb-4 max-w-md">
-              Artículos del hogar, electrónicos y lo último en tendencias. Calidad y servicio en
-              cada compra.
+            <p className="text-white/70 mb-4 max-w-md">
+              {t('footer.descripcion')}
             </p>
 
             {/* Social Icons */}
@@ -133,20 +135,20 @@ export default function Footer({
             </div>
 
             {/* Contacto */}
-            <div className="text-slate-300 text-sm space-y-1">
+            <div className="text-white/70 text-sm space-y-1">
               {address.line1 && <div>{address.line1}</div>}
               {(address.city || address.country) && (
                 <div>
                   {address.city} {address.country ? `· ${address.country}` : ''}
                 </div>
               )}
-              {address.phone && <div>Tel: {address.phone}</div>}
+              {address.phone && <div>{t('footer.tel', { phone: address.phone })}</div>}
               {address.email && (
                 <div>
                   Email:{' '}
                   <a
                     href={`mailto:${address.email}`}
-                    className="text-blue-400 hover:text-blue-300 transition-colors"
+                    className="text-white transition-colors"
                   >
                     {address.email}
                   </a>
@@ -157,12 +159,12 @@ export default function Footer({
 
           {/* Tienda */}
           <div>
-            {colTitle('Tienda')}
+            {colTitle(t('footer.tienda'))}
             <nav className="space-y-2">
               {internalLinks.tienda?.map((l, i) => (
-                <Link key={i} to={l.to} className={linkStyle}>
-                  <span className="text-blue-400">›</span>
-                  <span>{l.label}</span>
+                <Link key={i} to={locPath(l.to)} className={linkStyle}>
+                  <span className="text-white">›</span>
+                  <span>{i === 0 ? t('footer.inicio') : t('nav.productos')}</span>
                 </Link>
               ))}
             </nav>
@@ -170,12 +172,12 @@ export default function Footer({
 
           {/* Soporte */}
           <div>
-            {colTitle('Soporte')}
+            {colTitle(t('footer.soporte'))}
             <nav className="space-y-2">
               {internalLinks.soporte?.map((l, i) => (
-                <Link key={i} to={l.to} className={linkStyle}>
-                  <span className="text-blue-400">›</span>
-                  <span>{l.label}</span>
+                <Link key={i} to={locPath(l.to)} className={linkStyle}>
+                  <span className="text-white">›</span>
+                  <span>{t('nav.reporteFallas')}</span>
                 </Link>
               ))}
             </nav>
@@ -184,24 +186,24 @@ export default function Footer({
           {/* Empresa & Legal */}
           <div className="space-y-6">
             <div>
-              {colTitle('Empresa')}
+              {colTitle(t('footer.empresa'))}
               <nav className="space-y-2">
                 {externalLinks.empresa?.map((l, i) => (
                   <a key={i} href={l.href} target="_blank" rel="noreferrer" className={linkStyle}>
-                    <span className="text-green-400">↗</span>
-                    <span>{l.label}</span>
+                    <span className="text-white">↗</span>
+                    <span>{i === 0 ? t('footer.nosotros') : t('footer.contacto')}</span>
                   </a>
                 ))}
               </nav>
             </div>
 
             <div>
-              {colTitle('Legal')}
+              {colTitle(t('footer.legal'))}
               <nav className="space-y-2">
                 {externalLinks.legal?.map((l, i) => (
                   <a key={i} href={l.href} target="_blank" rel="noreferrer" className={linkStyle}>
-                    <span className="text-green-400">↗</span>
-                    <span>{l.label}</span>
+                    <span className="text-white">↗</span>
+                    <span>{i === 0 ? t('footer.terminos') : t('footer.privacidad')}</span>
                   </a>
                 ))}
               </nav>
@@ -211,11 +213,11 @@ export default function Footer({
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-slate-800 bg-slate-800/50">
+      <div className="border-t border-white/10 bg-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/70">
             <div>
-              © {year} {brand.name}. Todos los derechos reservados.
+              {t('footer.derechos', { year, brand: brand.name })}
             </div>
             <div className="flex gap-6">
               {externalLinks.legal?.map((l, i) => (
@@ -224,9 +226,9 @@ export default function Footer({
                   href={l.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-slate-300 hover:text-white transition-colors"
+                  className="text-white/70 hover:text-white transition-colors"
                 >
-                  {l.label}
+                  {i === 0 ? t('footer.terminos') : t('footer.privacidad')}
                 </a>
               ))}
             </div>

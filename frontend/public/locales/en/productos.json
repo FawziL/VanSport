@@ -1,0 +1,12 @@
+{
+  "titulo": "Our Products",
+  "subtitulo": "Discover our wide selection of quality products",
+  "mostrando": "Showing <bold>{{count}}</bold> products",
+  "para": "for <bold>{{query}}</bold>",
+  "pagina": "Page <bold>{{page}}</bold> of <bold>{{pages}}</bold>",
+  "noEncontrados": "No products found",
+  "sinFiltros": "We will soon add new products to our catalog.",
+  "conFiltros": "Try adjusting the filters to see more results.",
+  "verTodos": "View all products",
+  "errorCargar": "Could not load products"
+}

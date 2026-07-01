@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { authService } from '@/services/routes';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { locPath } from '@/utils/localePath';
 
 export default function PasswordReset() {
+  const { t } = useTranslation('auth');
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [okMsg, setOkMsg] = useState('');
@@ -15,9 +18,7 @@ export default function PasswordReset() {
     setSubmitting(true);
     try {
       await authService.passwordReset(email);
-      setOkMsg(
-        'Si el correo existe en el sistema, te enviaremos las instrucciones para restablecer tu contraseña.'
-      );
+      setOkMsg(t('reset.success'));
     } catch (err) {
       const data = err?.response?.data;
       const msg =
@@ -25,7 +26,7 @@ export default function PasswordReset() {
           ? Object.entries(data)
               .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : String(v)}`)
               .join(' | ')
-          : err?.message || 'No se pudo iniciar el proceso de recuperación';
+          : err?.message || t('reset.error');
       setErrMsg(msg);
     } finally {
       setSubmitting(false);
@@ -34,14 +35,14 @@ export default function PasswordReset() {
 
   return (
     <div style={{ maxWidth: 420, margin: '2rem auto', padding: '0 1rem' }}>
-      <h2 style={{ marginBottom: 10 }}>Recuperar contraseña</h2>
+      <h2 style={{ marginBottom: 10 }}>{t('reset.titulo')}</h2>
       <p style={{ color: '#555', marginBottom: 14 }}>
-        Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña.
+        {t('reset.subtitulo')}
       </p>
       <form onSubmit={onSubmit}>
         <input
           type="email"
-          placeholder="tu@correo.com"
+          placeholder={t('reset.emailPlaceholder')}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -67,7 +68,7 @@ export default function PasswordReset() {
             fontWeight: 800,
           }}
         >
-          {submitting ? 'Enviando…' : 'Enviar enlace'}
+          {submitting ? t('reset.sending') : t('reset.submit')}
         </button>
       </form>
 
@@ -75,8 +76,8 @@ export default function PasswordReset() {
       {errMsg && <div style={{ color: '#c62828', marginTop: 10, fontWeight: 700 }}>{errMsg}</div>}
 
       <div style={{ marginTop: 14 }}>
-        <Link to="/login" style={{ color: '#1e88e5', fontWeight: 700, textDecoration: 'none' }}>
-          Volver a iniciar sesión
+        <Link to={locPath('/login')} style={{ color: '#1e88e5', fontWeight: 700, textDecoration: 'none' }}>
+          {t('reset.backToLogin')}
         </Link>
       </div>
     </div>

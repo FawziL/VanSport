@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 
 export default function EditOrder() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const [form, setForm] = useState(null);
   const [error, setError] = useState('');
@@ -12,17 +15,17 @@ export default function EditOrder() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    adminService.pedidos
+    adminService.orders
       .retrieve(id)
       .then((data) => {
         if (!active) return;
         setForm({
-          estado: data.estado || '',
-          direccion_envio: data.direccion_envio || '',
-          notas: data.notas || '',
+          status: data.status || '',
+          shippingAddress: data.shippingAddress || '',
+          notes: data.notes || '',
         });
       })
-      .catch(() => setError('No se pudo cargar el pedido'))
+      .catch(() => setError(t('editOrder.errorCargar')))
       .finally(() => active && setLoading(false));
     return () => (active = false);
   }, [id]);
@@ -36,10 +39,10 @@ export default function EditOrder() {
     e.preventDefault();
     setError('');
     try {
-      await adminService.pedidos.partialUpdate(id, form);
-      navigate('/admin/pedidos');
+      await adminService.orders.partialUpdate(id, form);
+      navigate(locPath('/admin/pedidos'));
     } catch (err) {
-      setError(err?.detail || 'No se pudo actualizar el pedido');
+      setError(err?.detail || t('editOrder.errorGuardar'));
     }
   };
 
@@ -48,7 +51,7 @@ export default function EditOrder() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando pedido...</p>
+          <p className="mt-4 text-gray-600">{t('editOrder.cargando')}</p>
         </div>
       </div>
     );
@@ -81,7 +84,7 @@ export default function EditOrder() {
           }}
         >
           <button
-            onClick={() => navigate('/admin/pedidos')}
+            onClick={() => navigate(locPath('/admin/pedidos'))}
             style={{
               background: 'none',
               border: 'none',
@@ -122,7 +125,7 @@ export default function EditOrder() {
               color: '#1a1a1a',
             }}
           >
-            Editar pedido #{id}
+            {t('editOrder.titulo')}{id}
           </h1>
         </div>
 
@@ -169,11 +172,11 @@ export default function EditOrder() {
                 marginBottom: '4px',
               }}
             >
-              Estado *
+              {t('editOrder.estado')}
             </label>
             <select
-              name="estado"
-              value={form.estado}
+              name="status"
+              value={form.status}
               onChange={onChange}
               required
               style={{
@@ -195,12 +198,12 @@ export default function EditOrder() {
                 e.target.style.boxShadow = 'none';
               }}
             >
-              <option value="">Seleccionar estado</option>
-              <option value="pendiente">Pendiente</option>
-              <option value="pagado">Pagado</option>
-              <option value="en_transito">En transito</option>
-              <option value="entregado">Entregado</option>
-              <option value="cancelado">Cancelado</option>
+              <option value="">{t('editOrder.seleccionarEstado')}</option>
+              <option value="pendiente">{t('status.pendiente')}</option>
+              <option value="pagado">{t('status.pagado')}</option>
+              <option value="en_transito">{t('status.enTransito')}</option>
+              <option value="entregado">{t('status.entregado')}</option>
+              <option value="cancelado">{t('status.cancelado')}</option>
             </select>
           </div>
 
@@ -213,11 +216,11 @@ export default function EditOrder() {
                 marginBottom: '4px',
               }}
             >
-              Dirección de envío
+              {t('editOrder.direccion')}
             </label>
             <input
-              name="direccion_envio"
-              value={form.direccion_envio}
+              name="shippingAddress"
+              value={form.shippingAddress}
               onChange={onChange}
               style={{
                 padding: '12px 14px',
@@ -247,11 +250,11 @@ export default function EditOrder() {
                 marginBottom: '4px',
               }}
             >
-              Notas
+              {t('editOrder.notas')}
             </label>
             <textarea
-              name="notas"
-              value={form.notas}
+              name="notes"
+              value={form.notes}
               onChange={onChange}
               rows={4}
               style={{
@@ -288,7 +291,7 @@ export default function EditOrder() {
           >
             <button
               type="button"
-              onClick={() => navigate('/admin/pedidos')}
+              onClick={() => navigate(locPath('/admin/pedidos'))}
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',
@@ -308,7 +311,7 @@ export default function EditOrder() {
                 e.target.style.borderColor = '#ddd';
               }}
             >
-              Cancelar
+              {t('editOrder.cancelar')}
             </button>
             <button
               type="submit"
@@ -328,7 +331,7 @@ export default function EditOrder() {
               onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
               onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
             >
-              Guardar cambios
+              {t('editOrder.guardar')}
             </button>
           </div>
         </form>

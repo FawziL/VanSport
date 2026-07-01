@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 
 export default function CreateNotification() {
-  const [form, setForm] = useState({ titulo: '', mensaje: '', tipo: 'banner', expira: '' }); // expira opcional
+  const { t } = useTranslation('admin');
+  const [form, setForm] = useState({ title: '', message: '', type: 'banner', expiresAt: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -19,20 +22,21 @@ export default function CreateNotification() {
     setLoading(true);
     try {
       const payload = { ...form };
-      // Solo enviar expira si hay valor
-      if (payload.expira) {
-        const d = new Date(payload.expira); // viene de <input type="datetime-local">
+      if (!payload.expiresAt) {
+        delete payload.expiresAt;
+      } else {
+        const d = new Date(payload.expiresAt);
         if (!isNaN(d.getTime())) {
-          payload.expira = d.toISOString(); // enviar ISO 8601
+          payload.expiresAt = d.toISOString();
         } else {
-          delete payload.expira;
+          delete payload.expiresAt;
         }
       }
-      await adminService.notificaciones.create(payload);
-      navigate('/admin/notificaciones');
+      await adminService.notifications.create(payload);
+      navigate(locPath('/admin/notificaciones'));
     } catch (err) {
       const data = err?.response?.data;
-      let msg = 'No se pudo crear la notificación';
+      let msg = t('createNotification.error');
       if (data && typeof data === 'object') {
         const parts = Object.entries(data).map(
           ([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : String(v)}`
@@ -73,7 +77,7 @@ export default function CreateNotification() {
           }}
         >
           <button
-            onClick={() => navigate('/admin/notificaciones')}
+            onClick={() => navigate(locPath('/admin/notificaciones'))}
             style={{
               background: 'none',
               border: 'none',
@@ -114,7 +118,7 @@ export default function CreateNotification() {
               color: '#1a1a1a',
             }}
           >
-            Crear nueva notificación
+            {t('createNotification.titulo')}
           </h1>
         </div>
 
@@ -161,11 +165,11 @@ export default function CreateNotification() {
                 marginBottom: '4px',
               }}
             >
-              Título *
+              {t('createNotification.tituloLabel')}
             </label>
             <input
-              name="titulo"
-              value={form.titulo}
+              name="title"
+              value={form.title}
               onChange={onChange}
               required
               style={{
@@ -184,7 +188,7 @@ export default function CreateNotification() {
                 e.target.style.borderColor = '#ddd';
                 e.target.style.boxShadow = 'none';
               }}
-              placeholder="Ingrese el título de la notificación"
+              placeholder={t('createNotification.tituloPlaceholder')}
             />
           </div>
 
@@ -197,11 +201,11 @@ export default function CreateNotification() {
                 marginBottom: '4px',
               }}
             >
-              Mensaje *
+              {t('createNotification.mensaje')}
             </label>
             <textarea
-              name="mensaje"
-              value={form.mensaje}
+              name="message"
+              value={form.message}
               onChange={onChange}
               rows={4}
               required
@@ -224,7 +228,7 @@ export default function CreateNotification() {
                 e.target.style.borderColor = '#ddd';
                 e.target.style.boxShadow = 'none';
               }}
-              placeholder="Ingrese el mensaje de la notificación"
+              placeholder={t('createNotification.mensajePlaceholder')}
             />
           </div>
 
@@ -237,11 +241,11 @@ export default function CreateNotification() {
                 marginBottom: '4px',
               }}
             >
-              Tipo de notificación
+              {t('createNotification.tipo')}
             </label>
             <select
-              name="tipo"
-              value={form.tipo}
+              name="type"
+              value={form.type}
               onChange={onChange}
               style={{
                 padding: '12px 14px',
@@ -262,14 +266,14 @@ export default function CreateNotification() {
                 e.target.style.boxShadow = 'none';
               }}
             >
-              <option value="banner">Banner</option>
-              <option value="info">Información</option>
-              <option value="aviso">Aviso</option>
-              <option value="oferta">Oferta</option>
+              <option value="banner">{t('createNotification.banner')}</option>
+              <option value="info">{t('createNotification.info')}</option>
+              <option value="aviso">{t('createNotification.aviso')}</option>
+              <option value="oferta">{t('createNotification.oferta')}</option>
             </select>
           </div>
 
-          {form.tipo === 'oferta' && (
+          {form.type === 'oferta' && (
             <div
               style={{
                 background: '#f8f9fa',
@@ -294,12 +298,12 @@ export default function CreateNotification() {
                     marginBottom: '4px',
                   }}
                 >
-                  Fecha de expiración (opcional)
+                  {t('createNotification.fechaExpiracion')}
                 </label>
-                <input
-                  type="datetime-local"
-                  name="expira"
-                  value={form.expira || ''}
+                  <input
+                    type="datetime-local"
+                    name="expiresAt"
+                    value={form.expiresAt || ''}
                   onChange={onChange}
                   style={{
                     padding: '12px 14px',
@@ -326,9 +330,7 @@ export default function CreateNotification() {
                     marginTop: '4px',
                   }}
                 >
-                  Fecha y hora límite de la oferta. Al llegar, el banner se ocultará
-                  automáticamente. Si no se especifica, la oferta permanecerá activa
-                  indefinidamente.
+                  {t('createNotification.fechaAyuda')}
                 </small>
               </div>
 
@@ -339,7 +341,7 @@ export default function CreateNotification() {
                     const d = new Date(Date.now() + 2 * 60 * 60 * 1000); // +2 horas
                     const pad = (n) => n.toString().padStart(2, '0');
                     const val = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-                    setForm((f) => ({ ...f, expira: val }));
+                    setForm((f) => ({ ...f, expiresAt: val }));
                   }}
                   style={{
                     padding: '0.5rem 1rem',
@@ -355,7 +357,7 @@ export default function CreateNotification() {
                   onMouseOver={(e) => (e.target.style.backgroundColor = '#bbdefb')}
                   onMouseOut={(e) => (e.target.style.backgroundColor = '#e3f2fd')}
                 >
-                  +2 horas
+                  {t('createNotification.mas2Horas')}
                 </button>
                 <button
                   type="button"
@@ -363,7 +365,7 @@ export default function CreateNotification() {
                     const d = new Date(Date.now() + 24 * 60 * 60 * 1000); // +1 día
                     const pad = (n) => n.toString().padStart(2, '0');
                     const val = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-                    setForm((f) => ({ ...f, expira: val }));
+                    setForm((f) => ({ ...f, expiresAt: val }));
                   }}
                   style={{
                     padding: '0.5rem 1rem',
@@ -379,11 +381,11 @@ export default function CreateNotification() {
                   onMouseOver={(e) => (e.target.style.backgroundColor = '#bbdefb')}
                   onMouseOut={(e) => (e.target.style.backgroundColor = '#e3f2fd')}
                 >
-                  +1 día
+                  {t('createNotification.mas1Dia')}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setForm((f) => ({ ...f, expira: '' }))}
+                  onClick={() => setForm((f) => ({ ...f, expiresAt: '' }))}
                   style={{
                     padding: '0.5rem 1rem',
                     borderRadius: '6px',
@@ -398,7 +400,7 @@ export default function CreateNotification() {
                   onMouseOver={(e) => (e.target.style.backgroundColor = '#ffcdd2')}
                   onMouseOut={(e) => (e.target.style.backgroundColor = '#ffebee')}
                 >
-                  Limpiar fecha
+                  {t('createNotification.limpiarFecha')}
                 </button>
               </div>
             </div>
@@ -470,7 +472,7 @@ export default function CreateNotification() {
           >
             <button
               type="button"
-              onClick={() => navigate('/admin/notificaciones')}
+              onClick={() => navigate(locPath('/admin/notificaciones'))}
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',
@@ -490,7 +492,7 @@ export default function CreateNotification() {
                 e.target.style.borderColor = '#ddd';
               }}
             >
-              Cancelar
+              {t('createNotification.cancelar')}
             </button>
             <button
               type="submit"
@@ -560,10 +562,10 @@ export default function CreateNotification() {
                       strokeLinecap="round"
                     />
                   </svg>
-                  Creando notificación...
+                  {t('createNotification.creando')}
                 </div>
               ) : (
-                'Crear notificación'
+                t('createNotification.crear')
               )}
             </button>
           </div>

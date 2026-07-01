@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { authService } from '@/services/routes';
-import { http } from '@/config/api';
+import PhoneInput from '@/components/PhoneInput';
+import { locPath } from '@/utils/localePath';
 
 export default function Perfil() {
   const navigate = useNavigate();
+  const { t } = useTranslation('perfil');
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -12,18 +15,26 @@ export default function Perfil() {
   const [success, setSuccess] = useState('');
 
   const [form, setForm] = useState({
-    usuario_id: '',
+    id: '',
     email: '',
-    nombre: '',
-    apellido: '',
-    telefono: '',
-    is_staff: false,
+    name: '',
+    lastName: '',
+    isStaff: false,
   });
 
-  // Guard simple: si no hay token, a login
+  const [initialPhone, setInitialPhone] = useState('');
+  const phoneRef = useRef();
+
+  // Guard simple: si no hay sesión, a login
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (!token) navigate('/login');
+    async function checkAuth() {
+      try {
+        await authService.me();
+      } catch {
+        navigate(locPath('/login'));
+      }
+    }
+    checkAuth();
   }, [navigate]);
 
   // Cargar perfil
@@ -34,16 +45,17 @@ export default function Perfil() {
       setError('');
       setSuccess('');
       try {
-        const data = await authService.me();
+        const res = await authService.me();
         if (!alive) return;
+        const data = res?.user || res;
         setForm({
-          usuario_id: data.usuario_id ?? '',
+          id: data.id ?? '',
           email: data.email ?? '',
-          nombre: data.nombre ?? '',
-          apellido: data.apellido ?? '',
-          telefono: data.telefono ?? '',
-          is_staff: !!data.is_staff,
+          name: data.name ?? '',
+          lastName: data.lastName ?? '',
+          isStaff: data.isStaff ?? false,
         });
+        setInitialPhone(data.phone || '');
       } catch (err) {
         if (!alive) return;
         const backend = err?.response?.data;
@@ -52,7 +64,7 @@ export default function Perfil() {
             ? Object.entries(backend)
                 .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
                 .join(' | ')
-            : backend || err.message || 'Error al cargar el perfil';
+            :             backend || err.message || t('errorCargar');
         setError(msg);
       } finally {
         if (alive) setLoading(false);
@@ -62,10 +74,10 @@ export default function Perfil() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [t]);
 
   const initials =
-    ((form.nombre || '') + ' ' + (form.apellido || ''))
+    ((form.name || '') + ' ' + (form.lastName || ''))
       .trim()
       .split(' ')
       .filter(Boolean)
@@ -87,18 +99,18 @@ export default function Perfil() {
     setSuccess('');
     try {
       const payload = {
-        nombre: form.nombre ?? '',
-        apellido: form.apellido ?? '',
-        telefono: form.telefono ?? '',
+        name: form.name ?? '',
+        lastName: form.lastName ?? '',
+        phone: phoneRef.current?.getValue() || '',
       };
-      const updated = await http.patch('/auth/me/', payload);
+      await authService.updateProfile(payload);
       setForm((f) => ({
         ...f,
-        nombre: updated.nombre ?? f.nombre,
-        apellido: updated.apellido ?? f.apellido,
-        telefono: updated.telefono ?? f.telefono,
+        name: payload.name ?? f.name,
+        lastName: payload.lastName ?? f.lastName,
       }));
-      setSuccess('Perfil actualizado correctamente.');
+      setInitialPhone(payload.phone || '');
+      setSuccess(t('success'));
     } catch (err) {
       const backend = err?.response?.data;
       const msg =
@@ -106,7 +118,7 @@ export default function Perfil() {
           ? Object.entries(backend)
               .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
               .join(' | ')
-          : backend || err.message || 'Error al guardar cambios';
+          :           backend || err.message || t('errorGuardar');
       setError(msg);
     } finally {
       setSaving(false);
@@ -140,10 +152,10 @@ export default function Perfil() {
         </div>
         <div className="profile-info">
           <h1 className="profile-title">
-            Perfil de usuario
-            {form.is_staff && <span className="admin-badge">Admin</span>}
+            {t('titulo')}
+            {form.isStaff && <span className="admin-badge">{t('admin')}</span>}
           </h1>
-          <p className="profile-subtitle">Consulta y actualiza tus datos personales</p>
+          <p className="profile-subtitle">{t('subtitulo')}</p>
         </div>
       </div>
 
@@ -177,16 +189,16 @@ export default function Perfil() {
       <form onSubmit={handleSubmit} className="profile-form">
         <div className="form-grid">
           <div className="form-group">
-            <label className="form-label">ID de usuario</label>
+            <label className="form-label">{t('userId')}</label>
             <input
               type="text"
-              value={form.usuario_id || '—'}
+              value={form.id || '—'}
               disabled
               className="form-input disabled"
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Email</label>
+            <label className="form-label">{t('email')}</label>
             <input
               type="email"
               value={form.email || '—'}
@@ -198,23 +210,23 @@ export default function Perfil() {
 
         <div className="form-grid">
           <div className="form-group">
-            <label className="form-label">Nombre</label>
+            <label className="form-label">{t('nombre')}</label>
             <input
-              name="nombre"
+              name="name"
               type="text"
-              placeholder="Tu nombre"
-              value={form.nombre}
+              placeholder={t('nombrePlaceholder')}
+              value={form.name}
               onChange={handleChange}
               className="form-input"
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Apellido</label>
+            <label className="form-label">{t('apellido')}</label>
             <input
-              name="apellido"
+              name="lastName"
               type="text"
-              placeholder="Tu apellido"
-              value={form.apellido}
+              placeholder={t('apellidoPlaceholder')}
+              value={form.lastName}
               onChange={handleChange}
               className="form-input"
             />
@@ -222,15 +234,8 @@ export default function Perfil() {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Teléfono</label>
-          <input
-            name="telefono"
-            type="tel"
-            placeholder="Tu teléfono"
-            value={form.telefono}
-            onChange={handleChange}
-            className="form-input"
-          />
+          <label className="form-label">{t('telefono')}</label>
+          <PhoneInput ref={phoneRef} initialValue={initialPhone} />
         </div>
 
         <div className="form-actions">
@@ -248,14 +253,14 @@ export default function Perfil() {
                     strokeDasharray="15.85 15.85"
                   />
                 </svg>
-                Guardando...
+                {t('guardando')}
               </>
             ) : (
-              'Guardar cambios'
+              t('guardar')
             )}
           </button>
-          <button type="button" onClick={() => navigate('/')} className="btn btn-secondary">
-            Volver al inicio
+          <button type="button" onClick={() => navigate(locPath('/'))} className="btn btn-secondary">
+            {t('volverInicio')}
           </button>
         </div>
       </form>

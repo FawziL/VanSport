@@ -1,11 +1,14 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function PageSizeSelector({
   value = 6,
   onChange,
   options = [6, 12, 24, 48],
-  label = 'Por página',
+  label: labelProp,
 }) {
+  const { t } = useTranslation('admin');
+  const label = labelProp ?? t('pageSize.label');
   const handleChange = (e) => {
     const next = Number(e.target.value);
     if (typeof onChange === 'function') onChange(next);
@@ -25,7 +28,7 @@ export default function PageSizeSelector({
           fontSize: 14,
           color: '#222',
         }}
-        aria-label="Seleccionar cantidad de productos por página"
+        aria-label={t('pageSize.ariaLabel')}
       >
         {options.map((opt) => (
           <option key={opt} value={opt}>

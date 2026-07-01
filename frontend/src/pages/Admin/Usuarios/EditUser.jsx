@@ -1,10 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
+import PhoneInput from '@/components/PhoneInput';
 
 export default function EditUser() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const [form, setForm] = useState(null);
+  const [initialPhone, setInitialPhone] = useState('');
+  const phoneRef = useRef();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -12,21 +18,21 @@ export default function EditUser() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    adminService.usuarios
+    adminService.users
       .retrieve(id)
       .then((data) => {
         if (!active) return;
         setForm({
-          nombre: data.nombre || '',
-          apellido: data.apellido || '',
+          name: data.name || '',
+          lastName: data.lastName || '',
           email: data.email || '',
-          telefono: data.telefono || '',
-          direccion: data.direccion || '',
-          is_active: !!data.is_active,
-          is_staff: !!data.is_staff,
+          address: data.address || '',
+          isActive: !!data.isActive,
+          isStaff: !!data.isStaff,
         });
+        setInitialPhone(data.phone || '');
       })
-      .catch(() => setError('No se pudo cargar el usuario'))
+      .catch(() => setError(t('editUser.errorCargar')))
       .finally(() => active && setLoading(false));
     return () => (active = false);
   }, [id]);
@@ -40,10 +46,10 @@ export default function EditUser() {
     e.preventDefault();
     setError('');
     try {
-      await adminService.usuarios.partialUpdate(id, form);
-      navigate('/admin/usuarios');
+      await adminService.users.partialUpdate(id, { ...form, phone: phoneRef.current?.getValue() || '' });
+      navigate(locPath('/admin/usuarios'));
     } catch (err) {
-      setError(err?.detail || 'No se pudo actualizar el usuario');
+      setError(err?.detail || t('editUser.errorGuardar'));
     }
   };
 
@@ -52,7 +58,7 @@ export default function EditUser() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando datos de Usuario...</p>
+          <p className="mt-4 text-gray-600">{t('editUser.cargando')}</p>
         </div>
       </div>
     );
@@ -85,7 +91,7 @@ export default function EditUser() {
           }}
         >
           <button
-            onClick={() => navigate('/admin/usuarios')}
+            onClick={() => navigate(locPath('/admin/usuarios'))}
             style={{
               background: 'none',
               border: 'none',
@@ -126,7 +132,7 @@ export default function EditUser() {
               color: '#1a1a1a',
             }}
           >
-            Editar usuario
+            {t('editUser.titulo')}
           </h1>
         </div>
 
@@ -174,11 +180,11 @@ export default function EditUser() {
                   marginBottom: '4px',
                 }}
               >
-                Nombre
+                {t('editUser.nombre')}
               </label>
               <input
-                name="nombre"
-                value={form.nombre}
+                name="name"
+                value={form.name}
                 onChange={onChange}
                 required
                 style={{
@@ -208,11 +214,11 @@ export default function EditUser() {
                   marginBottom: '4px',
                 }}
               >
-                Apellido
+                {t('editUser.apellido')}
               </label>
               <input
-                name="apellido"
-                value={form.apellido}
+                name="lastName"
+                value={form.lastName}
                 onChange={onChange}
                 required
                 style={{
@@ -244,7 +250,7 @@ export default function EditUser() {
                 marginBottom: '4px',
               }}
             >
-              Email
+              {t('editUser.email')}
             </label>
             <input
               type="email"
@@ -281,29 +287,9 @@ export default function EditUser() {
                   marginBottom: '4px',
                 }}
               >
-                Teléfono
+                {t('editUser.telefono')}
               </label>
-              <input
-                name="telefono"
-                value={form.telefono}
-                onChange={onChange}
-                style={{
-                  padding: '12px 14px',
-                  borderRadius: '8px',
-                  border: '1px solid #ddd',
-                  fontSize: '16px',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                  outline: 'none',
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#1e88e5';
-                  e.target.style.boxShadow = '0 0 0 2px rgba(30, 136, 229, 0.2)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#ddd';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
+              <PhoneInput ref={phoneRef} initialValue={initialPhone} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <label
@@ -314,11 +300,11 @@ export default function EditUser() {
                   marginBottom: '4px',
                 }}
               >
-                Dirección
+                {t('editUser.direccion')}
               </label>
               <input
-                name="direccion"
-                value={form.direccion}
+                name="address"
+                value={form.address}
                 onChange={onChange}
                 style={{
                   padding: '12px 14px',
@@ -360,8 +346,8 @@ export default function EditUser() {
             >
               <input
                 type="checkbox"
-                name="is_active"
-                checked={form.is_active}
+                name="isActive"
+                checked={form.isActive}
                 onChange={onChange}
                 style={{
                   width: '18px',
@@ -369,7 +355,7 @@ export default function EditUser() {
                   cursor: 'pointer',
                 }}
               />
-              <span style={{ fontWeight: 500 }}>Usuario activo</span>
+              <span style={{ fontWeight: 500 }}>{t('editUser.usuarioActivo')}</span>
             </label>
             <label
               style={{
@@ -381,8 +367,8 @@ export default function EditUser() {
             >
               <input
                 type="checkbox"
-                name="is_staff"
-                checked={form.is_staff}
+                name="isStaff"
+                checked={form.isStaff}
                 onChange={onChange}
                 style={{
                   width: '18px',
@@ -390,7 +376,7 @@ export default function EditUser() {
                   cursor: 'pointer',
                 }}
               />
-              <span style={{ fontWeight: 500 }}>Administrador</span>
+              <span style={{ fontWeight: 500 }}>{t('editUser.administrador')}</span>
             </label>
           </div>
 
@@ -406,7 +392,7 @@ export default function EditUser() {
           >
             <button
               type="button"
-              onClick={() => navigate('/admin/usuarios')}
+              onClick={() => navigate(locPath('/admin/usuarios'))}
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',
@@ -426,7 +412,7 @@ export default function EditUser() {
                 e.target.style.borderColor = '#ddd';
               }}
             >
-              Cancelar
+              {t('editUser.cancelar')}
             </button>
             <button
               type="submit"
@@ -446,7 +432,7 @@ export default function EditUser() {
               onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
               onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
             >
-              Guardar cambios
+              {t('editUser.guardar')}
             </button>
           </div>
         </form>

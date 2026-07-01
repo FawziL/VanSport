@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import {
   Table,
   TableHead,
@@ -15,6 +17,7 @@ import ConfirmModal from '@/components/ConfirmModal';
 import { toast } from 'react-toastify';
 
 export default function ListPaymentMethods() {
+  const { t } = useTranslation('admin');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -28,12 +31,12 @@ export default function ListPaymentMethods() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.pagos
+    adminService.paymentMethodsAdmin
       .list({})
       .then((data) => setItems(Array.isArray(data) ? data : data.results || []))
       .catch(() => {
-        setError('No se pudieron cargar los métodos de pago');
-        toast.error('No se pudieron cargar los métodos de pago');
+        setError(t('listPaymentMethods.errorCargar'));
+        toast.error(t('listPaymentMethods.errorCargar'));
       })
       .finally(() => setLoading(false));
   }, []);
@@ -48,16 +51,16 @@ export default function ListPaymentMethods() {
       setTogglingId(m.id);
 
       // Actualización optimista
-      setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, activo: !m.activo } : it)));
+      setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, isActive: !m.isActive } : it)));
 
-      await adminService.pagos.partialUpdate(m.id, { activo: !m.activo });
+      await adminService.paymentMethodsAdmin.partialUpdate(m.id, { isActive: !m.isActive });
 
-      toast.success(`Método de pago ${!m.activo ? 'activado' : 'desactivado'} correctamente`);
+      toast.success(t('listPaymentMethods.successToggle', { action: !m.isActive ? t('listPaymentMethods.activado') : t('listPaymentMethods.desactivado') }));
     } catch (err) {
       // Revertir cambio en caso de error
-      setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, activo: m.activo } : it)));
+      setItems((prev) => prev.map((it) => (it.id === m.id ? { ...it, isActive: m.isActive } : it)));
 
-      const msg = err?.response?.data?.detail || 'No se pudo actualizar el estado';
+      const msg = err?.response?.data?.detail || t('listPaymentMethods.errorToggle');
       setError(msg);
       toast.error(msg);
     } finally {
@@ -68,13 +71,13 @@ export default function ListPaymentMethods() {
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      await adminService.pagos.remove(deleteId);
+      await adminService.paymentMethodsAdmin.remove(deleteId);
       setItems((prev) => prev.filter((it) => it.id !== deleteId));
       setModalOpen(false);
       setDeleteId(null);
-      toast.success('Método de pago eliminado correctamente');
+      toast.success(t('listPaymentMethods.successEliminar'));
     } catch (err) {
-      const msg = err?.response?.data?.detail || 'No se pudo eliminar el método';
+      const msg = err?.response?.data?.detail || t('listPaymentMethods.errorEliminar');
       setError(msg);
       toast.error(msg);
     }
@@ -84,19 +87,19 @@ export default function ListPaymentMethods() {
     <div className="max-w-[1100px] mx-auto my-10 px-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-extrabold">Métodos de Pago</h1>
+        <h1 className="text-2xl font-extrabold">{t('listPaymentMethods.titulo')}</h1>
         <Link
-          to="/admin/metodos-pago/crear"
+          to={locPath('/admin/metodos-pago/crear')}
           className="px-4 py-2 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
         >
-          + Crear Método
+          {t('listPaymentMethods.crear')}
         </Link>
       </div>
 
       {/* Page Size Selector */}
       <div className="flex justify-end mb-3">
         <label className="flex items-center gap-2 text-gray-700">
-          Por página:
+          {t('listPaymentMethods.porPagina')}
           <select
             value={pageSize}
             onChange={(e) => {
@@ -120,46 +123,46 @@ export default function ListPaymentMethods() {
       {/* Table */}
       <Table minWidth="min-w-[900px]">
         <TableHead>
-          <TableHeader>ID</TableHeader>
-          <TableHeader>Código</TableHeader>
-          <TableHeader>Nombre</TableHeader>
-          <TableHeader>Tipo</TableHeader>
-          <TableHeader>Orden</TableHeader>
-          <TableHeader align="center">Activo</TableHeader>
-          <TableHeader>Actualizado</TableHeader>
-          <TableHeader align="center">Acciones</TableHeader>
+          <TableHeader>{t('listPaymentMethods.colId')}</TableHeader>
+          <TableHeader>{t('listPaymentMethods.colCodigo')}</TableHeader>
+          <TableHeader>{t('listPaymentMethods.colNombre')}</TableHeader>
+          <TableHeader>{t('listPaymentMethods.colTipo')}</TableHeader>
+          <TableHeader>{t('listPaymentMethods.colOrden')}</TableHeader>
+          <TableHeader align="center">{t('listPaymentMethods.colActivo')}</TableHeader>
+          <TableHeader>{t('listPaymentMethods.colActualizado')}</TableHeader>
+          <TableHeader align="center">{t('listPaymentMethods.colAcciones')}</TableHeader>
         </TableHead>
 
         <TableBody
           loading={loading}
           empty={pageItems.length === 0}
           colSpan={8}
-          loadingText="Cargando métodos de pago..."
-          emptyText="No hay métodos de pago."
+          loadingText={t('listPaymentMethods.cargando')}
+          emptyText={t('listPaymentMethods.vacio')}
         >
           {pageItems.map((m) => (
             <TableRow key={m.id}>
               <TableCell>{m.id}</TableCell>
-              <TableCell>{m.codigo}</TableCell>
-              <TableCell>{m.nombre}</TableCell>
-              <TableCell>{m.tipo}</TableCell>
-              <TableCell>{m.orden}</TableCell>
+              <TableCell>{m.code}</TableCell>
+              <TableCell>{m.name}</TableCell>
+              <TableCell>{m.type}</TableCell>
+              <TableCell>{m.sortOrder}</TableCell>
               <TableCell align="center">
                 <button
                   onClick={() => toggleActivo(m)}
                   disabled={togglingId === m.id}
                   className={`border rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                    m.activo
+                    m.isActive
                       ? 'bg-green-100 border-green-300 text-green-800 hover:bg-green-200'
                       : 'bg-red-100 border-red-300 text-red-800 hover:bg-red-200'
                   } ${togglingId === m.id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >
-                  {m.activo ? 'Activo' : 'Inactivo'}
+                  {m.isActive ? t('listPaymentMethods.activo') : t('listPaymentMethods.inactivo')}
                 </button>
               </TableCell>
               <TableCell>
-                {m.actualizado
-                  ? new Date(m.actualizado).toLocaleString('es-ES', {
+                {m.updatedAt
+                  ? new Date(m.updatedAt).toLocaleString('es-ES', {
                       dateStyle: 'short',
                       timeStyle: 'short',
                     })
@@ -169,9 +172,9 @@ export default function ListPaymentMethods() {
                 <div className="flex justify-center gap-2">
                   <ActionButton
                     variant="edit"
-                    onClick={() => navigate(`/admin/metodos-pago/editar/${m.id}`)}
+                    onClick={() => navigate(locPath(`/admin/metodos-pago/editar/${m.id}`))}
                   >
-                    Editar
+                    {t('listPaymentMethods.editar')}
                   </ActionButton>
                   <ActionButton
                     variant="delete"
@@ -180,7 +183,7 @@ export default function ListPaymentMethods() {
                       setModalOpen(true);
                     }}
                   >
-                    Eliminar
+                    {t('listPaymentMethods.eliminar')}
                   </ActionButton>
                 </div>
               </TableCell>
@@ -194,10 +197,10 @@ export default function ListPaymentMethods() {
 
       <ConfirmModal
         open={modalOpen}
-        title="¿Estás seguro de eliminar este método de pago?"
-        message="Esta acción no se puede deshacer."
-        confirmText="Sí, eliminar"
-        cancelText="Cancelar"
+        title={t('listPaymentMethods.confirmarTitulo')}
+        message={t('listPaymentMethods.confirmarMensaje')}
+        confirmText={t('listPaymentMethods.confirmarSi')}
+        cancelText={t('listPaymentMethods.confirmarNo')}
         danger
         onCancel={() => setModalOpen(false)}
         onConfirm={handleDelete}

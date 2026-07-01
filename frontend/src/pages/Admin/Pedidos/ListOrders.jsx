@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
 import {
@@ -15,6 +17,7 @@ import {
 import StatusBadge from '@/components/StatusBadge';
 
 export default function ListOrders() {
+  const { t } = useTranslation('admin');
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -29,7 +32,7 @@ export default function ListOrders() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.pedidos
+    adminService.orders
       .list()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
@@ -38,7 +41,7 @@ export default function ListOrders() {
         setPages(totalPages);
         setPage((prev) => Math.min(prev, totalPages));
       })
-      .catch(() => setError('No se pudieron cargar los pedidos'))
+      .catch(() => setError(t('listOrders.errorCargar')))
       .finally(() => setLoading(false));
     // eslint-disable-next-line
   }, [pageSize]);
@@ -65,15 +68,7 @@ export default function ListOrders() {
     money: (n) => (n != null ? `$${Number(n).toFixed(2)}` : '-'),
   };
 
-  const getUserLabel = (p) => {
-    const nombre = p.usuario_nombre || '';
-    const apellido = p.usuario_apellido || '';
-    const email = p.usuario_email || '';
-    const base = `${nombre} ${apellido}`.trim();
-    const id = p.usuario != null ? p.usuario : p.usuario_id != null ? p.usuario_id : null;
-    const emailPart = email ? ` - ${email}` : '';
-    return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
-  };
+  const getUserLabel = (p) => p.userId ?? '-';
 
   const handleExportExcel = async () => {
     try {
@@ -82,7 +77,7 @@ export default function ListOrders() {
         ...(startDate ? { start_date: startDate } : {}),
         ...(endDate ? { end_date: endDate } : {}),
       };
-      const data = await adminService.pedidos.export(params); // ArrayBuffer
+      const data = await adminService.orders.export(params); // ArrayBuffer
       const blob = new Blob([data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
@@ -94,7 +89,7 @@ export default function ListOrders() {
       a.remove();
       URL.revokeObjectURL(a.href);
     } catch (e) {
-      setError('No se pudo exportar pedidos');
+      setError(t('listOrders.errorExportar'));
       console.error(e);
     } finally {
       setExporting(false);
@@ -105,12 +100,12 @@ export default function ListOrders() {
     <div className="max-w-[1200px] mx-auto my-10 px-4">
       {/* Header with Filters */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-        <h1 className="text-2xl font-extrabold">Pedidos</h1>
+        <h1 className="text-2xl font-extrabold">{t('listOrders.titulo')}</h1>
 
         <div className="flex flex-col sm:flex-row gap-4 items-end">
           <div className="flex flex-col sm:flex-row gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Desde</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">{t('listOrders.desde')}</label>
               <input
                 type="date"
                 value={startDate}
@@ -119,7 +114,7 @@ export default function ListOrders() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Hasta</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">{t('listOrders.hasta')}</label>
               <input
                 type="date"
                 value={endDate}
@@ -136,9 +131,9 @@ export default function ListOrders() {
                 ? 'bg-blue-50 border-blue-200 text-blue-400 cursor-not-allowed'
                 : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 cursor-pointer'
             }`}
-            title="Exportar pedidos a Excel"
+            title={t('listOrders.exportTitle')}
           >
-            {exporting ? 'Exportando…' : 'Exportar Excel'}
+            {exporting ? t('listOrders.exportando') : t('listOrders.exportar')}
           </button>
         </div>
       </div>
@@ -149,7 +144,7 @@ export default function ListOrders() {
           value={pageSize}
           onChange={setPageSize}
           options={[5, 10, 20, 50]}
-          label="Por página"
+          label={t('listOrders.porPagina')}
         />
       </div>
 
@@ -159,13 +154,13 @@ export default function ListOrders() {
       {/* Table */}
       <Table>
         <TableHead>
-          <TableHeader width="10%">ID</TableHeader>
-          <TableHeader width="30%">Usuario</TableHeader>
-          <TableHeader width="20%">Fecha</TableHeader>
-          <TableHeader width="20%">Estado</TableHeader>
-          <TableHeader width="10%">Total</TableHeader>
+          <TableHeader width="10%">{t('listOrders.colId')}</TableHeader>
+          <TableHeader width="30%">{t('listOrders.colUsuario')}</TableHeader>
+          <TableHeader width="20%">{t('listOrders.colFecha')}</TableHeader>
+          <TableHeader width="20%">{t('listOrders.colEstado')}</TableHeader>
+          <TableHeader width="10%">{t('listOrders.colTotal')}</TableHeader>
           <TableHeader width="10%" align="center">
-            Acciones
+            {t('listOrders.colAcciones')}
           </TableHeader>
         </TableHead>
 
@@ -173,24 +168,24 @@ export default function ListOrders() {
           loading={loading}
           empty={pageItems.length === 0}
           colSpan={6}
-          loadingText="Cargando pedidos..."
-          emptyText="No hay pedidos."
+          loadingText={t('listOrders.cargando')}
+          emptyText={t('listOrders.vacio')}
         >
           {pageItems.map((p) => (
-            <TableRow key={p.pedido_id}>
-              <TableCell className="whitespace-nowrap">{p.pedido_id}</TableCell>
+            <TableRow key={p.id}>
+              <TableCell className="whitespace-nowrap">{p.id}</TableCell>
               <TableCell className="break-words">{getUserLabel(p)}</TableCell>
-              <TableCell className="whitespace-nowrap">{fmt.date(p.fecha_pedido)}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.date(p.createdAt)}</TableCell>
               <TableCell className="break-words">
-                <StatusBadge estado={p.estado} variant="order" />
+                <StatusBadge estado={p.status} variant="order" />
               </TableCell>
               <TableCell className="whitespace-nowrap">{fmt.money(p.total)}</TableCell>
               <TableCell align="center">
                 <ActionButton
                   variant="edit"
-                  onClick={() => navigate(`/admin/pedidos/editar/${p.pedido_id}`)}
+                  onClick={() => navigate(locPath(`/admin/pedidos/editar/${p.id}`))}
                 >
-                  Editar
+                  {t('listOrders.editar')}
                 </ActionButton>
               </TableCell>
             </TableRow>

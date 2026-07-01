@@ -1,13 +1,19 @@
+import { useTranslation } from 'react-i18next';
+
 export default function ConfirmModal({
   open,
-  title = '¿Estás seguro?',
+  title: titleProp,
   message = '',
-  confirmText = 'Sí, confirmar',
-  cancelText = 'Cancelar',
+  confirmText: confirmTextProp,
+  cancelText: cancelTextProp,
   onConfirm,
   onCancel,
   danger = false,
 }) {
+  const { t } = useTranslation('admin');
+  const title = titleProp ?? t('confirm.titulo');
+  const confirmText = confirmTextProp ?? t('confirm.confirmar');
+  const cancelText = cancelTextProp ?? t('confirm.cancelar');
   if (!open) return null;
   return (
     <div

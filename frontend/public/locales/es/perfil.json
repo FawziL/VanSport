@@ -1,0 +1,18 @@
+{
+  "titulo": "Perfil de usuario",
+  "admin": "Admin",
+  "subtitulo": "Consulta y actualiza tus datos personales",
+  "userId": "ID de usuario",
+  "email": "Email",
+  "nombre": "Nombre",
+  "nombrePlaceholder": "Tu nombre",
+  "apellido": "Apellido",
+  "apellidoPlaceholder": "Tu apellido",
+  "telefono": "Teléfono",
+  "guardando": "Guardando...",
+  "guardar": "Guardar cambios",
+  "volverInicio": "Volver al inicio",
+  "success": "Perfil actualizado correctamente.",
+  "errorCargar": "Error al cargar el perfil",
+  "errorGuardar": "Error al guardar cambios"
+}

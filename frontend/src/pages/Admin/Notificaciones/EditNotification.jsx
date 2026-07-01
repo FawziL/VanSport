@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 
 function toDatetimeLocalValue(isoOrNull) {
   if (!isoOrNull) return '';
@@ -11,6 +13,7 @@ function toDatetimeLocalValue(isoOrNull) {
 }
 
 export default function EditNotification() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const [form, setForm] = useState(null);
   const [error, setError] = useState('');
@@ -20,18 +23,18 @@ export default function EditNotification() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    adminService.notificaciones
+    adminService.notifications
       .retrieve(id)
       .then((data) => {
         if (!active) return;
         setForm({
-          titulo: data.titulo || '',
-          mensaje: data.mensaje || '',
-          tipo: data.tipo || 'banner',
-          expira: toDatetimeLocalValue(data.expira || ''),
+          title: data.title || '',
+          message: data.message || '',
+          type: data.type || 'banner',
+          expiresAt: toDatetimeLocalValue(data.expiresAt || ''),
         });
       })
-      .catch(() => setError('No se pudo cargar la notificación'))
+      .catch(() => setError(t('editNotification.errorCargar')))
       .finally(() => active && setLoading(false));
     return () => (active = false);
   }, [id]);
@@ -45,33 +48,33 @@ export default function EditNotification() {
     e.preventDefault();
     setError('');
     try {
-      const payload = { titulo: form.titulo, mensaje: form.mensaje, tipo: form.tipo };
-      if (form.expira) {
-        const d = new Date(form.expira);
+      const payload = { title: form.title, message: form.message, type: form.type };
+      if (form.expiresAt) {
+        const d = new Date(form.expiresAt);
         if (!isNaN(d.getTime())) {
-          payload.expira = d.toISOString();
+          payload.expiresAt = d.toISOString();
         }
       } else {
-        payload.expira = null; // permitir limpiar la expiración
+        delete payload.expiresAt;
       }
-      await adminService.notificaciones.partialUpdate(id, payload);
-      navigate('/admin/notificaciones');
+      await adminService.notifications.partialUpdate(id, payload);
+      navigate(locPath('/admin/notificaciones'));
     } catch (err) {
       const msg = err?.response?.data
         ? Object.entries(err.response.data)
             .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : String(v)}`)
             .join(' | ')
-        : err?.message || 'No se pudo actualizar la notificación';
+        : err?.message || t('editNotification.errorGuardar');
       setError(msg);
     }
   };
 
-  if (loading)
+  if (loading || !form)
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando notificación...</p>
+          <p className="mt-4 text-gray-600">{loading ? t('editNotification.cargando') : error || t('editNotification.errorCargar2')}</p>
         </div>
       </div>
     );
@@ -104,7 +107,7 @@ export default function EditNotification() {
           }}
         >
           <button
-            onClick={() => navigate('/admin/notificaciones')}
+            onClick={() => navigate(locPath('/admin/notificaciones'))}
             style={{
               background: 'none',
               border: 'none',
@@ -145,7 +148,7 @@ export default function EditNotification() {
               color: '#1a1a1a',
             }}
           >
-            Editar notificación
+            {t('editNotification.titulo')}
           </h1>
         </div>
 
@@ -192,11 +195,11 @@ export default function EditNotification() {
                 marginBottom: '4px',
               }}
             >
-              Título *
+              {t('editNotification.tituloLabel')}
             </label>
             <input
-              name="titulo"
-              value={form.titulo}
+              name="title"
+              value={form.title}
               onChange={onChange}
               required
               style={{
@@ -227,11 +230,11 @@ export default function EditNotification() {
                 marginBottom: '4px',
               }}
             >
-              Mensaje
+              {t('editNotification.mensaje')}
             </label>
             <textarea
-              name="mensaje"
-              value={form.mensaje}
+              name="message"
+              value={form.message}
               onChange={onChange}
               rows={4}
               style={{
@@ -265,11 +268,11 @@ export default function EditNotification() {
                 marginBottom: '4px',
               }}
             >
-              Tipo
+              {t('editNotification.tipo')}
             </label>
             <select
-              name="tipo"
-              value={form.tipo}
+              name="type"
+              value={form.type}
               onChange={onChange}
               style={{
                 padding: '12px 14px',
@@ -290,14 +293,14 @@ export default function EditNotification() {
                 e.target.style.boxShadow = 'none';
               }}
             >
-              <option value="banner">Banner</option>
-              <option value="info">Información</option>
-              <option value="aviso">Aviso</option>
-              <option value="oferta">Oferta</option>
+              <option value="banner">{t('editNotification.banner')}</option>
+              <option value="info">{t('editNotification.info')}</option>
+              <option value="aviso">{t('editNotification.aviso')}</option>
+              <option value="oferta">{t('editNotification.oferta')}</option>
             </select>
           </div>
 
-          {form.tipo === 'oferta' && (
+          {form.type === 'oferta' && (
             <div
               style={{
                 background: '#f8f9fa',
@@ -322,12 +325,12 @@ export default function EditNotification() {
                     marginBottom: '4px',
                   }}
                 >
-                  Fecha de expiración
+                  {t('editNotification.fechaExpiracion')}
                 </label>
                 <input
                   type="datetime-local"
-                  name="expira"
-                  value={form.expira || ''}
+                  name="expiresAt"
+                  value={form.expiresAt || ''}
                   onChange={onChange}
                   style={{
                     padding: '12px 14px',
@@ -354,8 +357,7 @@ export default function EditNotification() {
                     marginTop: '4px',
                   }}
                 >
-                  Fecha y hora límite de la oferta. Al llegar, el banner se ocultará
-                  automáticamente.
+                  {t('editNotification.fechaAyuda')}
                 </small>
               </div>
 
@@ -366,7 +368,7 @@ export default function EditNotification() {
                     const d = new Date(Date.now() + 2 * 60 * 60 * 1000);
                     const pad = (n) => n.toString().padStart(2, '0');
                     const val = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-                    setForm((f) => ({ ...f, expira: val }));
+                    setForm((f) => ({ ...f, expiresAt: val }));
                   }}
                   style={{
                     padding: '0.5rem 1rem',
@@ -382,7 +384,7 @@ export default function EditNotification() {
                   onMouseOver={(e) => (e.target.style.backgroundColor = '#bbdefb')}
                   onMouseOut={(e) => (e.target.style.backgroundColor = '#e3f2fd')}
                 >
-                  +2 horas
+                  {t('editNotification.mas2Horas')}
                 </button>
                 <button
                   type="button"
@@ -390,7 +392,7 @@ export default function EditNotification() {
                     const d = new Date(Date.now() + 24 * 60 * 60 * 1000);
                     const pad = (n) => n.toString().padStart(2, '0');
                     const val = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-                    setForm((f) => ({ ...f, expira: val }));
+                    setForm((f) => ({ ...f, expiresAt: val }));
                   }}
                   style={{
                     padding: '0.5rem 1rem',
@@ -406,11 +408,11 @@ export default function EditNotification() {
                   onMouseOver={(e) => (e.target.style.backgroundColor = '#bbdefb')}
                   onMouseOut={(e) => (e.target.style.backgroundColor = '#e3f2fd')}
                 >
-                  +1 día
+                  {t('editNotification.mas1Dia')}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setForm((f) => ({ ...f, expira: '' }))}
+                  onClick={() => setForm((f) => ({ ...f, expiresAt: '' }))}
                   style={{
                     padding: '0.5rem 1rem',
                     borderRadius: '6px',
@@ -425,7 +427,7 @@ export default function EditNotification() {
                   onMouseOver={(e) => (e.target.style.backgroundColor = '#ffcdd2')}
                   onMouseOut={(e) => (e.target.style.backgroundColor = '#ffebee')}
                 >
-                  Limpiar fecha
+                  {t('editNotification.limpiarFecha')}
                 </button>
               </div>
             </div>
@@ -443,7 +445,7 @@ export default function EditNotification() {
           >
             <button
               type="button"
-              onClick={() => navigate('/admin/notificaciones')}
+              onClick={() => navigate(locPath('/admin/notificaciones'))}
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',
@@ -463,7 +465,7 @@ export default function EditNotification() {
                 e.target.style.borderColor = '#ddd';
               }}
             >
-              Cancelar
+              {t('editNotification.cancelar')}
             </button>
             <button
               type="submit"
@@ -483,7 +485,7 @@ export default function EditNotification() {
               onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
               onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
             >
-              Guardar cambios
+              {t('editNotification.guardar')}
             </button>
           </div>
         </form>

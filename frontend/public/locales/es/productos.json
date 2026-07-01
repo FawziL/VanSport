@@ -1,0 +1,12 @@
+{
+  "titulo": "Nuestros Productos",
+  "subtitulo": "Descubre nuestra amplia selección de productos de calidad",
+  "mostrando": "Mostrando <bold>{{count}}</bold> productos",
+  "para": "para <bold>{{query}}</bold>",
+  "pagina": "Página <bold>{{page}}</bold> de <bold>{{pages}}</bold>",
+  "noEncontrados": "No se encontraron productos",
+  "sinFiltros": "Pronto agregaremos nuevos productos a nuestro catálogo.",
+  "conFiltros": "Intenta ajustar los filtros para ver más resultados.",
+  "verTodos": "Ver todos los productos",
+  "errorCargar": "No se pudieron cargar los productos"
+}

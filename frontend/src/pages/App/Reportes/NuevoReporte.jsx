@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { appService } from '@/services/routes';
 import { CATEGORIAS_FALLA } from '@/utils/categorias';
 
 export default function NuevoReporte() {
-  const [form, setForm] = useState({ categoria: 'ui', titulo: '', descripcion: '', seccion: '' });
+  const { t } = useTranslation('reporte');
+  const [form, setForm] = useState({ category: 'ui', title: '', description: '', section: '' });
   const [imagen, setImagen] = useState(null);
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -18,7 +20,7 @@ export default function NuevoReporte() {
       Object.entries(form).forEach(([k, v]) => fd.append(k, v ?? ''));
       if (imagen) fd.append('imagen', imagen);
       if (video) fd.append('video', video);
-      await appService.reportes.create(fd);
+      await appService.bugReports.create(fd);
       navigate('/reportes');
     } finally {
       setLoading(false);
@@ -32,20 +34,20 @@ export default function NuevoReporte() {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              Reportar una Falla
+              {t('nuevo.titulo')}
             </h1>
             <p className="text-gray-600">
-              Describe el problema que encontraste para que podamos solucionarlo
+              {t('nuevo.subtitulo')}
             </p>
           </div>
 
           <form onSubmit={onSubmit} className="space-y-6">
             {/* Categoría */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Categoría *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('nuevo.categoria')}</label>
               <select
-                value={form.categoria}
-                onChange={(e) => setForm((f) => ({ ...f, categoria: e.target.value }))}
+                value={form.category}
+                onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 required
               >
@@ -59,12 +61,12 @@ export default function NuevoReporte() {
 
             {/* Título */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Título *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('nuevo.tituloField')}</label>
               <input
                 type="text"
-                value={form.titulo}
-                onChange={(e) => setForm((f) => ({ ...f, titulo: e.target.value }))}
-                placeholder="Describe brevemente el problema..."
+                value={form.title}
+                onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                placeholder={t('nuevo.tituloPlaceholder')}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 required
               />
@@ -73,13 +75,13 @@ export default function NuevoReporte() {
             {/* Descripción */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Descripción *
+                {t('nuevo.descripcion')}
               </label>
               <textarea
-                value={form.descripcion}
-                onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value }))}
+                value={form.description}
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                 rows={4}
-                placeholder="Proporciona todos los detalles relevantes sobre la falla..."
+                placeholder={t('nuevo.descripcionPlaceholder')}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical"
                 required
               />
@@ -88,13 +90,13 @@ export default function NuevoReporte() {
             {/* Sección */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Sección de la página *
+                {t('nuevo.seccion')}
               </label>
               <input
                 type="text"
-                placeholder="/productos, /checkout, etc."
-                value={form.seccion}
-                onChange={(e) => setForm((f) => ({ ...f, seccion: e.target.value }))}
+                placeholder={t('nuevo.seccionPlaceholder')}
+                value={form.section}
+                onChange={(e) => setForm((f) => ({ ...f, section: e.target.value }))}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 required
               />
@@ -105,7 +107,7 @@ export default function NuevoReporte() {
               {/* Imagen */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Imagen (opcional)
+                  {t('nuevo.imagen')}
                 </label>
                 <input
                   type="file"
@@ -118,7 +120,7 @@ export default function NuevoReporte() {
               {/* Video */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Video (opcional)
+                  {t('nuevo.video')}
                 </label>
                 <input
                   type="file"
@@ -158,17 +160,17 @@ export default function NuevoReporte() {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
-                    Enviando reporte...
+                    {t('nuevo.enviando')}
                   </div>
                 ) : (
-                  'Enviar Reporte'
+                  t('nuevo.enviar')
                 )}
               </button>
             </div>
 
             {/* Información adicional */}
             <div className="text-center text-sm text-gray-500 pt-2">
-              Todos los campos marcados con * son obligatorios
+              {t('nuevo.obligatorios')}
             </div>
           </form>
         </div>

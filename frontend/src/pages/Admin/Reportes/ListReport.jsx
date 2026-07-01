@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import Pagination from '@/components/Pagination';
 import {
   Table,
@@ -12,10 +14,10 @@ import {
   ActionButton,
 } from '@/components/ui/Table';
 import StatusBadge from '@/components/StatusBadge';
-import { useNavigate } from 'react-router-dom';
 import PageSizeSelector from '@/components/PageSizeSelector';
 
 export default function ListReportes() {
+  const { t } = useTranslation('admin');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -29,7 +31,7 @@ export default function ListReportes() {
     setLoading(true);
     setError('');
 
-    adminService.reportes
+    adminService.bugReports
       .list()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
@@ -39,7 +41,7 @@ export default function ListReportes() {
         }
       })
       .catch(() => {
-        if (alive) setError('No se pudieron cargar los reportes');
+        if (alive) setError(t('listReports.errorCargar'));
       })
       .finally(() => {
         if (alive) setLoading(false);
@@ -69,13 +71,13 @@ export default function ListReportes() {
   return (
     <div className="max-w-[1100px] mx-auto my-10 px-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-extrabold">Reportes de Fallas</h1>
+        <h1 className="text-2xl font-extrabold">{t('listReports.titulo')}</h1>
         <div className="flex gap-2">
           <Link
-            to="/admin/reportes/crear"
+            to={locPath('/admin/reportes/crear')}
             className="px-4 py-2 rounded-lg bg-blue-600 text-white! font-bold no-underline hover:bg-blue-700 transition-colors"
           >
-            + Crear Reporte
+            {t('listReports.crear')}
           </Link>
         </div>
       </div>
@@ -85,7 +87,7 @@ export default function ListReportes() {
           value={pageSize}
           onChange={setPageSize}
           options={[5, 10, 20, 50]}
-          label="Por página"
+          label={t('listReports.porPagina')}
         />
       </div>
 
@@ -93,38 +95,36 @@ export default function ListReportes() {
 
       <Table minWidth="min-w-[1000px]">
         <TableHead>
-          <TableHeader>Título</TableHeader>
-          <TableHeader>Usuario</TableHeader>
-          <TableHeader>Estado</TableHeader>
-          <TableHeader>Fecha</TableHeader>
-          <TableHeader align="center">Acciones</TableHeader>
+          <TableHeader>{t('listReports.colTitulo')}</TableHeader>
+          <TableHeader>{t('listReports.colUsuario')}</TableHeader>
+          <TableHeader>{t('listReports.colEstado')}</TableHeader>
+          <TableHeader>{t('listReports.colFecha')}</TableHeader>
+          <TableHeader align="center">{t('listReports.colAcciones')}</TableHeader>
         </TableHead>
 
         <TableBody
           loading={loading}
           empty={itemsPage.length === 0}
           colSpan={6}
-          loadingText="Cargando reportes..."
-          emptyText="No hay reportes de fallas."
+          loadingText={t('listReports.cargando')}
+          emptyText={t('listReports.vacio')}
         >
           {itemsPage.map((report) => (
             <TableRow key={report.id}>
-              <TableCell className="font-medium">{report.titulo}</TableCell>
+              <TableCell className="font-medium">{report.title}</TableCell>
               <TableCell>
-                {report.usuario_nombre} {report.usuario_apellido}
-                <br />
-                <span className="text-sm text-gray-500">({report.usuario_email})</span>
+                {report.userId}
               </TableCell>
               <TableCell>
-                <StatusBadge estado={report.estado} />
+                <StatusBadge estado={report.status} />
               </TableCell>
-              <TableCell>{fmtFecha(report.fecha_creacion)}</TableCell>
+              <TableCell>{fmtFecha(report.createdAt)}</TableCell>
               <TableCell align="center">
                 <ActionButton
                   variant="edit"
-                  onClick={() => navigate(`/admin/reportes/${report.id}`)}
+                    onClick={() => navigate(locPath(`/admin/reportes/${report.id}`))}
                 >
-                  Ver
+                  {t('listReports.ver')}
                 </ActionButton>
               </TableCell>
             </TableRow>

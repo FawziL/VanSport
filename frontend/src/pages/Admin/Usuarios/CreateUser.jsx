@@ -1,18 +1,22 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
+import PhoneInput from '@/components/PhoneInput';
 
 export default function CreateUser() {
+  const { t } = useTranslation('admin');
   const [form, setForm] = useState({
-    nombre: '',
-    apellido: '',
+    name: '',
+    lastName: '',
     email: '',
     password: '',
-    telefono: '',
-    direccion: '',
-    is_active: true,
-    is_staff: false,
+    address: '',
+    isActive: true,
+    isStaff: false,
   });
+  const phoneRef = useRef();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -27,10 +31,11 @@ export default function CreateUser() {
     setLoading(true);
     setError('');
     try {
-      await adminService.usuarios.create(form);
-      navigate('/admin/usuarios');
+      await adminService.users.create({ ...form, phone: phoneRef.current?.getValue() || '' });
+      navigate(locPath('/admin/usuarios'));
     } catch (err) {
-      setError(err?.detail || 'No se pudo crear el usuario');
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.detail || err?.message || t('createUser.error');
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -64,7 +69,7 @@ export default function CreateUser() {
           }}
         >
           <button
-            onClick={() => navigate('/admin/usuarios')}
+            onClick={() => navigate(locPath('/admin/usuarios'))}
             style={{
               background: 'none',
               border: 'none',
@@ -105,7 +110,7 @@ export default function CreateUser() {
               color: '#1a1a1a',
             }}
           >
-            Crear nuevo usuario
+            {t('createUser.titulo')}
           </h1>
         </div>
 
@@ -153,11 +158,11 @@ export default function CreateUser() {
                   marginBottom: '4px',
                 }}
               >
-                Nombre *
+                {t('createUser.nombre')}
               </label>
               <input
-                name="nombre"
-                value={form.nombre}
+                name="name"
+                value={form.name}
                 onChange={onChange}
                 required
                 style={{
@@ -187,11 +192,11 @@ export default function CreateUser() {
                   marginBottom: '4px',
                 }}
               >
-                Apellido *
+                {t('createUser.apellido')}
               </label>
               <input
-                name="apellido"
-                value={form.apellido}
+                name="lastName"
+                value={form.lastName}
                 onChange={onChange}
                 required
                 style={{
@@ -223,7 +228,7 @@ export default function CreateUser() {
                 marginBottom: '4px',
               }}
             >
-              Email *
+              {t('createUser.email')}
             </label>
             <input
               type="email"
@@ -259,7 +264,7 @@ export default function CreateUser() {
                 marginBottom: '4px',
               }}
             >
-              Contraseña *
+              {t('createUser.contrasena')}
             </label>
             <input
               type="password"
@@ -296,29 +301,9 @@ export default function CreateUser() {
                   marginBottom: '4px',
                 }}
               >
-                Teléfono
+                {t('createUser.telefono')}
               </label>
-              <input
-                name="telefono"
-                value={form.telefono}
-                onChange={onChange}
-                style={{
-                  padding: '12px 14px',
-                  borderRadius: '8px',
-                  border: '1px solid #ddd',
-                  fontSize: '16px',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                  outline: 'none',
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#1e88e5';
-                  e.target.style.boxShadow = '0 0 0 2px rgba(30, 136, 229, 0.2)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#ddd';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
+              <PhoneInput ref={phoneRef} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <label
@@ -329,11 +314,11 @@ export default function CreateUser() {
                   marginBottom: '4px',
                 }}
               >
-                Dirección
+                {t('createUser.direccion')}
               </label>
               <input
-                name="direccion"
-                value={form.direccion}
+                name="address"
+                value={form.address}
                 onChange={onChange}
                 style={{
                   padding: '12px 14px',
@@ -375,8 +360,8 @@ export default function CreateUser() {
             >
               <input
                 type="checkbox"
-                name="is_active"
-                checked={form.is_active}
+                name="isActive"
+                checked={form.isActive}
                 onChange={onChange}
                 style={{
                   width: '18px',
@@ -384,7 +369,7 @@ export default function CreateUser() {
                   cursor: 'pointer',
                 }}
               />
-              <span style={{ fontWeight: 500 }}>Usuario activo</span>
+              <span style={{ fontWeight: 500 }}>{t('createUser.usuarioActivo')}</span>
             </label>
             <label
               style={{
@@ -396,8 +381,8 @@ export default function CreateUser() {
             >
               <input
                 type="checkbox"
-                name="is_staff"
-                checked={form.is_staff}
+                name="isStaff"
+                checked={form.isStaff}
                 onChange={onChange}
                 style={{
                   width: '18px',
@@ -405,7 +390,7 @@ export default function CreateUser() {
                   cursor: 'pointer',
                 }}
               />
-              <span style={{ fontWeight: 500 }}>Administrador</span>
+              <span style={{ fontWeight: 500 }}>{t('createUser.administrador')}</span>
             </label>
           </div>
 
@@ -421,7 +406,7 @@ export default function CreateUser() {
           >
             <button
               type="button"
-              onClick={() => navigate('/admin/usuarios')}
+              onClick={() => navigate(locPath('/admin/usuarios'))}
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',
@@ -441,7 +426,7 @@ export default function CreateUser() {
                 e.target.style.borderColor = '#ddd';
               }}
             >
-              Cancelar
+              {t('createUser.cancelar')}
             </button>
             <button
               type="submit"
@@ -511,10 +496,10 @@ export default function CreateUser() {
                       strokeLinecap="round"
                     />
                   </svg>
-                  Creando usuario...
+                  {t('createUser.creando')}
                 </div>
               ) : (
-                'Crear usuario'
+                t('createUser.crear')
               )}
             </button>
           </div>

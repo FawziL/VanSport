@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
 import Login from '@/pages/Auth/Login';
 import Register from '@/pages/Auth/Register';
@@ -51,280 +51,289 @@ import EditPaymentMethod from '@/pages/Admin/MetodosPago/EditPaymentMethod';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import LanguageRouter from '@/components/LanguageRouter';
+import i18n from './i18n';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 function AppShell() {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname.includes('/admin');
+
+  if (location.pathname === '/') {
+    const lang = i18n.language?.slice(0, 2) === 'en' ? 'en' : 'es';
+    return <Navigate to={`/${lang}`} replace />;
+  }
 
   return (
     <div className="app-shell">
       {!isAdminRoute && <Navbar />}
       <main className="app-main">
         <Routes>
-          {/* Públicas */}
-          <Route path="/" element={<Home />} />
-          <Route path="/productos" element={<Productos />} />
-          <Route path="/productos/:id" element={<VerProducto />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/password-reset" element={<PasswordReset />} />
-          <Route path="/password-reset/confirm" element={<PasswordResetConfirm />} />
+          <Route path="/:lang" element={<LanguageRouter />}>
+            {/* Públicas */}
+            <Route index element={<Home />} />
+            <Route path="productos" element={<Productos />} />
+            <Route path="productos/:id" element={<VerProducto />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route path="password-reset" element={<PasswordReset />} />
+            <Route path="password-reset/confirm" element={<PasswordResetConfirm />} />
 
-          {/* Usuario autenticado */}
-          <Route path="/perfil" element={<Perfil />} />
-          <Route path="/pedidos" element={<MisPedidos />} />
-          <Route path="/pedidos/:id" element={<VerPedido />} />
-          <Route path="/carrito" element={<Carrito />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/reportes" element={<MisReportes />} />
-          <Route path="/reportes/nuevo" element={<NuevoReporte />} />
-          <Route path="/reportes/:id" element={<VerReporte />} />
+            {/* Usuario autenticado */}
+            <Route path="perfil" element={<Perfil />} />
+            <Route path="pedidos" element={<MisPedidos />} />
+            <Route path="pedidos/:id" element={<VerPedido />} />
+            <Route path="carrito" element={<Carrito />} />
+            <Route path="checkout" element={<Checkout />} />
+            <Route path="reportes" element={<MisReportes />} />
+            <Route path="reportes/nuevo" element={<NuevoReporte />} />
+            <Route path="reportes/:id" element={<VerReporte />} />
 
-          {/* Admin */}
-          <Route
-            path="/admin/dashboard"
-            element={
-              <AdminPage>
-                <Dashboard />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/categorias"
-            element={
-              <AdminPage>
-                <AdminCategorias />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/categorias/crear"
-            element={
-              <AdminPage>
-                <CrearCategorias />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/categorias/editar/:id"
-            element={
-              <AdminPage>
-                <EditarCategorias />
-              </AdminPage>
-            }
-          />
+            {/* Admin */}
+            <Route
+              path="admin/dashboard"
+              element={
+                <AdminPage>
+                  <Dashboard />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/categorias"
+              element={
+                <AdminPage>
+                  <AdminCategorias />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/categorias/crear"
+              element={
+                <AdminPage>
+                  <CrearCategorias />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/categorias/editar/:id"
+              element={
+                <AdminPage>
+                  <EditarCategorias />
+                </AdminPage>
+              }
+            />
 
-          {/* Productos Admin */}
-          <Route
-            path="/admin/productos"
-            element={
-              <AdminPage>
-                <ListProduct />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/productos/crear"
-            element={
-              <AdminPage>
-                <CreateProduct />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/productos/editar/:id"
-            element={
-              <AdminPage>
-                <EditProduct />
-              </AdminPage>
-            }
-          />
+            {/* Productos Admin */}
+            <Route
+              path="admin/productos"
+              element={
+                <AdminPage>
+                  <ListProduct />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/productos/crear"
+              element={
+                <AdminPage>
+                  <CreateProduct />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/productos/editar/:id"
+              element={
+                <AdminPage>
+                  <EditProduct />
+                </AdminPage>
+              }
+            />
 
-          {/* Usuarios Admin */}
-          <Route
-            path="/admin/usuarios"
-            element={
-              <AdminPage>
-                <ListUsers />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/usuarios/crear"
-            element={
-              <AdminPage>
-                <CreateUser />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/usuarios/editar/:id"
-            element={
-              <AdminPage>
-                <EditUser />
-              </AdminPage>
-            }
-          />
+            {/* Usuarios Admin */}
+            <Route
+              path="admin/usuarios"
+              element={
+                <AdminPage>
+                  <ListUsers />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/usuarios/crear"
+              element={
+                <AdminPage>
+                  <CreateUser />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/usuarios/editar/:id"
+              element={
+                <AdminPage>
+                  <EditUser />
+                </AdminPage>
+              }
+            />
 
-          {/* Pedidos Admin */}
-          <Route
-            path="/admin/pedidos"
-            element={
-              <AdminPage>
-                <ListOrders />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/pedidos/editar/:id"
-            element={
-              <AdminPage>
-                <EditOrder />
-              </AdminPage>
-            }
-          />
+            {/* Pedidos Admin */}
+            <Route
+              path="admin/pedidos"
+              element={
+                <AdminPage>
+                  <ListOrders />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/pedidos/editar/:id"
+              element={
+                <AdminPage>
+                  <EditOrder />
+                </AdminPage>
+              }
+            />
 
-          {/* Reseñas Admin */}
-          <Route
-            path="/admin/resenas"
-            element={
-              <AdminPage>
-                <ListReviews />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/resenas/editar/:id"
-            element={
-              <AdminPage>
-                <EditReview />
-              </AdminPage>
-            }
-          />
+            {/* Reseñas Admin */}
+            <Route
+              path="admin/resenas"
+              element={
+                <AdminPage>
+                  <ListReviews />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/resenas/editar/:id"
+              element={
+                <AdminPage>
+                  <EditReview />
+                </AdminPage>
+              }
+            />
 
-          {/* Ventas (Transacciones) Admin */}
-          <Route
-            path="/admin/ventas"
-            element={
-              <AdminPage>
-                <ListSales />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/ventas/pendientes"
-            element={
-              <AdminPage>
-                <PendingPayments />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/ventas/editar/:id"
-            element={
-              <AdminPage>
-                <EditSale />
-              </AdminPage>
-            }
-          />
+            {/* Ventas (Transacciones) Admin */}
+            <Route
+              path="admin/ventas"
+              element={
+                <AdminPage>
+                  <ListSales />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/ventas/pendientes"
+              element={
+                <AdminPage>
+                  <PendingPayments />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/ventas/editar/:id"
+              element={
+                <AdminPage>
+                  <EditSale />
+                </AdminPage>
+              }
+            />
 
-          {/* Notificaciones Admin */}
-          <Route
-            path="/admin/notificaciones"
-            element={
-              <AdminPage>
-                <ListNotifications />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/notificaciones/crear"
-            element={
-              <AdminPage>
-                <CreateNotification />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/notificaciones/editar/:id"
-            element={
-              <AdminPage>
-                <EditNotification />
-              </AdminPage>
-            }
-          />
+            {/* Notificaciones Admin */}
+            <Route
+              path="admin/notificaciones"
+              element={
+                <AdminPage>
+                  <ListNotifications />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/notificaciones/crear"
+              element={
+                <AdminPage>
+                  <CreateNotification />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/notificaciones/editar/:id"
+              element={
+                <AdminPage>
+                  <EditNotification />
+                </AdminPage>
+              }
+            />
 
-          {/* Envíos Admin */}
-          <Route
-            path="/admin/envios"
-            element={
-              <AdminPage>
-                <ListShipments />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/envios/editar/:id"
-            element={
-              <AdminPage>
-                <EditShipment />
-              </AdminPage>
-            }
-          />
+            {/* Envíos Admin */}
+            <Route
+              path="admin/envios"
+              element={
+                <AdminPage>
+                  <ListShipments />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/envios/editar/:id"
+              element={
+                <AdminPage>
+                  <EditShipment />
+                </AdminPage>
+              }
+            />
 
-          {/* Reportes Admin */}
-          <Route
-            path="/admin/reportes"
-            element={
-              <AdminPage>
-                <ListReports />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/reportes/crear"
-            element={
-              <AdminPage>
-                <CreateReport />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/reportes/:id"
-            element={
-              <AdminPage>
-                <EditReport />
-              </AdminPage>
-            }
-          />
+            {/* Reportes Admin */}
+            <Route
+              path="admin/reportes"
+              element={
+                <AdminPage>
+                  <ListReports />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/reportes/crear"
+              element={
+                <AdminPage>
+                  <CreateReport />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/reportes/:id"
+              element={
+                <AdminPage>
+                  <EditReport />
+                </AdminPage>
+              }
+            />
 
-          {/* Pagos Admin */}
-          <Route
-            path="/admin/metodos-pago"
-            element={
-              <AdminPage>
-                <ListPaymentMethods />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/metodos-pago/crear"
-            element={
-              <AdminPage>
-                <CreatePaymentMethod />
-              </AdminPage>
-            }
-          />
-          <Route
-            path="/admin/metodos-pago/editar/:id"
-            element={
-              <AdminPage>
-                <EditPaymentMethod />
-              </AdminPage>
-            }
-          />
+            {/* Pagos Admin */}
+            <Route
+              path="admin/metodos-pago"
+              element={
+                <AdminPage>
+                  <ListPaymentMethods />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/metodos-pago/crear"
+              element={
+                <AdminPage>
+                  <CreatePaymentMethod />
+                </AdminPage>
+              }
+            />
+            <Route
+              path="admin/metodos-pago/editar/:id"
+              element={
+                <AdminPage>
+                  <EditPaymentMethod />
+                </AdminPage>
+              }
+            />
+          </Route>
 
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -347,10 +356,14 @@ function AppShell() {
 
 export default function App() {
   return (
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <BrowserRouter>
+    <BrowserRouter>
+      {GOOGLE_CLIENT_ID ? (
+      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
         <AppShell />
-      </BrowserRouter>
-    </GoogleOAuthProvider>
+      </GoogleOAuthProvider>
+      ) : (
+        <AppShell />
+      )}
+    </BrowserRouter>
   );
 }

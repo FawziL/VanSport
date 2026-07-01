@@ -1,194 +1,133 @@
 import { http } from '@/config/api';
 
+// --- Auth (BetterAuth + NestJS) ---
 export const authService = {
-  login: (email, password) => http.post('/auth/login/', { email, password }),
-  register: (payload) => http.post('/auth/register/', payload),
-  me: () => http.get('/auth/me/'),
-  passwordReset: (email) => http.post('/auth/password-reset/', { email }),
-  passwordResetConfirm: (token, password) =>
-    http.post('/auth/password-reset/confirm/', { token, password }),
-  googleLogin: (accessToken) => http.post('/auth/google/', { access_token: accessToken }),
+  signIn: (email, password) => http.post('/api/auth/sign-in/email', { email, password, rememberMe: true }),
+  signUp: (data) => http.post('/api/auth/sign-up/email', data),
+  signOut: () => http.post('/api/auth/sign-out'),
+  me: () => http.get('/api/auth/get-session'),
+  updateProfile: (data) => http.post('/api/auth/update-user', data),
+  passwordReset: (email) =>
+    http.post('/api/auth/forget-password', {
+      email,
+      redirectTo: `${window.location.origin}/password-reset/confirm`,
+    }),
+  passwordResetConfirm: (token, newPassword) =>
+    http.post('/api/auth/reset-password', { token, newPassword }),
 };
 
+// --- Public & Authenticated API ---
 export const appService = {
-  categorias: {
-    list: (params) => http.get(`/api/categorias/${qs(params)}`),
-    retrieve: (id) => http.get(`/api/categorias/${encodeURIComponent(id)}/`),
+  categories: {
+    list: (params) => http.get('/categories', { params }),
+    retrieve: (id) => http.get(`/categories/${id}`),
+    create: (data) => http.post('/categories', data),
+    update: (id, data) => http.put(`/categories/${id}`, data),
+    partialUpdate: (id, data) => http.patch(`/categories/${id}`, data),
+    remove: (id) => http.delete(`/categories/${id}`),
   },
-  productos: {
-    list: (params) => http.get(`/api/productos/${qs(params)}`),
-    retrieve: (id) => http.get(`/api/productos/${encodeURIComponent(id)}/`),
+  products: {
+    list: (params) => http.get('/products', { params }),
+    listAdmin: (params) => http.get('/products/admin', { params }),
+    retrieve: (id) => http.get(`/products/${id}`),
+    create: (data) => http.post('/products', data),
+    update: (id, data) => http.put(`/products/${id}`, data),
+    partialUpdate: (id, data) => http.patch(`/products/${id}`, data),
+    remove: (id) => http.delete(`/products/${id}`),
+    export: () => http.get('/products/export', { responseType: 'arraybuffer' }),
   },
-  usuarios: {
-    list: (params) => http.get(`/api/usuarios/${qs(params)}`),
-    retrieve: (id) => http.get(`/api/usuarios/${encodeURIComponent(id)}/`),
+  orders: {
+    list: (params) => http.get('/orders', { params }),
+    retrieve: (id) => http.get(`/orders/${id}`),
+    checkout: (data) => http.post('/orders/checkout', data),
+    export: (params) => http.get('/orders/export', { params, responseType: 'arraybuffer' }),
   },
-  pedidos: {
-    list: (params) => http.get(`/api/pedidos/${qs(params)}`),
-    retrieve: (id) => http.get(`/api/pedidos/${encodeURIComponent(id)}/`),
-    checkout: (data) => http.post('/api/pedidos/checkout/', data),
+  orderItems: {
+    list: (params) => http.get('/order-items', { params }),
+    retrieve: (id) => http.get(`/order-items/${id}`),
+    remove: (id) => http.delete(`/order-items/${id}`),
   },
-  detallesPedido: {
-    list: (params) => http.get(`/api/detalles-pedido/${qs(params)}`),
-    retrieve: (id) => http.get(`/api/detalles-pedido/${encodeURIComponent(id)}/`),
+  cart: {
+    list: (params) => http.get('/cart', { params }),
+    add: (data) => http.post('/cart/add', data),
+    updateQuantity: (data) => http.post('/cart/update-quantity', data),
+    remove: (data) => http.post('/cart/remove', data),
+    clear: () => http.post('/cart/clear'),
   },
-  carrito: {
-    list: (params) => http.get(`/api/carrito/${qs(params)}`),
-    retrieve: (id) => http.get(`/api/carrito/${encodeURIComponent(id)}/`),
-    add: (data) => http.post('/api/carrito/add/', data),
-    updateQuantity: (data) => http.post('/api/carrito/update-quantity/', data),
-    remove: (data) => http.post('/api/carrito/remove/', data),
-    clear: () => http.post('/api/carrito/clear/'),
+  reviews: {
+    list: (params) => http.get('/reviews', { params }),
+    listAdmin: (params) => http.get('/reviews/admin', { params }),
+    retrieve: (id) => http.get(`/reviews/${id}`),
+    create: (data) => http.post('/reviews', data),
+    update: (id, data) => http.put(`/reviews/${id}`, data),
+    partialUpdate: (id, data) => http.patch(`/reviews/${id}`, data),
+    remove: (id) => http.delete(`/reviews/${id}`),
+    updateAdmin: (id, data) => http.put(`/reviews/admin/${id}`, data),
+    removeAdmin: (id) => http.delete(`/reviews/admin/${id}`),
   },
-  reseñas: {
-    list: (params) => http.get(`/api/resenas/${qs(params)}`),
-    retrieve: (id) => http.get(`/api/resenas/${encodeURIComponent(id)}/`),
-    create: (data) => http.post('/api/resenas/', data),
+  notifications: {
+    list: (params) => http.get('/notifications', { params }),
+    retrieve: (id) => http.get(`/notifications/${id}`),
+    latestBanner: () => http.get('/notifications/latest-banner'),
+    create: (data) => http.post('/notifications', data),
+    update: (id, data) => http.put(`/notifications/${id}`, data),
+    partialUpdate: (id, data) => http.patch(`/notifications/${id}`, data),
+    remove: (id) => http.delete(`/notifications/${id}`),
+    markRead: (id) => http.post(`/notifications/${id}/mark-read`),
   },
-  notificaciones: {
-    list: (params) => http.get(`/api/notificaciones/${qs(params)}`),
-    retrieve: (id) => http.get(`/api/notificaciones/${encodeURIComponent(id)}/`),
-    latestBanner: () => http.get('/api/notificaciones/latest-banner/'),
+  transactions: {
+    list: (params) => http.get('/transactions', { params }),
+    retrieve: (id) => http.get(`/transactions/${id}`),
+    create: (data) => http.post('/transactions', data),
+    pay: (data) => http.post('/transactions/pay', data),
+    update: (id, data) => http.put(`/transactions/${id}`, data),
+    partialUpdate: (id, data) => http.patch(`/transactions/${id}`, data),
+    remove: (id) => http.delete(`/transactions/${id}`),
+    export: (params) => http.get('/transactions/export', { params, responseType: 'arraybuffer' }),
   },
-  transacciones: {
-    list: (params) => http.get(`/api/transacciones/${qs(params)}`),
-    retrieve: (id) => http.get(`/api/transacciones/${encodeURIComponent(id)}/`),
-    pay: (data) => http.post('/api/transacciones/pay/', data),
+  shipments: {
+    list: (params) => http.get('/shipments', { params }),
+    retrieve: (id) => http.get(`/shipments/${id}`),
+    create: (data) => http.post('/shipments', data),
+    export: (params) => http.get('/shipments/export', { params, responseType: 'arraybuffer' }),
   },
-  envios: {
-    list: (params) => http.get(`/api/envios/${qs(params)}`),
-    retrieve: (id) => http.get(`/api/envios/${encodeURIComponent(id)}/`),
+  bugReports: {
+    list: () => http.get('/bug-reports'),
+    create: (formData) => http.post('/bug-reports', formData),
+    retrieve: (id) => http.get(`/bug-reports/${id}`),
+    update: (id, data) => http.put(`/bug-reports/${id}`, data),
+    partialUpdate: (id, data) => http.patch(`/bug-reports/${id}`, data),
+    remove: (id) => http.delete(`/bug-reports/${id}`),
+    addFollowUp: (id, formData) => http.post(`/bug-reports/${id}/followups`, formData),
+    findFollowups: (id) => http.get(`/bug-reports/${id}/followups`),
   },
-  reportes: {
-    list: () => http.get('/api/reportes-fallas/'),
-    create: (formData) => http.post('/api/reportes-fallas/', formData),
-    retrieve: (id) => http.get(`/api/reportes-fallas/${id}/`),
-    addFollowUp: (id, formData) => http.post(`/api/reportes-fallas/${id}/followups/`, formData),
+  paymentMethods: {
+    listPublic: () => http.get('/payment-methods'),
   },
-  utils: {
-    dolarBcvHoy: () => http.get('/api/utils/dolar-bcv/'),
+  exchangeRate: {
+    dolarBcv: () => http.get('/exchange-rate/dolar-bcv'),
+    dolarBcvHoy: () => http.get('/exchange-rate/dolar-bcv'),
   },
-  pagos: {
-    listarPublicos: () => http.get('/api/pagos/metodos/'),
+  users: {
+    list: (params) => http.get('/users', { params }),
+    retrieve: (id) => http.get(`/users/${id}`),
+    create: (data) => http.post('/users', data),
+    update: (id, data) => http.put(`/users/${id}`, data),
+    partialUpdate: (id, data) => http.patch(`/users/${id}`, data),
+    remove: (id) => http.delete(`/users/${id}`),
   },
-};
-
-// ADMIN (/admin/...)
-export const adminService = {
-  categorias: {
-    list: (params) => http.get(`/admin/categorias/${qs(params)}`),
-    retrieve: (id) => http.get(`/admin/categorias/${encodeURIComponent(id)}/`),
-    create: (data) => http.post('/admin/categorias/', data),
-    update: (id, data) => http.put(`/admin/categorias/${encodeURIComponent(id)}/`, data),
-    partialUpdate: (id, data) => http.patch(`/admin/categorias/${encodeURIComponent(id)}/`, data),
-    remove: (id) => http.delete(`/admin/categorias/${encodeURIComponent(id)}/`),
-  },
-  productos: {
-    list: (params) => http.get(`/admin/productos/${qs(params)}`),
-    retrieve: (id) => http.get(`/admin/productos/${encodeURIComponent(id)}/`),
-    create: (data) => http.post('/admin/productos/', data),
-    update: (id, data) => http.put(`/admin/productos/${encodeURIComponent(id)}/`, data),
-    partialUpdate: (id, data) => http.patch(`/admin/productos/${encodeURIComponent(id)}/`, data),
-    remove: (id) => http.delete(`/admin/productos/${encodeURIComponent(id)}/`),
-    export: (params) =>
-      http.get('/admin/productos/export/', {
-        params,
-        responseType: 'arraybuffer',
-      }),
-  },
-  usuarios: {
-    list: (params) => http.get(`/admin/usuarios/${qs(params)}`),
-    retrieve: (id) => http.get(`/admin/usuarios/${encodeURIComponent(id)}/`),
-    create: (data) => http.post('/admin/usuarios/', data),
-    update: (id, data) => http.put(`/admin/usuarios/${encodeURIComponent(id)}/`, data),
-    partialUpdate: (id, data) => http.patch(`/admin/usuarios/${encodeURIComponent(id)}/`, data),
-    remove: (id) => http.delete(`/admin/usuarios/${encodeURIComponent(id)}/`),
-  },
-  pedidos: {
-    list: (params) => http.get(`/admin/pedidos/${qs(params)}`),
-    retrieve: (id) => http.get(`/admin/pedidos/${encodeURIComponent(id)}/`),
-    create: (data) => http.post('/admin/pedidos/', data),
-    update: (id, data) => http.put(`/admin/pedidos/${encodeURIComponent(id)}/`, data),
-    partialUpdate: (id, data) => http.patch(`/admin/pedidos/${encodeURIComponent(id)}/`, data),
-    remove: (id) => http.delete(`/admin/pedidos/${encodeURIComponent(id)}/`),
-    export: (params) => http.get('/admin/pedidos/export/', { params, responseType: 'arraybuffer' }), // <-- nuevo
-  },
-  detallesPedido: {
-    list: (params) => http.get(`/admin/detalles-pedido/${qs(params)}`),
-    retrieve: (id) => http.get(`/admin/detalles-pedido/${encodeURIComponent(id)}/`),
-    create: (data) => http.post('/admin/detalles-pedido/', data),
-    update: (id, data) => http.put(`/admin/detalles-pedido/${encodeURIComponent(id)}/`, data),
-    partialUpdate: (id, data) =>
-      http.patch(`/admin/detalles-pedido/${encodeURIComponent(id)}/`, data),
-    remove: (id) => http.delete(`/admin/detalles-pedido/${encodeURIComponent(id)}/`),
-  },
-  carrito: {
-    list: (params) => http.get(`/admin/carrito/${qs(params)}`),
-    retrieve: (id) => http.get(`/admin/carrito/${encodeURIComponent(id)}/`),
-    create: (data) => http.post('/admin/carrito/', data),
-    update: (id, data) => http.put(`/admin/carrito/${encodeURIComponent(id)}/`, data),
-    partialUpdate: (id, data) => http.patch(`/admin/carrito/${encodeURIComponent(id)}/`, data),
-    remove: (id) => http.delete(`/admin/carrito/${encodeURIComponent(id)}/`),
-  },
-  reseñas: {
-    list: (params) => http.get(`/admin/resenas/${qs(params)}`),
-    retrieve: (id) => http.get(`/admin/resenas/${encodeURIComponent(id)}/`),
-    create: (data) => http.post('/admin/resenas/', data),
-    update: (id, data) => http.put(`/admin/resenas/${encodeURIComponent(id)}/`, data),
-    partialUpdate: (id, data) => http.patch(`/admin/resenas/${encodeURIComponent(id)}/`, data),
-    remove: (id) => http.delete(`/admin/resenas/${encodeURIComponent(id)}/`),
-  },
-  notificaciones: {
-    list: (params) => http.get(`/admin/notificaciones/${qs(params)}`),
-    retrieve: (id) => http.get(`/admin/notificaciones/${encodeURIComponent(id)}/`),
-    create: (data) => http.post('/admin/notificaciones/', data),
-    update: (id, data) => http.put(`/admin/notificaciones/${encodeURIComponent(id)}/`, data),
-    partialUpdate: (id, data) =>
-      http.patch(`/admin/notificaciones/${encodeURIComponent(id)}/`, data),
-    remove: (id) => http.delete(`/admin/notificaciones/${encodeURIComponent(id)}/`),
-  },
-  transacciones: {
-    list: (params) => http.get(`/admin/transacciones/${qs(params)}`),
-    retrieve: (id) => http.get(`/admin/transacciones/${encodeURIComponent(id)}/`),
-    create: (data) => http.post('/admin/transacciones/', data),
-    update: (id, data) => http.put(`/admin/transacciones/${encodeURIComponent(id)}/`, data),
-    partialUpdate: (id, data) =>
-      http.patch(`/admin/transacciones/${encodeURIComponent(id)}/`, data),
-    remove: (id) => http.delete(`/admin/transacciones/${encodeURIComponent(id)}/`),
-    export: (params) =>
-      http.get('/admin/transacciones/export/', { params, responseType: 'arraybuffer' }), // <-- nuevo
-  },
-  envios: {
-    list: (params) => http.get(`/admin/envios/${qs(params)}`),
-    retrieve: (id) => http.get(`/admin/envios/${encodeURIComponent(id)}/`),
-    create: (data) => http.post('/admin/envios/', data),
-    update: (id, data) => http.put(`/admin/envios/${encodeURIComponent(id)}/`, data),
-    partialUpdate: (id, data) => http.patch(`/admin/envios/${encodeURIComponent(id)}/`, data),
-    remove: (id) => http.delete(`/admin/envios/${encodeURIComponent(id)}/`),
-    export: (params) => http.get('/admin/envios/export/', { params, responseType: 'arraybuffer' }), // <-- nuevo
-  },
-  reportes: {
-    list: (params) => http.get('/admin/reportes-fallas/', { params }),
-    retrieve: (id) => http.get(`/admin/reportes-fallas/${id}/`),
-    patch: (id, data) => http.patch(`/admin/reportes-fallas/${id}/`, data),
-    addFollowUp: (id, formData) => http.post(`/admin/reportes-fallas/${id}/followups/`, formData),
-  },
-  pagos: {
-    list: (params) => http.get(`/admin/metodos-pago/${qs(params)}`),
-    create: (payload) => http.post('/admin/metodos-pago/', payload),
-    get: (id) => http.get(`/admin/metodos-pago/${id}/`),
-    partialUpdate: (id, payload) => http.patch(`/admin/metodos-pago/${id}/`, payload),
-    delete: (id) => http.delete(`/admin/metodos-pago/${id}/`),
+  paymentMethodsAdmin: {
+    list: (params) => http.get('/payment-methods', { params }),
+    retrieve: (id) => http.get(`/payment-methods/${id}`),
+    create: (data) => http.post('/payment-methods', data),
+    update: (id, data) => http.put(`/payment-methods/${id}`, data),
+    partialUpdate: (id, data) => http.patch(`/payment-methods/${id}`, data),
+    remove: (id) => http.delete(`/payment-methods/${id}`),
   },
 };
 
-function qs(params) {
-  if (!params) return '';
-  const entries = Object.entries(params).filter(
-    ([_, v]) => v !== undefined && v !== null && v !== ''
-  );
-  if (entries.length === 0) return '';
-  const usp = new URLSearchParams();
-  for (const [k, v] of entries) usp.append(k, String(v));
-  return `?${usp.toString()}`;
-}
+// Re-export appService as adminService for backward compat in pages
+// Admin pages use the same endpoints (auth guards on backend)
+export const adminService = appService;
+
+export default authService;

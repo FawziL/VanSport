@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 import Pagination from '@/components/Pagination';
 import PageSizeSelector from '@/components/PageSizeSelector';
 import ConfirmModal from '@/components/ConfirmModal';
@@ -16,6 +18,7 @@ import {
 import { toast } from 'react-toastify';
 
 export default function ListReviews() {
+  const { t } = useTranslation('admin');
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -29,8 +32,8 @@ export default function ListReviews() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.reseñas
-      .list()
+    adminService.reviews
+      .listAdmin()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
         setItems(arr);
@@ -39,8 +42,8 @@ export default function ListReviews() {
         setPage((prev) => Math.min(prev, totalPages));
       })
       .catch(() => {
-        setError('No se pudieron cargar las reseñas');
-        toast.error('No se pudieron cargar las reseñas');
+        setError(t('listReviews.errorCargar'));
+        toast.error(t('listReviews.errorCargar'));
       })
       .finally(() => setLoading(false));
     // eslint-disable-next-line
@@ -75,23 +78,21 @@ export default function ListReviews() {
   };
 
   const getUserLabel = (r) => {
-    const nombre = r.usuario_nombre || '';
-    const apellido = r.usuario_apellido || '';
-    const email = r.usuario_email || '';
+    const nombre = r.userName || '';
+    const apellido = r.userLastName || '';
     const base = `${nombre} ${apellido}`.trim();
-    const id = r.usuario != null ? r.usuario : r.usuario_id != null ? r.usuario_id : null;
-    const emailPart = email ? ` - ${email}` : '';
-    return base || id != null ? `${base}${emailPart}${id != null ? ` (ID ${id})` : ''}` : '-';
+    const id = r.userId != null ? r.userId : null;
+    return base || id != null ? `${base}${id != null ? ` (ID ${id})` : ''}` : '-';
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      await adminService.reseñas.remove(deleteId);
-      setItems((prev) => prev.filter((x) => x.resena_id !== deleteId));
-      toast.success('Reseña eliminada correctamente');
+      await adminService.reviews.removeAdmin(deleteId);
+      setItems((prev) => prev.filter((x) => x.id !== deleteId));
+      toast.success(t('listReviews.successEliminar'));
     } catch (err) {
-      const msg = err?.response?.data?.detail || 'No se pudo eliminar la reseña';
+      const msg = err?.response?.data?.detail || t('listReviews.errorEliminar');
       setError(msg);
       toast.error(msg);
     } finally {
@@ -104,7 +105,7 @@ export default function ListReviews() {
     <div className="max-w-[1200px] mx-auto my-10 px-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-extrabold">Reseñas</h1>
+        <h1 className="text-2xl font-extrabold">{t('listReviews.titulo')}</h1>
       </div>
 
       {/* Page Size Selector */}
@@ -113,7 +114,7 @@ export default function ListReviews() {
           value={pageSize}
           onChange={setPageSize}
           options={[5, 10, 20, 50]}
-          label="Por página"
+          label={t('listReviews.porPagina')}
         />
       </div>
 
@@ -123,14 +124,14 @@ export default function ListReviews() {
       {/* Table */}
       <Table>
         <TableHead>
-          <TableHeader width="5%">ID</TableHeader>
-          <TableHeader width="5%">Producto</TableHeader>
-          <TableHeader width="20%">Usuario</TableHeader>
-          <TableHeader width="20%">Comentario</TableHeader>
-          <TableHeader width="10%">Calif.</TableHeader>
-          <TableHeader width="10%">Fecha</TableHeader>
+          <TableHeader width="5%">{t('listReviews.colId')}</TableHeader>
+          <TableHeader width="5%">{t('listReviews.colProducto')}</TableHeader>
+          <TableHeader width="20%">{t('listReviews.colUsuario')}</TableHeader>
+          <TableHeader width="20%">{t('listReviews.colComentario')}</TableHeader>
+          <TableHeader width="10%">{t('listReviews.colCalif')}</TableHeader>
+          <TableHeader width="10%">{t('listReviews.colFecha')}</TableHeader>
           <TableHeader width="10%" align="center">
-            Acciones
+            {t('listReviews.colAcciones')}
           </TableHeader>
         </TableHead>
 
@@ -138,35 +139,35 @@ export default function ListReviews() {
           loading={loading}
           empty={pageItems.length === 0}
           colSpan={7}
-          loadingText="Cargando reseñas..."
-          emptyText="No hay reseñas."
+          loadingText={t('listReviews.cargando')}
+          emptyText={t('listReviews.vacio')}
         >
           {pageItems.map((r) => (
-            <TableRow key={r.resena_id}>
-              <TableCell className="whitespace-nowrap">{r.resena_id}</TableCell>
-              <TableCell className="break-words">{r.producto ?? '-'}</TableCell>
+            <TableRow key={r.id}>
+              <TableCell className="whitespace-nowrap">{r.id}</TableCell>
+              <TableCell className="break-words">{r.productName ?? '-'}</TableCell>
               <TableCell className="break-words">{getUserLabel(r)}</TableCell>
-              <TableCell className="break-words" title={r.comentario || ''}>
-                {truncateWords(r.comentario, 12)}
+              <TableCell className="break-words" title={r.comment || ''}>
+                {truncateWords(r.comment, 12)}
               </TableCell>
-              <TableCell className="whitespace-nowrap">{r.calificacion}</TableCell>
-              <TableCell className="whitespace-nowrap">{fmt.date(r.fecha_creacion)}</TableCell>
+              <TableCell className="whitespace-nowrap">{r.rating}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.date(r.createdAt)}</TableCell>
               <TableCell align="center">
                 <div className="flex justify-center gap-2">
                   <ActionButton
                     variant="edit"
-                    onClick={() => navigate(`/admin/resenas/editar/${r.resena_id}`)}
+                    onClick={() => navigate(locPath(`/admin/resenas/editar/${r.id}`))}
                   >
-                    Editar
+                    {t('listReviews.editar')}
                   </ActionButton>
                   <ActionButton
                     variant="delete"
                     onClick={() => {
-                      setDeleteId(r.resena_id);
+                      setDeleteId(r.id);
                       setModalOpen(true);
                     }}
                   >
-                    Eliminar
+                    {t('listReviews.eliminar')}
                   </ActionButton>
                 </div>
               </TableCell>
@@ -181,10 +182,10 @@ export default function ListReviews() {
       {/* Confirm Modal */}
       <ConfirmModal
         open={modalOpen}
-        title="¿Eliminar reseña?"
-        message="Esta acción no se puede deshacer."
-        confirmText="Sí, eliminar"
-        cancelText="Cancelar"
+        title={t('listReviews.confirmarTitulo')}
+        message={t('listReviews.confirmarMensaje')}
+        confirmText={t('listReviews.confirmarSi')}
+        cancelText={t('confirm.cancelar')}
         danger
         onCancel={() => setModalOpen(false)}
         onConfirm={handleDelete}

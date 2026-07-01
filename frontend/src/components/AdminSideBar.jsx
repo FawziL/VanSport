@@ -1,6 +1,8 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
+import { locPath } from '@/utils/localePath';
 import {
   FaThLarge,
   FaTags,
@@ -21,17 +23,17 @@ import {
 import { FiTool, FiSettings } from 'react-icons/fi';
 
 const sections = [
-  { to: '/admin/dashboard', label: 'Dashboard', icon: <FaThLarge /> },
-  { to: '/admin/usuarios', label: 'Usuarios', icon: <FaUsers /> },
-  { to: '/admin/categorias', label: 'Categorias', icon: <FaTags /> },
-  { to: '/admin/productos', label: 'Productos', icon: <FaBoxOpen /> },
-  { to: '/admin/pedidos', label: 'Pedidos', icon: <FaClipboardList /> },
-  { to: '/admin/envios', label: 'Envíos', icon: <FaTruck /> },
-  { to: '/admin/ventas', label: 'Ventas', icon: <FaChartBar /> },
-  { to: '/admin/resenas', label: 'Reseñas', icon: <FaStar /> },
-  { to: '/admin/notificaciones', label: 'Notificaciones', icon: <FaBell /> },
-  { to: '/admin/reportes', label: 'Reporte de fallas', icon: <FiTool /> },
-  { to: '/admin/metodos-pago', label: 'Métodos de Pago', icon: <FaTags /> },
+  { path: '/admin/dashboard', labelKey: 'sidebar.dashboard', icon: <FaThLarge /> },
+  { path: '/admin/usuarios', labelKey: 'sidebar.usuarios', icon: <FaUsers /> },
+  { path: '/admin/categorias', labelKey: 'sidebar.categorias', icon: <FaTags /> },
+  { path: '/admin/productos', labelKey: 'sidebar.productos', icon: <FaBoxOpen /> },
+  { path: '/admin/pedidos', labelKey: 'sidebar.pedidos', icon: <FaClipboardList /> },
+  { path: '/admin/envios', labelKey: 'sidebar.envios', icon: <FaTruck /> },
+  { path: '/admin/ventas', labelKey: 'sidebar.ventas', icon: <FaChartBar /> },
+  { path: '/admin/resenas', labelKey: 'sidebar.resenas', icon: <FaStar /> },
+  { path: '/admin/notificaciones', labelKey: 'sidebar.notificaciones', icon: <FaBell /> },
+  { path: '/admin/reportes', labelKey: 'sidebar.reportes', icon: <FiTool /> },
+  { path: '/admin/metodos-pago', labelKey: 'sidebar.metodosPago', icon: <FaTags /> },
 ];
 
 const linkStyle = (isActive, collapsed) => ({
@@ -50,6 +52,7 @@ const linkStyle = (isActive, collapsed) => ({
 });
 
 export default function AdminSidebar({ collapsed, onToggle }) {
+  const { t } = useTranslation('admin');
   const sidebarWidth = collapsed ? 70 : 240;
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -67,11 +70,11 @@ export default function AdminSidebar({ collapsed, onToggle }) {
   }, []);
 
   const displayName = (() => {
-    if (!user) return 'Usuario';
-    const nombre = user.nombre || user.first_name || user.name || '';
-    const apellido = user.apellido || user.last_name || '';
+    if (!user) return t('sidebar.usuario');
+    const nombre = user.name || user.first_name || user.name || '';
+    const apellido = user.lastName || user.last_name || '';
     const combined = `${nombre} ${apellido}`.trim();
-    return combined || user.username || 'Usuario';
+    return combined || user.username || t('sidebar.usuario');
   })();
 
   const displayEmail = user?.email || user?.correo || '';
@@ -79,8 +82,7 @@ export default function AdminSidebar({ collapsed, onToggle }) {
   const handleLogout = () => {
     setOpenSettings(false);
     logout();
-    // Llevar al catálogo público como destino seguro
-    navigate('/productos');
+    navigate(locPath('/productos'));
   };
 
   return (
@@ -125,8 +127,8 @@ export default function AdminSidebar({ collapsed, onToggle }) {
           justifyContent: 'center',
           transform: `translateX(${toggleHover ? (collapsed ? 2 : -2) : 0}px)`,
         }}
-        aria-label={collapsed ? 'Expandir menú' : 'Colapsar menú'}
-        title={collapsed ? 'Expandir menú' : 'Colapsar menú'}
+        aria-label={collapsed ? t('sidebar.expandir') : t('sidebar.colapsar')}
+        title={collapsed ? t('sidebar.expandir') : t('sidebar.colapsar')}
       >
         <span style={{ fontSize: 14, lineHeight: 0 }}>
           {collapsed ? <FaChevronRight /> : <FaChevronLeft />}
@@ -144,20 +146,20 @@ export default function AdminSidebar({ collapsed, onToggle }) {
           whiteSpace: 'nowrap',
         }}
       >
-        {collapsed ? 'A' : 'Panel Admin'}
+        {collapsed ? 'A' : t('sidebar.panelAdmin')}
       </div>
 
       <nav style={{ display: 'grid', gap: 6 }}>
         {sections.map((s) => (
           <NavLink
-            key={s.to}
-            to={s.to}
-            end={s.to === '/admin/dashboard'}
+            key={s.path}
+            to={locPath(s.path)}
+            end={s.path === '/admin/dashboard'}
             style={({ isActive }) => linkStyle(isActive, collapsed)}
-            title={collapsed ? s.label : undefined}
+            title={collapsed ? t(s.labelKey) : undefined}
           >
             <span style={{ fontSize: 20, minWidth: 24, textAlign: 'center' }}>{s.icon}</span>
-            {!collapsed && <span>{s.label}</span>}
+            {!collapsed && <span>{t(s.labelKey)}</span>}
           </NavLink>
         ))}
       </nav>
@@ -171,10 +173,10 @@ export default function AdminSidebar({ collapsed, onToggle }) {
           transition: 'all .5s',
         }}
       >
-        <div>{!collapsed && 'Acceso rápido'}</div>
+        <div>{!collapsed && t('sidebar.acceso Rapido')}</div>
         <div style={{ marginTop: 6 }}>
           <Link
-            to="/productos"
+            to={locPath('/productos')}
             style={{
               color: '#90caf9',
               textDecoration: 'none',
@@ -184,10 +186,10 @@ export default function AdminSidebar({ collapsed, onToggle }) {
               gap: 8,
               fontSize: 16,
             }}
-            title="Ver tienda"
+            title={t('sidebar.verTienda')}
           >
             <FaStore />
-            {!collapsed && <span>Ver tienda</span>}
+            {!collapsed && <span>{t('sidebar.verTienda')}</span>}
           </Link>
         </div>
       </div>
@@ -203,8 +205,8 @@ export default function AdminSidebar({ collapsed, onToggle }) {
         >
           <button
             onClick={() => setOpenSettings((v) => !v)}
-            aria-label="Configuración"
-            title="Configuración"
+            aria-label={t('sidebar.configuracion')}
+            title={t('sidebar.configuracion')}
             style={{
               background: '#222',
               color: '#fff',
@@ -258,7 +260,7 @@ export default function AdminSidebar({ collapsed, onToggle }) {
               {/* Opciones */}
               <div style={{ padding: 6 }}>
                 <Link
-                  to="/perfil"
+                  to={locPath('/perfil')}
                   onClick={() => setOpenSettings(false)}
                   style={{
                     display: 'flex',
@@ -271,7 +273,7 @@ export default function AdminSidebar({ collapsed, onToggle }) {
                   }}
                 >
                   <FaUserCog />
-                  <span>Perfil</span>
+                  <span>{t('sidebar.perfil')}</span>
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -290,7 +292,7 @@ export default function AdminSidebar({ collapsed, onToggle }) {
                   }}
                 >
                   <FaSignOutAlt />
-                  <span>Cerrar Sesión</span>
+                  <span>{t('sidebar.cerrarSesion')}</span>
                 </button>
               </div>
             </div>

@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 
 export default function EditPaymentMethod() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const navigate = useNavigate();
   const [form, setForm] = useState(null);
@@ -13,22 +16,22 @@ export default function EditPaymentMethod() {
   useEffect(() => {
     setLoading(true);
     setError('');
-    adminService.pagos
-      .get(id)
+    adminService.paymentMethodsAdmin
+      .retrieve(id)
       .then((data) => {
         setForm({
-          codigo: data.codigo || '',
-          nombre: data.nombre || '',
-          tipo: data.tipo || '',
-          activo: !!data.activo,
-          orden: data.orden ?? 0,
-          descripcion: data.descripcion || '',
-          instrucciones: data.instrucciones || '',
-          icono: data.icono || '',
+          codigo: data.code || '',
+          nombre: data.name || '',
+          tipo: data.type || '',
+          activo: !!data.isActive,
+          orden: data.sortOrder ?? 0,
+          descripcion: data.description || '',
+          instrucciones: data.instructions || '',
+          icono: data.icon || '',
           config: JSON.stringify(data.config ?? {}, null, 2),
         });
       })
-      .catch(() => setError('No se pudo cargar el método'))
+      .catch(() => setError(t('editPaymentMethod.errorCargar')))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -41,33 +44,33 @@ export default function EditPaymentMethod() {
     try {
       cfg = form.config ? JSON.parse(form.config) : {};
     } catch {
-      setError('Config debe ser JSON válido');
+      setError(t('editPaymentMethod.errorConfig'));
       return;
     }
 
     try {
       setSaving(true);
-      await adminService.pagos.partialUpdate(id, {
-        codigo: form.codigo.trim(),
-        nombre: form.nombre.trim(),
-        tipo: form.tipo.trim(),
-        activo: !!form.activo,
-        orden: Number(form.orden) || 0,
-        descripcion: form.descripcion || '',
-        instrucciones: form.instrucciones || '',
-        icono: form.icono || '',
+      await adminService.paymentMethodsAdmin.partialUpdate(id, {
+        code: form.codigo.trim(),
+        name: form.nombre.trim(),
+        type: form.tipo.trim(),
+        isActive: !!form.activo,
+        sortOrder: Number(form.orden) || 0,
+        description: form.descripcion || '',
+        instructions: form.instrucciones || '',
+        icon: form.icono || '',
         config: cfg,
       });
-      navigate('/admin/metodos-pago');
+      navigate(locPath('/admin/metodos-pago'));
     } catch (e) {
-      setError(e?.response?.data?.detail || 'No se pudo actualizar el método');
+      setError(e?.response?.data?.detail || t('editPaymentMethod.errorGuardar'));
     } finally {
       setSaving(false);
     }
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-[50vh] text-gray-600">Cargando…</div>;
+    return <div className="flex items-center justify-center h-[50vh] text-gray-600">{t('editPaymentMethod.cargando')}</div>;
   }
 
   if (error && !form) {
@@ -87,9 +90,9 @@ export default function EditPaymentMethod() {
       <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
         <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
           <button
-            onClick={() => navigate('/admin/metodos-pago')}
+            onClick={() => navigate(locPath('/admin/metodos-pago'))}
             className="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
-            aria-label="Volver"
+            aria-label={t('editPaymentMethod.ariaVolver')}
           >
             <svg
               width="18"
@@ -107,7 +110,7 @@ export default function EditPaymentMethod() {
               />
             </svg>
           </button>
-          <h1 className="text-xl font-extrabold text-gray-900">Editar método de pago #{id}</h1>
+          <h1 className="text-xl font-extrabold text-gray-900">{t('editPaymentMethod.titulo')}{id}</h1>
         </div>
 
         {error && (
@@ -132,7 +135,7 @@ export default function EditPaymentMethod() {
 
         <form onSubmit={submit} className="grid gap-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Código</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editPaymentMethod.codigo')}</label>
             <input
               value={form.codigo}
               onChange={(e) => onChange('codigo', e.target.value)}
@@ -141,7 +144,7 @@ export default function EditPaymentMethod() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editPaymentMethod.nombre')}</label>
             <input
               value={form.nombre}
               onChange={(e) => onChange('nombre', e.target.value)}
@@ -150,7 +153,7 @@ export default function EditPaymentMethod() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Tipo</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editPaymentMethod.tipo')}</label>
             <input
               value={form.tipo}
               onChange={(e) => onChange('tipo', e.target.value)}
@@ -159,7 +162,7 @@ export default function EditPaymentMethod() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Orden</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editPaymentMethod.orden')}</label>
             <input
               type="number"
               value={form.orden}
@@ -177,67 +180,67 @@ export default function EditPaymentMethod() {
               className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-300"
             />
             <label htmlFor="activo" className="text-sm font-medium text-gray-700">
-              Activo
+              {t('editPaymentMethod.activo')}
             </label>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editPaymentMethod.descripcion')}</label>
             <textarea
               value={form.descripcion}
               onChange={(e) => onChange('descripcion', e.target.value)}
               rows={2}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
-              placeholder="Descripción (opcional)"
+              placeholder={t('editPaymentMethod.descripcionPlaceholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Instrucciones</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editPaymentMethod.instrucciones')}</label>
             <textarea
               value={form.instrucciones}
               onChange={(e) => onChange('instrucciones', e.target.value)}
               rows={4}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
-              placeholder="Instrucciones para el cliente (opcional)"
+              placeholder={t('editPaymentMethod.instruccionesPlaceholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Icono</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editPaymentMethod.icono')}</label>
             <input
               value={form.icono}
               onChange={(e) => onChange('icono', e.target.value)}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
-              placeholder="Nombre o URL del icono"
+              placeholder={t('editPaymentMethod.iconoPlaceholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Config (JSON)</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('editPaymentMethod.config')}</label>
             <textarea
               value={form.config}
               onChange={(e) => onChange('config', e.target.value)}
               rows={6}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white font-mono"
-              placeholder='{"clave":"valor"}'
+              placeholder={t('editPaymentMethod.configPlaceholder')}
             />
           </div>
 
           <div className="flex gap-3 justify-end pt-3 border-t border-gray-100">
             <button
               type="button"
-              onClick={() => navigate('/admin/metodos-pago')}
+              onClick={() => navigate(locPath('/admin/metodos-pago'))}
               className="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-colors"
             >
-              Cancelar
+              {t('editPaymentMethod.cancelar')}
             </button>
             <button
               type="submit"
               disabled={saving}
               className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-60 transition-colors"
             >
-              {saving ? 'Guardando…' : 'Guardar cambios'}
+              {saving ? t('editPaymentMethod.guardando') : t('editPaymentMethod.guardar')}
             </button>
           </div>
         </form>

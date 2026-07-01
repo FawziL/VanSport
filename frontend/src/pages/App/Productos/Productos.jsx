@@ -4,23 +4,24 @@ import CardProduct from '@/components/CardProduct';
 import { appService } from '@/services/routes';
 import Pagination from '@/components/Pagination';
 import ProductFilters from '@/components/ProductFilters';
+import { useTranslation, Trans } from 'react-i18next';
 
 const fetchProductos = async ({ page, filters }) => {
   const params = {
     page,
     q: filters?.q || undefined,
-    categoria_id: filters?.categoria_id || undefined,
+    categoryId: filters?.categoryId || undefined,
     min_price: filters?.min_price || undefined,
     max_price: filters?.max_price || undefined,
     oferta: filters?.oferta || undefined,
     page_size: filters?.pageSize || undefined,
   };
-  const data = await appService.productos.list(params);
+  const data = await appService.products.list(params);
 
   // Acepta ambos formatos: array plano o objeto paginado { count, results, ... }
   const items = Array.isArray(data) ? data : (data?.results ?? []);
   const filtered = items.filter(
-    (p) => !filters?.q || (p?.nombre ?? '').toLowerCase().includes(String(filters.q).toLowerCase())
+    (p) => !filters?.q || (p?.name ?? '').toLowerCase().includes(String(filters.q).toLowerCase())
   );
 
   const pageSize = filters?.pageSize || 6;
@@ -38,6 +39,7 @@ const fetchProductos = async ({ page, filters }) => {
 };
 
 export default function Productos() {
+  const { t } = useTranslation('productos');
   const [searchParams, setSearchParams] = useSearchParams();
 
   const parseFiltersFromSearch = (sp) => {
@@ -46,7 +48,7 @@ export default function Productos() {
     const pageSize = Number(sp.get('page_size') || '6') || 6;
     return {
       q: get('q'),
-      categoria_id: get('categoria_id'),
+      categoryId: get('categoryId'),
       min_price: get('min_price'),
       max_price: get('max_price'),
       oferta: oferta === '1' ? '1' : '',
@@ -85,7 +87,7 @@ export default function Productos() {
       })
       .catch((err) => {
         console.error('Error cargando productos:', err);
-        setError(err?.message || 'No se pudieron cargar los productos');
+        setError(err?.message || t('errorCargar'));
         setProductos([]);
         setPages(1);
       });
@@ -98,7 +100,7 @@ export default function Productos() {
   useEffect(() => {
     const sp = new URLSearchParams();
     if (filters.q) sp.set('q', filters.q);
-    if (filters.categoria_id) sp.set('categoria_id', String(filters.categoria_id));
+    if (filters.categoryId) sp.set('categoryId', String(filters.categoryId));
     if (filters.min_price) sp.set('min_price', String(filters.min_price));
     if (filters.max_price) sp.set('max_price', String(filters.max_price));
     if (filters.oferta) sp.set('oferta', String(filters.oferta));
@@ -114,9 +116,9 @@ export default function Productos() {
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Nuestros Productos</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{t('titulo')}</h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Descubre nuestra amplia selección de productos de calidad
+          {t('subtitulo')}
         </p>
       </div>
 
@@ -139,19 +141,26 @@ export default function Productos() {
           {/* Resultados y estadísticas */}
           <div className="flex justify-between items-center mb-6">
             <div className="text-sm text-gray-600">
-              Mostrando <span className="font-semibold text-gray-900">{productos.length}</span>{' '}
-              productos
+              <Trans
+                i18nKey="mostrando"
+                values={{ count: productos.length }}
+                components={{ bold: <span className="font-semibold text-gray-900" /> }}
+              />
               {filters.q && (
-                <span>
-                  {' '}
-                  para "<span className="font-semibold text-gray-900">{filters.q}</span>"
-                </span>
+                <Trans
+                  i18nKey="para"
+                  values={{ query: filters.q }}
+                  components={{ bold: <span className="font-semibold text-gray-900" /> }}
+                />
               )}
             </div>
             {pages > 1 && (
               <div className="text-sm text-gray-600">
-                Página <span className="font-semibold text-gray-900">{page}</span> de{' '}
-                <span className="font-semibold text-gray-900">{pages}</span>
+                <Trans
+                  i18nKey="pagina"
+                  values={{ page, pages }}
+                  components={{ bold: <span className="font-semibold text-gray-900" /> }}
+                />
               </div>
             )}
           </div>
@@ -191,19 +200,19 @@ export default function Productos() {
                   />
                 </svg>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  No se encontraron productos
+                  {t('noEncontrados')}
                 </h3>
                 <p className="text-gray-600 mb-6">
                   {filters.q ||
-                  filters.categoria_id ||
+                  filters.categoryId ||
                   filters.min_price ||
                   filters.max_price ||
                   filters.oferta
-                    ? 'Intenta ajustar los filtros para ver más resultados.'
-                    : 'Pronto agregaremos nuevos productos a nuestro catálogo.'}
+                    ? t('conFiltros')
+                    : t('sinFiltros')}
                 </p>
                 {(filters.q ||
-                  filters.categoria_id ||
+                  filters.categoryId ||
                   filters.min_price ||
                   filters.max_price ||
                   filters.oferta) && (
@@ -211,7 +220,7 @@ export default function Productos() {
                     onClick={() => {
                       setFilters({
                         q: '',
-                        categoria_id: '',
+                        categoryId: '',
                         min_price: '',
                         max_price: '',
                         oferta: '',
@@ -221,7 +230,7 @@ export default function Productos() {
                     }}
                     className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    Ver todos los productos
+                    {t('verTodos')}
                   </button>
                 )}
               </div>
@@ -230,7 +239,7 @@ export default function Productos() {
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
                 {productos.map((p) => (
-                  <CardProduct key={p.producto_id ?? p.id ?? Math.random()} producto={p} />
+                  <CardProduct key={p.productId ?? p.id ?? Math.random()} producto={p} />
                 ))}
               </div>
 

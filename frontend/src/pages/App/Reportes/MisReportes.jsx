@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { locPath } from '@/utils/localePath';
 import { appService } from '@/services/routes';
 import {
   Table,
@@ -14,6 +16,7 @@ import StatusBadge from '@/components/StatusBadge';
 import { useNavigate } from 'react-router-dom';
 
 export default function MisReportes() {
+  const { t } = useTranslation('reporte');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -21,7 +24,7 @@ export default function MisReportes() {
   useEffect(() => {
     let alive = true;
     setLoading(true);
-    appService.reportes
+    appService.bugReports
       .list()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
@@ -41,26 +44,26 @@ export default function MisReportes() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">
-            ⚙️ Mis Reportes de Fallas
+            ⚙️ {t('misReportes.titulo')}
           </h1>
-          <p className="text-gray-600 mt-1">Seguimiento de todos tus reportes enviados</p>
+          <p className="text-gray-600 mt-1">{t('misReportes.subtitulo')}</p>
         </div>
         <Link
-          to="/reportes/nuevo"
+          to={locPath('/reportes/nuevo')}
           className="px-4 py-2 bg-green-600 text-white! font-bold rounded-lg no-underline hover:bg-green-700 transition-colors"
         >
-          + Nuevo Reporte
+          {t('misReportes.nuevo')}
         </Link>
       </div>
 
       {/* Table */}
       <Table>
         <TableHead>
-          <TableHeader width="40%">Título</TableHeader>
-          <TableHeader width="20%">Estado</TableHeader>
-          <TableHeader width="25%">Fecha</TableHeader>
+          <TableHeader width="40%">{t('misReportes.colTitulo')}</TableHeader>
+          <TableHeader width="20%">{t('misReportes.colEstado')}</TableHeader>
+          <TableHeader width="25%">{t('misReportes.colFecha')}</TableHeader>
           <TableHeader width="15%" align="center">
-            Acciones
+            {t('misReportes.colAcciones')}
           </TableHeader>
         </TableHead>
 
@@ -68,27 +71,27 @@ export default function MisReportes() {
           loading={loading}
           empty={items.length === 0}
           colSpan={4}
-          loadingText="Cargando tus reportes..."
-          emptyText="✅ No tienes reportes de fallas pendientes."
+          loadingText={t('misReportes.cargando')}
+          emptyText={t('misReportes.vacio')}
         >
           {items.map((r) => (
             <TableRow key={r.id}>
-              <TableCell className="font-medium">{r.titulo}</TableCell>
+              <TableCell className="font-medium">{r.title}</TableCell>
               <TableCell>
-                <StatusBadge estado={r.estado} />
+                <StatusBadge estado={r.status} />
               </TableCell>
               <TableCell>
-                {new Date(r.fecha_creacion).toLocaleString('es-ES', {
+                {new Date(r.createdAt).toLocaleString('es-ES', {
                   dateStyle: 'short',
                   timeStyle: 'short',
                 })}
               </TableCell>
               <TableCell align="center">
                 <ActionButton
-                  onClick={() => navigate(`/reportes/${r.id}`)}
+                  onClick={() => navigate(locPath(`/reportes/${r.id}`))}
                   className="px-4 py-2 bg-blue-600 text-white! font-bold rounded-lg no-underline hover:bg-blue-700 transition-colors inline-block"
                 >
-                  Ver Detalles
+                  {t('misReportes.verDetalles')}
                 </ActionButton>
               </TableCell>
             </TableRow>

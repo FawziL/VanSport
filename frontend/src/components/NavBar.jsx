@@ -3,9 +3,13 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { appService } from '@/services/routes';
 import { FaShoppingCart } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
+import LanguageToggle from '@/components/LanguageToggle';
+import { locPath } from '@/utils/localePath';
 
 export default function NavBar() {
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef(null);
@@ -49,9 +53,9 @@ export default function NavBar() {
         return;
       }
       try {
-        const data = await appService.carrito.list();
+        const data = await appService.cart.list();
         const items = Array.isArray(data) ? data : data?.results || [];
-        const totalQty = items.reduce((acc, it) => acc + (Number(it?.cantidad) || 1), 0);
+        const totalQty = items.reduce((acc, it) => acc + (Number(it?.quantity) || 1), 0);
         if (alive) setCartCount(totalQty);
       } catch {
         if (alive) setCartCount(0);
@@ -68,7 +72,7 @@ export default function NavBar() {
 
   const handleNav = (to) => {
     setMobileOpen(false);
-    navigate(to);
+    navigate(locPath(to));
   };
 
   return (
@@ -77,7 +81,7 @@ export default function NavBar() {
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
           {/* Brand */}
           <Link
-            to="/"
+            to={locPath('/')}
             className="text-white! no-underline font-black text-2xl tracking-wide mr-10"
             onClick={() => {
               setMobileOpen(false);
@@ -92,24 +96,25 @@ export default function NavBar() {
             {/* Left Group */}
             <div className="flex items-center gap-2">
               <NavLink
-                to="/productos"
+                to={locPath('/productos')}
                 className={({ isActive }) =>
                   `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                    isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                    isActive ? 'bg-white/10' : 'hover:bg-white/10'
                   }`
                 }
               >
-                Productos
+                  {t('nav.productos')}
               </NavLink>
             </div>
 
             {/* Right Group */}
             <div className="flex items-center gap-2">
+              <LanguageToggle />
               <NavLink
-                to="/carrito"
+                to={locPath('/carrito')}
                 className={({ isActive }) =>
                   `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                    isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                    isActive ? 'bg-white/10' : 'hover:bg-white/10'
                   }`
                 }
               >
@@ -117,8 +122,8 @@ export default function NavBar() {
                   <FaShoppingCart />
                   {cartCount > 0 && (
                     <span
-                      aria-label={`Productos en el carrito: ${cartCount}`}
-                      className="bg-red-600 text-white! rounded-full px-2 py-0 text-xs font-black h-5 min-w-5 flex items-center justify-center"
+                      aria-label={t('nav.ariaLabelCarrito', { count: cartCount })}
+                    className="bg-amber-600 text-white rounded-full px-2 py-0 text-xs font-black h-5 min-w-5 flex items-center justify-center"
                     >
                       {cartCount}
                     </span>
@@ -129,28 +134,28 @@ export default function NavBar() {
               {!user ? (
                 <>
                   <NavLink
-                    to="/register"
+                    to={locPath('/register')}
                     className={({ isActive }) =>
                       `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
                         isActive
-                          ? 'bg-gray-800 bg-opacity-10'
-                          : 'hover:bg-gray-800 hover:bg-opacity-10'
+                          ? 'bg-white/10'
+                          : 'hover:bg-white/10'
                       }`
                     }
                   >
-                    Crear cuenta
+                    {t('nav.crearCuenta')}
                   </NavLink>
                   <NavLink
-                    to="/login"
+                    to={locPath('/login')}
                     className={({ isActive }) =>
                       `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
                         isActive
-                          ? 'bg-gray-800 bg-opacity-10'
-                          : 'hover:bg-gray-800 hover:bg-opacity-10'
+                          ? 'bg-white/10'
+                          : 'hover:bg-white/10'
                       }`
                     }
                   >
-                    Iniciar sesión
+                    {t('nav.iniciarSesion')}
                   </NavLink>
                 </>
               ) : (
@@ -160,23 +165,23 @@ export default function NavBar() {
                     onClick={() => setUserMenuOpen((p) => !p)}
                     aria-haspopup="menu"
                     aria-expanded={userMenuOpen}
-                    className="flex items-center gap-2 bg-transparent text-white! cursor-pointer px-3 py-2 rounded-lg hover:bg-gray-800 hover:bg-opacity-10 transition-colors"
+                    className="flex items-center gap-2 bg-transparent text-white! cursor-pointer px-3 py-2 rounded-lg hover:bg-white/10 transition-colors"
                   >
                     <div
                       aria-hidden
-                      className="w-7 h-7 rounded-full bg-gray-800 flex items-center justify-center font-bold"
+                      className="w-7 h-7 rounded-full bg-amber-600 flex items-center justify-center font-bold"
                     >
-                      {(user.nombre || 'U')[0].toUpperCase()}
+                      {(user.name || 'U')[0].toUpperCase()}
                     </div>
                     <span className="font-semibold">
-                      {user.nombre} {user.apellido}
+                      {user.name} {user.lastName}
                     </span>
                   </button>
 
                   {userMenuOpen && (
                     <div
                       role="menu"
-                      className="absolute left-0 mt-2 bg-black rounded-xl min-w-48 shadow-2xl overflow-hidden border-none"
+                      className="absolute left-0 mt-2 bg-black rounded-xl min-w-48 shadow-2xl overflow-hidden border border-white/10"
                     >
                       <button
                         type="button"
@@ -184,9 +189,9 @@ export default function NavBar() {
                           setUserMenuOpen(false);
                           handleNav('/perfil');
                         }}
-                        className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-gray-700 transition-colors"
+                        className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-white/10 transition-colors"
                       >
-                        Perfil
+                        {t('nav.perfil')}
                       </button>
 
                       <button
@@ -195,9 +200,9 @@ export default function NavBar() {
                           setUserMenuOpen(false);
                           handleNav('/pedidos');
                         }}
-                        className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-gray-700 transition-colors"
+                        className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-white/10 transition-colors"
                       >
-                        Mis pedidos
+                        {t('nav.misPedidos')}
                       </button>
 
                       <button
@@ -206,21 +211,21 @@ export default function NavBar() {
                           setUserMenuOpen(false);
                           handleNav('/reportes');
                         }}
-                        className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-gray-700 transition-colors"
+                        className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-white/10 transition-colors"
                       >
-                        Reporte de fallas
+                        {t('nav.reporteFallas')}
                       </button>
 
-                      {user?.is_staff && (
+                      {user?.isStaff && (
                         <button
                           type="button"
                           onClick={() => {
                             setUserMenuOpen(false);
                             handleNav('/admin/dashboard');
                           }}
-                          className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-gray-700 transition-colors"
+                          className="w-full text-left px-4 py-2 bg-transparent text-white! border-none cursor-pointer hover:bg-white/10 transition-colors"
                         >
-                          Dashboard Admin
+                          {t('nav.dashboardAdmin')}
                         </button>
                       )}
 
@@ -231,9 +236,9 @@ export default function NavBar() {
                           logout();
                           setCartCount(0);
                         }}
-                        className="w-full text-left px-4 py-2 bg-transparent text-red-300! border-none cursor-pointer hover:bg-gray-700 transition-colors"
+                        className="w-full text-left px-4 py-2 bg-transparent text-red-300! border-none cursor-pointer hover:bg-white/10 transition-colors"
                       >
-                        Cerrar sesión
+                        {t('nav.cerrarSesion')}
                       </button>
                     </div>
                   )}
@@ -246,7 +251,7 @@ export default function NavBar() {
           <button
             type="button"
             onClick={() => setMobileOpen((p) => !p)}
-            aria-label="Abrir menú"
+            aria-label={t('nav.ariaLabelMenu')}
             className="md:hidden flex flex-col justify-center items-center w-10 h-10 bg-transparent border-none rounded-lg cursor-pointer p-0 outline-none shadow-none transition-transform duration-300"
             style={{ transform: mobileOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
           >
@@ -258,34 +263,34 @@ export default function NavBar() {
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="md:hidden grid gap-2 px-4 py-3 border-t border-gray-800 bg-gray-950">
+          <div className="md:hidden grid gap-2 px-4 py-3 border-t border-white/10 bg-black">
             <NavLink
-              to="/productos"
+              to={locPath('/productos')}
               className={({ isActive }) =>
                 `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                  isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                  isActive ? 'bg-white/10' : 'hover:bg-white/10'
                 }`
               }
               onClick={() => setMobileOpen(false)}
             >
-              Productos
+              {t('nav.productos')}
             </NavLink>
 
             <NavLink
-              to="/carrito"
+              to={locPath('/carrito')}
               className={({ isActive }) =>
                 `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                  isActive ? 'bg-gray-800 bg-opacity-10' : 'hover:bg-gray-800 hover:bg-opacity-10'
+                  isActive ? 'bg-white/10' : 'hover:bg-white/10'
                 }`
               }
               onClick={() => setMobileOpen(false)}
             >
               <span className="inline-flex items-center gap-2">
                 <FaShoppingCart />
-                <span>Carrito</span>
+                <span>{t('nav.carrito')}</span>
                 {cartCount > 0 && (
                   <span
-                    aria-label={`Productos en el carrito: ${cartCount}`}
+                    aria-label={t('nav.ariaLabelCarrito', { count: cartCount })}
                     className="bg-red-600 text-white! rounded-full px-2 py-0 text-xs font-black h-5 min-w-5 flex items-center justify-center"
                   >
                     {cartCount}
@@ -297,99 +302,86 @@ export default function NavBar() {
             {!user ? (
               <>
                 <NavLink
-                  to="/login"
+                  to={locPath('/login')}
                   className={({ isActive }) =>
                     `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
                       isActive
-                        ? 'bg-gray-800 bg-opacity-10'
-                        : 'hover:bg-gray-800 hover:bg-opacity-10'
-                    }`
-                  }
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Iniciar sesión
-                </NavLink>
-                <NavLink
-                  to="/register"
-                  className={({ isActive }) =>
-                    `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                      isActive
-                        ? 'bg-gray-800 bg-opacity-10'
-                        : 'hover:bg-gray-800 hover:bg-opacity-10'
-                    }`
-                  }
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Crear cuenta
-                </NavLink>
-              </>
-            ) : (
-              <>
-                <NavLink
-                  to="/perfil"
-                  className={({ isActive }) =>
-                    `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                      isActive
-                        ? 'bg-gray-800 bg-opacity-10'
-                        : 'hover:bg-gray-800 hover:bg-opacity-10'
-                    }`
-                  }
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Perfil
-                </NavLink>
-                <NavLink
-                  to="/pedidos"
-                  className={({ isActive }) =>
-                    `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                      isActive
-                        ? 'bg-gray-800 bg-opacity-10'
-                        : 'hover:bg-gray-800 hover:bg-opacity-10'
-                    }`
-                  }
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Mis pedidos
-                </NavLink>
-                <NavLink
-                  to="/reportes"
-                  className={({ isActive }) =>
-                    `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                      isActive
-                        ? 'bg-gray-800 bg-opacity-10'
-                        : 'hover:bg-gray-800 hover:bg-opacity-10'
-                    }`
-                  }
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Reporte de fallas
-                </NavLink>
-                {user?.is_staff && (
-                  <NavLink
-                    to="/admin/dashboard"
-                    className={({ isActive }) =>
-                      `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
-                        isActive
-                          ? 'bg-gray-800 bg-opacity-10'
-                          : 'hover:bg-gray-800 hover:bg-opacity-10'
+                        ? 'bg-white/10'
+                        : 'hover:bg-white/10'
                       }`
                     }
                     onClick={() => setMobileOpen(false)}
                   >
-                    Dashboard Admin
+                    {t('nav.iniciarSesion')}
                   </NavLink>
-                )}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    logout();
-                    setCartCount(0);
-                  }}
-                  className="text-center bg-transparent text-red-300! border-none px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-800 hover:bg-opacity-10 transition-colors"
-                >
-                  Cerrar sesión
-                </button>
+                </>
+              ) : (
+                <>
+                  <NavLink
+                    to={locPath('/perfil')}
+                    className={({ isActive }) =>
+                      `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
+                        isActive
+                        ? 'bg-white/10'
+                        : 'hover:bg-white/10'
+                      }`
+                    }
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {t('nav.perfil')}
+                  </NavLink>
+                  <NavLink
+                    to={locPath('/pedidos')}
+                    className={({ isActive }) =>
+                      `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
+                        isActive
+                          ? 'bg-white/10'
+                          : 'hover:bg-white/10'
+                      }`
+                    }
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {t('nav.misPedidos')}
+                  </NavLink>
+                  <NavLink
+                    to={locPath('/reportes')}
+                    className={({ isActive }) =>
+                      `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
+                        isActive
+                          ? 'bg-white/10'
+                          : 'hover:bg-white/10'
+                      }`
+                    }
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {t('nav.reporteFallas')}
+                  </NavLink>
+                  {user?.isStaff && (
+                    <NavLink
+                      to={locPath('/admin/dashboard')}
+                      className={({ isActive }) =>
+                        `text-white! no-underline px-3 py-2 rounded-lg transition-colors ${
+                          isActive
+                            ? 'bg-white/10'
+                            : 'hover:bg-white/10'
+                        }`
+                      }
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {t('nav.dashboardAdmin')}
+                    </NavLink>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileOpen(false);
+                      logout();
+                      setCartCount(0);
+                    }}
+                    className="text-center bg-transparent text-red-300! border-none px-3 py-2 rounded-lg cursor-pointer hover:bg-white/10 transition-colors"
+                  >
+                    {t('nav.cerrarSesion')}
+                  </button>
               </>
             )}
           </div>

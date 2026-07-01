@@ -1,72 +1,103 @@
-# Van Sport E-commerce
+# VanSport E-commerce
 
-Sistema de comercio electrónico desarrollado para la Distribuidora Van Sport como proyecto universitario, con el objetivo de modernizar sus procesos de ventas, inventario y logística. Desarrollado bajo buenas prácticas de ingeniería de software utilizando tecnologías modernas y arquitectura escalable.
+Sistema de comercio electrónico para Distribuidora VanSport. Catálogo de productos, carrito de compras, procesamiento de pedidos y panel de administración.
 
-## 📦 Características principales
-
-- Autenticación de usuarios (registro, login, recuperación de contraseña, cambio de contraseña)
-- Catálogo de productos con búsqueda y filtrado.
-- Carrito de compras y procesamiento de pedidos.
-- Notificaciones automáticas por email.
-- Panel administrativo para gestión de productos, pedidos y usuarios, etc...
-
-## 🧑‍💻 Tecnologías utilizadas
+## Tech Stack
 
 ### Frontend
-
-- React.js
-- Tailwind CSS
-- Axios
+- **React 19** + **Vite 7**
+- **Tailwind CSS v4**
+- **React Router v7**
+- **i18next** (internacionalización ES/EN)
+- **Fetch API** con `credentials: 'include'`
 
 ### Backend
+- **NestJS** (Express platform)
+- **Drizzle ORM** + PostgreSQL
+- **BetterAuth** (autenticación por sesión)
+- **class-validator** + **class-transformer** (DTOs)
 
-- Django (REST Framework)
-- PostgreSQL
-
-### Infraestructura
-
-- Docker (opcional)
-- Hosting posibles: AWS / Render 
-
-## 📁 Estructura del Proyecto
+## Estructura del proyecto
 
 ```
-├── frontend/         # Aplicación React
-│   ├── public/
+├── frontend/                    # Aplicación React
+│   ├── public/locales/          # Traducciones i18n (ES/EN)
 │   └── src/
-│       ├── components/
-│       ├── pages/
-│       ├── services/
-│       └── App.jsx
-├── backend/          # API REST con Django
-│   ├── core/
-│   ├── ecommerce/
-│   └── manage.py
+│       ├── components/          # Componentes reutilizables
+│       ├── config/              # Configuración (API client)
+│       ├── context/             # AuthContext, ThemeContext
+│       ├── pages/               # Páginas por módulo
+│       │   ├── App/             # Frontend público y de usuario
+│       │   └── Admin/           # Panel de administración
+│       ├── services/            # Endpoints de la API
+│       ├── utils/               # Utilidades y helpers
+│       └── i18n.js              # Configuración de i18next
+│
+├── backend-NestJs/              # API REST con NestJS
+│   ├── db/
+│   │   └── schema/              # Esquemas Drizzle ORM
+│   └── src/
+│       ├── modules/             # Módulos por entidad
+│       ├── common/              # Guards, decoradores, filtros
+│       └── main.ts
+│
 └── README.md
 ```
 
-## ⚙️ Instalación y uso local
+## Requisitos
 
-### Prerrequisitos
-
-- Node.js (v18 o superior)
-- Python 3.10+
+- Node.js >= 18
+- pnpm
 - PostgreSQL
 
-### Configuración del Frontend
+## Instalación
+
+### Frontend
 
 ```bash
 cd frontend
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
-### Configuración del Backend
+### Backend
 
 ```bash
-cd backend
-python -m venv env
-env\Scripts\activate
-pip install -r requirements.txt
-python manage.py runserver
+cd backend-NestJs
+pnpm install
+pnpm run start:dev
 ```
+
+## Variables de Entorno
+
+### Frontend (`frontend/.env`)
+
+| Variable | Descripción | Default |
+|----------|-------------|---------|
+| `VITE_API_URL` | URL del backend | `http://localhost:8080` |
+| `VITE_GOOGLE_CLIENT_ID` | Google OAuth Client ID (opcional) | — |
+
+### Backend (`backend-NestJs/.env`)
+
+Variables requeridas: conexión a PostgreSQL (`DATABASE_URL`), secretos de BetterAuth, credenciales de email, etc. Ver `.env.example` en el directorio del backend.
+
+## Scripts disponibles
+
+### Frontend
+
+| Comando | Descripción |
+|---------|-------------|
+| `pnpm run dev` | Servidor de desarrollo |
+| `pnpm run build` | Build de producción |
+| `pnpm run preview` | Vista previa del build |
+| `pnpm run lint` | ESLint |
+
+### Backend
+
+| Comando | Descripción |
+|---------|-------------|
+| `pnpm run start:dev` | Servidor de desarrollo con hot-reload |
+| `pnpm run build` | Compilar a JavaScript |
+| `pnpm run start:prod` | Iniciar en producción |
+| `pnpm run test` | Tests (Vitest) |
+| `pnpm run lint` | ESLint |

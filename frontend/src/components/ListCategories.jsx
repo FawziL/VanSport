@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { appService } from '@/services/routes';
 
 export default function ListCategories({
@@ -17,6 +18,7 @@ export default function ListCategories({
   placeholder = 'Seleccione una categoría',
   extraOptions = [],
 }) {
+  const { t } = useTranslation('admin');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -27,7 +29,7 @@ export default function ListCategories({
       setLoading(true);
       setError(null);
       try {
-        const res = await appService.categorias.list(params);
+        const res = await appService.categories.list(params);
         const items = Array.isArray(res) ? res : Array.isArray(res?.results) ? res.results : [];
         if (!ignore) setData(items);
       } catch (err) {
@@ -46,11 +48,11 @@ export default function ListCategories({
   const labelGetter = useMemo(
     () =>
       getOptionLabel ||
-      ((item) => item?.nombre ?? item?.name ?? item?.titulo ?? item?.title ?? `#${item?.id}`),
+      ((item) => item?.name ?? item?.name ?? item?.titulo ?? item?.title ?? `#${item?.id}`),
     [getOptionLabel]
   );
   const valueGetter = useMemo(
-    () => getOptionValue || ((item) => String(item?.categoria_id ?? item?.id ?? item?.pk ?? '')),
+    () => getOptionValue || ((item) => String(item?.categoryId ?? item?.id ?? item?.pk ?? '')),
     [getOptionValue]
   );
 
@@ -101,7 +103,7 @@ export default function ListCategories({
       >
         {!multiple && (
           <option value="" disabled={required && selectValue !== ''}>
-            {loading ? 'Cargando categorías…' : error ? 'Error al cargar' : placeholder}
+            {loading ? t('listCategories.cargando') : error ? t('listCategories.errorCargar') : placeholder}
           </option>
         )}
         {options.map((opt) => (
@@ -110,7 +112,7 @@ export default function ListCategories({
           </option>
         ))}
       </select>
-      {error && <span className="text-sm text-red-600">No se pudo cargar categorías.</span>}
+      {error && <span className="text-sm text-red-600">{t('listCategories.errorGeneral')}</span>}
     </div>
   );
 }

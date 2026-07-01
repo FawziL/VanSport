@@ -1,14 +1,16 @@
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/context/ThemeContext';
 
 export function ThemeToggleButton({ className = '' }) {
+  const { t } = useTranslation('admin');
   const { theme, toggle } = useTheme();
   const isDark = theme === 'dark';
 
   return (
     <button
       onClick={toggle}
-      aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-      title={isDark ? 'Modo claro' : 'Modo oscuro'}
+      aria-label={isDark ? t('tema.cambiarClaro') : t('tema.cambiarOscuro')}
+      title={isDark ? t('tema.modoClaro') : t('tema.modoOscuro')}
       className={`inline-flex items-center justify-center rounded-md border px-2.5 py-2 transition
         ${isDark ? 'border-slate-600 bg-slate-800 text-yellow-300 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}
         ${className}`}

@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { appService } from '@/services/routes';
 import { useAuth } from '@/context/AuthContext';
 import { StarRow, StarInput } from '@/utils/reviews';
+import { useTranslation } from 'react-i18next';
 
 export default function ProductReviews({ productoId, nombre }) {
+  const { t } = useTranslation('producto');
   const { isAuthenticated } = useAuth ? useAuth() : { isAuthenticated: false };
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,11 +23,11 @@ export default function ProductReviews({ productoId, nombre }) {
       setLoading(true);
       setErr('');
       try {
-        const data = await appService.reseñas.list({ producto_id: productoId });
+        const data = await appService.reseñas.list({ productId: productoId });
         const arr = Array.isArray(data) ? data : data.results || [];
         if (alive) setItems(arr);
       } catch {
-        if (alive) setErr('No se pudieron cargar las reseñas');
+        if (alive) setErr(t('reviews.errorCargar'));
       } finally {
         if (alive) setLoading(false);
       }
@@ -38,7 +40,7 @@ export default function ProductReviews({ productoId, nombre }) {
 
   const avg = useMemo(() => {
     if (!items.length) return 0;
-    const sum = items.reduce((acc, it) => acc + (Number(it.calificacion) || 0), 0);
+    const sum = items.reduce((acc, it) => acc + (Number(it.rating) || 0), 0);
     return sum / items.length;
   }, [items]);
 
@@ -50,7 +52,7 @@ export default function ProductReviews({ productoId, nombre }) {
       return;
     }
     if (displayed < 1) {
-      setErr('Selecciona una calificación de al menos 1 estrella.');
+      setErr(t('reviews.errorCalificacion'));
       return;
     }
     setSubmitting(true);
@@ -64,7 +66,7 @@ export default function ProductReviews({ productoId, nombre }) {
         comentario: comentario || '',
       });
       // recargar
-      const data = await appService.reseñas.list({ producto_id: productoId });
+      const data = await appService.reseñas.list({ productId: productoId });
       const arr = Array.isArray(data) ? data : data.results || [];
       setItems(arr);
       setRating(0);
@@ -76,7 +78,7 @@ export default function ProductReviews({ productoId, nombre }) {
           ? Object.entries(data)
               .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : String(v)}`)
               .join(' | ')
-          : e?.message || 'No se pudo enviar la reseña';
+          : e?.message || t('reviews.errorEnviar');
       setErr(msg);
     } finally {
       setSubmitting(false);
@@ -85,15 +87,15 @@ export default function ProductReviews({ productoId, nombre }) {
 
   return (
     <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: 12, padding: 16 }}>
-      <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>Reseñas</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{t('reviews.titulo')}</h2>
       <div style={{ color: '#666', marginBottom: 12 }}>
         {items.length > 0 ? (
           <span>
-            Promedio: <StarRow value={avg} size={18} /> ({avg.toFixed(1)}) · {items.length}{' '}
-            {items.length === 1 ? 'reseña' : 'reseñas'}
+            {t('reviews.promedio')} <StarRow value={avg} size={18} /> ({avg.toFixed(1)}) · {items.length}{' '}
+            {items.length === 1 ? t('reviews.resena') : t('reviews.resenas')}
           </span>
         ) : (
-          <span>Aún no hay reseñas para este producto.</span>
+          <span>{t('reviews.sinResenas')}</span>
         )}
       </div>
 
@@ -102,7 +104,7 @@ export default function ProductReviews({ productoId, nombre }) {
         {isAuthenticated ? (
           <div style={{ display: 'grid', gap: 8 }}>
             <div>
-              <div style={{ fontWeight: 700, marginBottom: 6 }}>Tu calificación</div>
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>{t('reviews.tuCalificacion')}</div>
               <StarInput
                 value={displayed}
                 onChange={setRating}
@@ -118,14 +120,14 @@ export default function ProductReviews({ productoId, nombre }) {
                 )}
               </div>
               <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>
-                Puedes seleccionar medias estrellas; por ahora se guardará como entero.
+                {t('reviews.mediaEstrella')}
               </div>
             </div>
             <div>
-              <div style={{ fontWeight: 700, marginBottom: 6 }}>Comentario (opcional)</div>
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>{t('reviews.comentario')}</div>
               <textarea
                 rows={3}
-                placeholder={`Comparte tu experiencia con ${nombre}...`}
+                placeholder={t('reviews.comentarioPlaceholder', { nombre })}
                 value={comentario}
                 onChange={(e) => setComentario(e.target.value)}
                 style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: 10 }}
@@ -147,7 +149,7 @@ export default function ProductReviews({ productoId, nombre }) {
                   cursor: submitting || displayed < 1 ? 'not-allowed' : 'pointer',
                 }}
               >
-                {submitting ? 'Enviando…' : 'Enviar reseña'}
+                {submitting ? t('reviews.enviando') : t('reviews.enviar')}
               </button>
             </div>
           </div>
@@ -161,9 +163,9 @@ export default function ProductReviews({ productoId, nombre }) {
               color: '#475569',
             }}
           >
-            Debes iniciar sesión para dejar una reseña.{' '}
+            {t('reviews.requiereSesion')}{' '}
             <a href="/login" style={{ color: '#1e88e5', fontWeight: 700 }}>
-              Iniciar sesión
+              {t('reviews.iniciarSesion')}
             </a>
           </div>
         )}
@@ -172,9 +174,9 @@ export default function ProductReviews({ productoId, nombre }) {
       {/* Listado de reseñas */}
       <div style={{ display: 'grid', gap: 10, textAlign: 'start' }}>
         {loading ? (
-          <div style={{ color: '#999' }}>Cargando reseñas…</div>
+          <div style={{ color: '#999' }}>{t('reviews.cargando')}</div>
         ) : items.length === 0 ? (
-          <div style={{ color: '#666' }}>Sé el primero en opinar.</div>
+          <div style={{ color: '#666' }}>{t('reviews.sePrimero')}</div>
         ) : (
           items.map((r) => (
             <div
@@ -187,16 +189,16 @@ export default function ProductReviews({ productoId, nombre }) {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <StarRow value={Number(r.calificacion) || 0} size={16} />
+                <StarRow value={Number(r.rating) || 0} size={16} />
                 <span style={{ color: '#666', fontSize: 12 }}>
-                  {new Date(r.fecha_creacion).toLocaleDateString()}
+                  {new Date(r.createdAt).toLocaleDateString()}
                 </span>
               </div>
               <div style={{ color: '#555', marginTop: 16, fontSize: 10 }}>
-                {r.usuario_nombre || ''} {r.usuario_apellido || ''}{' '}
+                {r.userId ?? ''}
               </div>
               <div style={{ color: '#111', marginTop: 1, whiteSpace: 'pre-wrap' }}>
-                {r.comentario || <span style={{ color: '#777' }}>(Sin comentario)</span>}
+                {r.comment || <span style={{ color: '#777' }}>{t('reviews.sinComentario')}</span>}
               </div>
             </div>
           ))

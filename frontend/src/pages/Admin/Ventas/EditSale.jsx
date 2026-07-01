@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '@/services/routes';
+import { locPath } from '@/utils/localePath';
 
 export default function EditSale() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const [form, setForm] = useState(null);
   const [error, setError] = useState('');
@@ -12,13 +15,13 @@ export default function EditSale() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    adminService.transacciones
+    adminService.transactions
       .retrieve(id)
       .then((data) => {
         if (!active) return;
-        setForm({ estado: data.estado || '', metodo_pago: data.metodo_pago || '' });
+        setForm({ status: data.status || '', paymentMethod: data.paymentMethod || '' });
       })
-      .catch(() => setError('No se pudo cargar la venta'))
+      .catch(() => setError(t('editSale.errorCargar')))
       .finally(() => active && setLoading(false));
     return () => (active = false);
   }, [id]);
@@ -32,10 +35,10 @@ export default function EditSale() {
     e.preventDefault();
     setError('');
     try {
-      await adminService.transacciones.partialUpdate(id, form);
-      navigate('/admin/ventas');
+      await adminService.transactions.partialUpdate(id, form);
+      navigate(locPath('/admin/ventas'));
     } catch (err) {
-      setError(err?.detail || 'No se pudo actualizar la venta');
+      setError(err?.detail || t('editSale.errorGuardar'));
     }
   };
 
@@ -44,7 +47,7 @@ export default function EditSale() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando datos de la venta...</p>
+          <p className="mt-4 text-gray-600">{t('editSale.cargando')}</p>
         </div>
       </div>
     );
@@ -77,7 +80,7 @@ export default function EditSale() {
           }}
         >
           <button
-            onClick={() => navigate('/admin/ventas')}
+            onClick={() => navigate(locPath('/admin/ventas'))}
             style={{
               background: 'none',
               border: 'none',
@@ -118,7 +121,7 @@ export default function EditSale() {
               color: '#1a1a1a',
             }}
           >
-            Editar venta #{id}
+            {t('editSale.titulo')}{id}
           </h1>
         </div>
 
@@ -165,11 +168,11 @@ export default function EditSale() {
                 marginBottom: '4px',
               }}
             >
-              Estado *
+              {t('editSale.estado')}
             </label>
             <select
-              name="estado"
-              value={form.estado}
+              name="status"
+              value={form.status}
               onChange={onChange}
               required
               style={{
@@ -191,12 +194,12 @@ export default function EditSale() {
                 e.target.style.boxShadow = 'none';
               }}
             >
-              <option value="">Seleccionar estado</option>
-              <option value="pendiente">Pendiente</option>
-              <option value="pagado">Pagado</option>
-              <option value="en_transito">En transito</option>
-              <option value="entregado">Entregado</option>
-              <option value="cancelado">Cancelado</option>
+              <option value="">{t('editSale.seleccionarEstado')}</option>
+              <option value="pendiente">{t('status.pendiente')}</option>
+              <option value="pagado">{t('status.pagado')}</option>
+              <option value="en_transito">{t('status.enTransito')}</option>
+              <option value="entregado">{t('status.entregado')}</option>
+              <option value="cancelado">{t('status.cancelado')}</option>
             </select>
           </div>
 
@@ -209,11 +212,11 @@ export default function EditSale() {
                 marginBottom: '4px',
               }}
             >
-              Método de pago
+              {t('editSale.metodo')}
             </label>
             <select
-              name="metodo_pago"
-              value={form.metodo_pago}
+              name="paymentMethod"
+              value={form.paymentMethod}
               onChange={onChange}
               style={{
                 padding: '12px 14px',
@@ -234,14 +237,14 @@ export default function EditSale() {
                 e.target.style.boxShadow = 'none';
               }}
             >
-              <option value="">Seleccionar método</option>
-              <option value="tarjeta_credito">Tarjeta de crédito</option>
-              <option value="tarjeta_debito">Tarjeta de débito</option>
-              <option value="paypal">PayPal</option>
-              <option value="transferencia">Transferencia bancaria</option>
-              <option value="efectivo">Efectivo</option>
-              <option value="criptomoneda">Criptomoneda</option>
-              <option value="otro">Otro</option>
+              <option value="">{t('editSale.seleccionarMetodo')}</option>
+              <option value="tarjeta_credito">{t('editSale.tarjetaCredito')}</option>
+              <option value="tarjeta_debito">{t('editSale.tarjetaDebito')}</option>
+              <option value="paypal">{t('editSale.paypal')}</option>
+              <option value="transferencia">{t('editSale.transferencia')}</option>
+              <option value="efectivo">{t('editSale.efectivo')}</option>
+              <option value="criptomoneda">{t('editSale.criptomoneda')}</option>
+              <option value="otro">{t('editSale.otro')}</option>
             </select>
           </div>
 
@@ -257,7 +260,7 @@ export default function EditSale() {
           >
             <button
               type="button"
-              onClick={() => navigate('/admin/ventas')}
+              onClick={() => navigate(locPath('/admin/ventas'))}
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',
@@ -277,7 +280,7 @@ export default function EditSale() {
                 e.target.style.borderColor = '#ddd';
               }}
             >
-              Cancelar
+              {t('editSale.cancelar')}
             </button>
             <button
               type="submit"
@@ -297,7 +300,7 @@ export default function EditSale() {
               onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
               onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
             >
-              Guardar cambios
+              {t('editSale.guardar')}
             </button>
           </div>
         </form>

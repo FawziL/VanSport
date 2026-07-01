@@ -1,15 +1,20 @@
-export const API_URL = import.meta.env.VITE_API_URL;
-
-function getAuthHeader() {
-  const token = localStorage.getItem('access_token') || localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
+export const API_URL = import.meta.env.VITE_API_URL || '';
 
 function buildUrl(base, path, params) {
-  const url = `${(base || '').replace(/\/+$/, '')}${path.startsWith('/') ? '' : '/'}${path}`;
+  const url = `${(base || '').replace(/\/+$/, '')}/${path.replace(/^\//, '')}`;
   if (!params) return url;
   const qs = new URLSearchParams(params).toString();
   return qs ? `${url}${url.includes('?') ? '&' : '?'}${qs}` : url;
+}
+
+export function getErrorMessage(err) {
+  const data = err?.response?.data;
+  if (!data) return err?.message || 'Error desconocido';
+  if (typeof data === 'string') return data;
+  if (data.message) return data.message;
+  if (data.detail) return data.detail;
+  if (data.error) return data.error;
+  return JSON.stringify(data);
 }
 
 async function request(method, path, { body, headers = {}, params, signal, responseType } = {}) {
@@ -17,7 +22,6 @@ async function request(method, path, { body, headers = {}, params, signal, respo
   const isFormData = body instanceof FormData;
   const finalHeaders = {
     ...(!isFormData && !responseType ? { 'Content-Type': 'application/json' } : {}),
-    ...getAuthHeader(),
     ...headers,
   };
 
@@ -26,35 +30,27 @@ async function request(method, path, { body, headers = {}, params, signal, respo
     headers: finalHeaders,
     body: isFormData ? body : body ? JSON.stringify(body) : undefined,
     signal,
-    credentials: 'same-origin',
+    credentials: 'include',
   });
 
   const ct = (res.headers.get('content-type') || '').toLowerCase();
 
-  // Leer cuerpo (intentar JSON primero)
   let data;
   try {
     if (ct.includes('application/json')) data = await res.json();
     else if (responseType === 'arraybuffer') data = await res.arrayBuffer();
     else if (responseType === 'blob') data = await res.blob();
     else data = await res.text();
-  } catch (e) {
+  } catch {
     data = null;
   }
 
   if (!res.ok) {
-    const err = new Error(data?.detail || data?.message || `HTTP ${res.status}`);
-    err.response = { status: res.status, data: data ?? (await res.text().catch(() => null)) };
-    // Normalizar 401 con mensaje amigable
-    if (res.status === 401) {
-      err.response.data = err.response.data || {};
-      if (!err.response.data.detail)
-        err.response.data.detail = 'No autorizado. Por favor inicia sesión.';
-    }
+    const err = new Error(getErrorMessage({ response: { data } }) || `HTTP ${res.status}`);
+    err.response = { status: res.status, data };
     throw err;
   }
 
-  // Responder datos procesados
   return data;
 }
 
