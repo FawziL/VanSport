@@ -13,6 +13,14 @@ import { Response } from 'express';
 export class ShipmentsController {
   constructor(private readonly shipmentsService: ShipmentsService) {}
 
+  @Get('admin')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Get all shipments (admin)' })
+  findAll() {
+    return this.shipmentsService.findAllAdmin();
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get user shipments' })
   findByUser(@CurrentUser('id') userId: string) {

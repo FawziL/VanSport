@@ -38,7 +38,12 @@ export const appService = {
   },
   orders: {
     list: (params) => http.get('/orders', { params }),
+    listAdmin: (params) => http.get('/orders/admin', { params }),
     retrieve: (id) => http.get(`/orders/${id}`),
+    create: (data) => http.post('/orders', data),
+    update: (id, data) => http.put(`/orders/${id}`, data),
+    partialUpdate: (id, data) => http.patch(`/orders/${id}`, data),
+    remove: (id) => http.delete(`/orders/${id}`),
     checkout: (data) => http.post('/orders/checkout', data),
     export: (params) => http.get('/orders/export', { params, responseType: 'arraybuffer' }),
   },
@@ -77,6 +82,7 @@ export const appService = {
   },
   transactions: {
     list: (params) => http.get('/transactions', { params }),
+    listAdmin: (params) => http.get('/transactions/admin', { params }),
     retrieve: (id) => http.get(`/transactions/${id}`),
     create: (data) => http.post('/transactions', data),
     pay: (data) => http.post('/transactions/pay', data),
@@ -87,8 +93,12 @@ export const appService = {
   },
   shipments: {
     list: (params) => http.get('/shipments', { params }),
+    listAdmin: (params) => http.get('/shipments/admin', { params }),
     retrieve: (id) => http.get(`/shipments/${id}`),
     create: (data) => http.post('/shipments', data),
+    update: (id, data) => http.put(`/shipments/${id}`, data),
+    partialUpdate: (id, data) => http.patch(`/shipments/${id}`, data),
+    remove: (id) => http.delete(`/shipments/${id}`),
     export: (params) => http.get('/shipments/export', { params, responseType: 'arraybuffer' }),
   },
   bugReports: {

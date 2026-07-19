@@ -10,15 +10,20 @@ export default function EditSale() {
   const [form, setForm] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [metodos, setMetodos] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     let active = true;
     setLoading(true);
-    adminService.transactions
-      .retrieve(id)
-      .then((data) => {
+    Promise.all([
+      adminService.transactions.retrieve(id),
+      adminService.paymentMethods.listPublic(),
+    ])
+      .then(([data, methods]) => {
         if (!active) return;
+        const list = Array.isArray(methods) ? methods : methods?.results || [];
+        setMetodos(list);
         setForm({ status: data.status || '', paymentMethod: data.paymentMethod || '' });
       })
       .catch(() => setError(t('editSale.errorCargar')))
@@ -195,11 +200,11 @@ export default function EditSale() {
               }}
             >
               <option value="">{t('editSale.seleccionarEstado')}</option>
-              <option value="pendiente">{t('status.pendiente')}</option>
-              <option value="pagado">{t('status.pagado')}</option>
-              <option value="en_transito">{t('status.enTransito')}</option>
-              <option value="entregado">{t('status.entregado')}</option>
-              <option value="cancelado">{t('status.cancelado')}</option>
+              <option value="pending">{t('status.pendiente')}</option>
+              <option value="paid">{t('status.pagado')}</option>
+              <option value="in_transit">{t('status.enTransito')}</option>
+              <option value="delivered">{t('status.entregado')}</option>
+              <option value="canceled">{t('status.cancelado')}</option>
             </select>
           </div>
 
@@ -238,13 +243,11 @@ export default function EditSale() {
               }}
             >
               <option value="">{t('editSale.seleccionarMetodo')}</option>
-              <option value="tarjeta_credito">{t('editSale.tarjetaCredito')}</option>
-              <option value="tarjeta_debito">{t('editSale.tarjetaDebito')}</option>
-              <option value="paypal">{t('editSale.paypal')}</option>
-              <option value="transferencia">{t('editSale.transferencia')}</option>
-              <option value="efectivo">{t('editSale.efectivo')}</option>
-              <option value="criptomoneda">{t('editSale.criptomoneda')}</option>
-              <option value="otro">{t('editSale.otro')}</option>
+              {metodos.map((m) => (
+                <option key={m.code} value={m.name}>
+                  {m.name} {m.description ? `(${m.description})` : ''}
+                </option>
+              ))}
             </select>
           </div>
 

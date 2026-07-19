@@ -33,7 +33,7 @@ export default function ListOrders() {
     setLoading(true);
     setError('');
     adminService.orders
-      .list()
+      .listAdmin()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
         setItems(arr);
@@ -175,7 +175,7 @@ export default function ListOrders() {
             <TableRow key={p.id}>
               <TableCell className="whitespace-nowrap">{p.id}</TableCell>
               <TableCell className="break-words">{getUserLabel(p)}</TableCell>
-              <TableCell className="whitespace-nowrap">{fmt.date(p.createdAt)}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.date(p.orderedAt)}</TableCell>
               <TableCell className="break-words">
                 <StatusBadge estado={p.status} variant="order" />
               </TableCell>

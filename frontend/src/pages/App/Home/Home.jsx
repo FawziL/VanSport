@@ -34,7 +34,7 @@ export default function Home() {
         const enriched = await Promise.all(
           top3.map(async (p) => {
             try {
-              const rev = await appService.reseñas.list({ productId: p.id });
+              const rev = await appService.reviews.list({ productId: p.id });
               const arr = Array.isArray(rev) ? rev : rev?.results || [];
               if (arr.length > 0) {
                 const sum = arr.reduce((acc, r) => acc + (Number(r.rating) || 0), 0);

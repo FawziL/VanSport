@@ -13,6 +13,14 @@ import { Response } from 'express';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @Get('orders/admin')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Get all orders (admin)' })
+  findAll() {
+    return this.ordersService.findAll();
+  }
+
   @Get('orders')
   @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Get user orders' })

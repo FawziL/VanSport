@@ -23,7 +23,7 @@ export default function ProductReviews({ productoId, nombre }) {
       setLoading(true);
       setErr('');
       try {
-        const data = await appService.reseñas.list({ productId: productoId });
+        const data = await appService.reviews.list({ productId: productoId });
         const arr = Array.isArray(data) ? data : data.results || [];
         if (alive) setItems(arr);
       } catch {
@@ -60,13 +60,13 @@ export default function ProductReviews({ productoId, nombre }) {
     try {
       // Backend actual usa IntegerField; redondeamos la media estrella al entero más cercano.
       const entero = Math.round(displayed);
-      await appService.reseñas.create({
-        producto: productoId,
-        calificacion: entero,
-        comentario: comentario || '',
+      await appService.reviews.create({
+        productId: productoId,
+        rating: entero,
+        comment: comentario || '',
       });
       // recargar
-      const data = await appService.reseñas.list({ productId: productoId });
+      const data = await appService.reviews.list({ productId: productoId });
       const arr = Array.isArray(data) ? data : data.results || [];
       setItems(arr);
       setRating(0);

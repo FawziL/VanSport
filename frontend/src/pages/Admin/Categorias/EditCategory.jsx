@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { adminService } from '@/services/routes';
 import { locPath } from '@/utils/localePath';
+import { resolveImageUrl } from '@/utils/resolveUrl';
 
 function FieldError({ error }) {
   if (!error) return null;
@@ -40,7 +41,7 @@ export default function EditCategory() {
         const data = await adminService.categories.retrieve(id);
         const name = data?.name ?? '';
         const description = data?.description ?? '';
-        const imagenActual = data?.imageUrl || '';
+        const imagenActual = resolveImageUrl(data?.imageUrl || '');
         if (alive) setForm({ name, description, imagen: null, imagenPreview: '', imagenActual });
       } catch (err) {
         if (!alive) return;

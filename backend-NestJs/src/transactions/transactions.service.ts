@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { schema } from '../../db';
-import { transactions } from '../../db/schema';
+import { transactions, orders } from '../../db/schema';
 import { eq, and, gte, lte } from 'drizzle-orm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { PayTransactionDto } from './dto/pay-transaction.dto';
@@ -24,7 +24,11 @@ export class TransactionsService {
   }
 
   async findAll() {
-    return this.db.select().from(transactions);
+    const result = await this.db
+      .select()
+      .from(transactions)
+      .innerJoin(orders, eq(transactions.orderId, orders.id));
+    return result.map((r) => ({ ...r.transactions, userId: r.orders.userId }));
   }
 
   async exportExcel(startDate?: string, endDate?: string): Promise<Buffer> {
@@ -104,23 +108,20 @@ export class TransactionsService {
     return result[0];
   }
 
-  async pay(id: number, dto: PayTransactionDto, file?: Express.Multer.File) {
-    const values: any = { status: 'completed' };
-    if (dto.reference !== undefined) values.reference = dto.reference;
-    if (dto.paymentNotes !== undefined) values.paymentNotes = dto.paymentNotes;
-
-    if (file) {
-      values.receipt = await this.r2.uploadFile(file, 'transactions');
-    } else if (dto.receipt !== undefined) {
-      values.receipt = dto.receipt;
-    }
-
+  async pay(dto: PayTransactionDto) {
     const result = await this.db
-      .update(transactions)
-      .set(values)
-      .where(eq(transactions.id, id))
+      .insert(transactions)
+      .values({
+        orderId: dto.orderId,
+        amount: dto.amount.toString(),
+        paymentMethod: dto.paymentMethod,
+        transactionCode: dto.transactionCode,
+        reference: dto.reference || '',
+        paymentNotes: dto.paymentNotes || '',
+        status: 'pending',
+      })
       .returning();
-    return result[0] || null;
+    return result[0];
   }
 
   async update(id: number, dto: Partial<CreateTransactionDto>, file?: Express.Multer.File) {

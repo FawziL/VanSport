@@ -184,7 +184,7 @@ export default function VerProducto() {
     async function loadAvg() {
       if (!producto?.id) return;
       try {
-        const data = await appService.reseñas.list({ productId: producto.id });
+        const data = await appService.reviews.list({ productId: producto.id });
         const arr = Array.isArray(data) ? data : data?.results || [];
         if (!alive) return;
         if (arr.length > 0) {
@@ -221,7 +221,7 @@ export default function VerProducto() {
         // Actualizar cantidad del carrito
         await appService.cart.updateQuantity({
           productId: producto.id,
-          cantidad: Number(qty) || 1,
+          quantity: Number(qty) || 1,
         });
         setCartQty(Number(qty) || 1);
         toast.success(t('cantidadActualizada'));
@@ -229,7 +229,7 @@ export default function VerProducto() {
         // Añadir al carrito
         await appService.cart.add({
           productId: producto.id,
-          cantidad: Number(qty) || 1,
+          quantity: Number(qty) || 1,
         });
         setInCart(true);
         setCartQty(Number(qty) || 1);

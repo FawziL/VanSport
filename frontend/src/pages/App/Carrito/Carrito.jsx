@@ -36,22 +36,22 @@ export default function Carrito() {
       const cache = new Map();
       const enriched = await Promise.all(
         baseItems.map(async (item) => {
-          const prodVal = item.producto;
-          if (prodVal && typeof prodVal === 'number') {
-            if (!cache.has(prodVal)) {
+          const prodId = item.productId;
+          if (prodId && typeof prodId === 'number') {
+            if (!cache.has(prodId)) {
               try {
-                const p = await appService.products.retrieve(prodVal);
-                cache.set(prodVal, p);
+                const p = await appService.products.retrieve(prodId);
+                cache.set(prodId, p);
               } catch {
-                cache.set(prodVal, {
-                  productId: prodVal,
-                  nombre: 'Producto',
-                  precio: 0,
+                cache.set(prodId, {
+                  productId: prodId,
+                  name: 'Producto',
+                  price: 0,
                   imageUrl: '',
                 });
               }
             }
-            return { ...item, producto: cache.get(prodVal) };
+            return { ...item, producto: cache.get(prodId) };
           }
           return item;
         })
@@ -93,7 +93,7 @@ export default function Carrito() {
     setItems((prev) =>
       prev.map((i) =>
         (i.cartId ?? i.id ?? i.producto?.productId ?? i.productId) === key
-          ? { ...i, cantidad: nuevaCantidad }
+          ? { ...i, quantity: nuevaCantidad }
           : i
       )
     );
@@ -101,7 +101,7 @@ export default function Carrito() {
     try {
       await appService.cart.updateQuantity({
         productId: item.producto?.productId ?? item.productId,
-        cantidad: nuevaCantidad,
+        quantity: nuevaCantidad,
       });
 
       // Éxito: mostrar toast
@@ -118,7 +118,7 @@ export default function Carrito() {
       setItems((prev) =>
         prev.map((i) =>
           (i.cartId ?? i.id ?? i.producto?.productId ?? i.productId) === key
-            ? { ...i, cantidad: prevCantidad }
+            ? { ...i, quantity: prevCantidad }
             : i
         )
       );

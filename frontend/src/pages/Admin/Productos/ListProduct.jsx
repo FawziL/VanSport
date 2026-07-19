@@ -66,7 +66,7 @@ export default function ListProduct() {
     if (!deleteId) return;
     try {
       await adminService.products.remove(deleteId);
-      setProductos((prev) => prev.filter((p) => p.productId !== deleteId));
+      setProductos((prev) => prev.filter((p) => p.id !== deleteId));
       setModalOpen(false);
       setDeleteId(null);
       toast.success(t('listProduct.successEliminar'));
@@ -109,23 +109,23 @@ export default function ListProduct() {
 
   const toggleDestacado = async (p) => {
     try {
-      setTogglingId(p.productId);
+      setTogglingId(p.id);
 
       // Actualización optimista
       setProductos((prev) =>
         prev.map((it) =>
-          it.productId === p.productId ? { ...it, isFeatured: !p.isFeatured } : it
+          it.id === p.id ? { ...it, isFeatured: !p.isFeatured } : it
         )
       );
 
-      await adminService.products.partialUpdate(p.productId, { isFeatured: !p.isFeatured });
+      await adminService.products.partialUpdate(p.id, { isFeatured: !p.isFeatured });
 
       toast.success(t('listProduct.successDestacar'));
     } catch (err) {
       // Revertir cambio en caso de error
       setProductos((prev) =>
         prev.map((it) =>
-          it.productId === p.productId ? { ...it, isFeatured: p.isFeatured } : it
+          it.id === p.id ? { ...it, isFeatured: p.isFeatured } : it
         )
       );
 
@@ -139,20 +139,20 @@ export default function ListProduct() {
 
   const toggleActivoProduct = async (p) => {
     try {
-      setTogglingActivoId(p.productId);
+      setTogglingActivoId(p.id);
 
       // Actualización optimista
       setProductos((prev) =>
-        prev.map((it) => (it.productId === p.productId ? { ...it, isActive: !p.isActive } : it))
+        prev.map((it) => (it.id === p.id ? { ...it, isActive: !p.isActive } : it))
       );
 
-      await adminService.products.partialUpdate(p.productId, { isActive: !p.isActive });
+      await adminService.products.partialUpdate(p.id, { isActive: !p.isActive });
 
       toast.success(t('listProduct.successEstado'));
     } catch (err) {
       // Revertir cambio en caso de error
       setProductos((prev) =>
-        prev.map((it) => (it.productId === p.productId ? { ...it, isActive: p.isActive } : it))
+        prev.map((it) => (it.id === p.id ? { ...it, isActive: p.isActive } : it))
       );
 
       const msg = err?.response?.data?.detail || t('listProduct.errorEstado');
@@ -231,8 +231,8 @@ export default function ListProduct() {
           emptyText={t('listProduct.vacio')}
         >
           {productosPage.map((p) => (
-            <TableRow key={p.productId}>
-              <TableCell>{p.productId}</TableCell>
+            <TableRow key={p.id}>
+              <TableCell>{p.id}</TableCell>
               <TableCell>{p.name}</TableCell>
               <TableCell>{p.category?.name ?? '-'}</TableCell>
               <TableCell>
@@ -247,18 +247,18 @@ export default function ListProduct() {
                 <FavoriteButton
                   isFavorite={p.isFeatured}
                   onClick={() => toggleDestacado(p)}
-                  disabled={togglingId === p.productId}
+                  disabled={togglingId === p.id}
                 />
               </TableCell>
               <TableCell>
                 <button
                   onClick={() => toggleActivoProduct(p)}
-                  disabled={togglingActivoId === p.productId}
+                  disabled={togglingActivoId === p.id}
                   className={`border rounded-full px-3 py-1 text-sm font-medium transition-colors ${
                     p.isActive
                       ? 'bg-green-100 border-green-300 text-green-800 hover:bg-green-200'
                       : 'bg-red-100 border-red-300 text-red-800 hover:bg-red-200'
-                  } ${togglingActivoId === p.productId ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                  } ${togglingActivoId === p.id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   {p.isActive ? t('listProduct.activo') : t('listProduct.inactivo')}
                 </button>
@@ -267,14 +267,14 @@ export default function ListProduct() {
                 <div className="flex justify-center gap-2">
                   <ActionButton
                     variant="edit"
-                    onClick={() => navigate(locPath(`/admin/productos/editar/${p.productId}`))}
+                    onClick={() => navigate(locPath(`/admin/productos/editar/${p.id}`))}
                   >
                     {t('listProduct.editar')}
                   </ActionButton>
                   <ActionButton
                     variant="delete"
                     onClick={() => {
-                      setDeleteId(p.productId);
+                      setDeleteId(p.id);
                       setModalOpen(true);
                     }}
                   >

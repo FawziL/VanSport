@@ -104,7 +104,7 @@ export default function EditProduct() {
         fd.append('imageUrl', form.imageUrl);
       }
 
-      fd.append('additionalImages_list', JSON.stringify(existingExtras));
+      fd.append('additionalImages', JSON.stringify(existingExtras));
       extras.forEach((file) => {
         if (file) fd.append('imagenes_adicionales', file);
       });

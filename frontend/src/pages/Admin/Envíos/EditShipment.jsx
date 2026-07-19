@@ -115,11 +115,11 @@ export default function EditShipment() {
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
             >
               <option value="">{t('editShipment.seleccionarEstado')}</option>
-              <option value="pendiente">{t('status.pendiente')}</option>
-              <option value="pagado">{t('status.pagado')}</option>
-              <option value="en_transito">{t('status.enTransito')}</option>
-              <option value="entregado">{t('status.entregado')}</option>
-              <option value="cancelado">{t('status.cancelado')}</option>
+              <option value="pending">{t('status.pendiente')}</option>
+              <option value="paid">{t('status.pagado')}</option>
+              <option value="in_transit">{t('status.enTransito')}</option>
+              <option value="delivered">{t('status.entregado')}</option>
+              <option value="canceled">{t('status.cancelado')}</option>
             </select>
           </div>
 

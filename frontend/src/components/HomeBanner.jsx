@@ -4,8 +4,8 @@ import { appService } from '@/services/routes';
 import { useTranslation } from 'react-i18next';
 
 function resolveCta(n) {
-  const tipo = String(n?.relacion_tipo || '').toLowerCase();
-  const id = n?.relacion_id;
+  const tipo = String(n?.relatedType || '').toLowerCase();
+  const id = n?.relatedId;
   if (tipo === 'producto' && id != null) return { to: `/productos/${id}`, labelKey: 'banner.verProducto' };
   if (tipo === 'categoria' && id != null)
     return { to: `/productos?categoryId=${id}`, labelKey: 'banner.verCategoria' };
@@ -27,13 +27,13 @@ function formatDuration(ms) {
 
 function makeDismissKey(n) {
   const parts = [
-    n.notificacion_id,
+    n.id,
     n.type || '',
-    n.titulo || '',
+    n.title || '',
     n.message || '',
-    n.relacion_tipo || '',
-    n.relacion_id != null ? String(n.relacion_id) : '',
-    n.expira || '',
+    n.relatedType || '',
+    n.relatedId != null ? String(n.relatedId) : '',
+    n.expiresAt || '',
   ];
   const version = parts.join('|');
   return `banner:dismiss:${version}`;
@@ -50,7 +50,7 @@ export default function HomeBanner() {
   useEffect(() => {
     let alive = true;
     appService.notifications.latestBanner().then((n) => {
-      if (!n || !n.notificacion_id) return;
+      if (!n || !n.id) return;
       const key = makeDismissKey(n);
       if (localStorage.getItem(key)) return;
       if (alive) setBanner(n);
@@ -62,7 +62,7 @@ export default function HomeBanner() {
 
   // Tick solo si hay expira o es oferta
   useEffect(() => {
-    const hasExpira = !!banner?.expira;
+    const hasExpira = !!banner?.expiresAt;
     const isOffer = banner?.type === 'oferta';
     if (!hasExpira && !isOffer) return;
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -109,8 +109,8 @@ export default function HomeBanner() {
   const isOffer = banner?.type === 'oferta';
   const startMs = banner?.createdAt ? new Date(banner.createdAt).getTime() : Date.now();
   const fallbackDurationMs = 2 * 60 * 60 * 1000;
-  const deadlineMs = banner?.expira
-    ? new Date(banner.expira).getTime()
+  const deadlineMs = banner?.expiresAt
+    ? new Date(banner.expiresAt).getTime()
     : isOffer
       ? startMs + fallbackDurationMs
       : null;
@@ -147,7 +147,7 @@ export default function HomeBanner() {
           {/* Múltiples repeticiones para efecto continuo */}
 
           <div style={{ display: 'inline-flex', gap: 10, alignItems: 'center' }}>
-            <strong style={{ fontWeight: 900 }}>{banner.titulo}</strong>
+            <strong style={{ fontWeight: 900 }}>{banner.title}</strong>
             <span style={{ opacity: 0.9 }}>{banner.message}</span>
             {remainingMs !== null && remainingMs > 0 && (
               <span

@@ -46,7 +46,7 @@ export default function Checkout() {
         const productIdsToFetch = [
           ...new Set( // Usar Set para evitar duplicados
             cartItems
-              .map((item) => item.producto)
+              .map((item) => item.productId)
               .filter((prod) => typeof prod === 'number')
           ),
         ];
@@ -71,8 +71,8 @@ export default function Checkout() {
 
         // 4. "Enriquecer" los items del carrito con los datos completos del producto.
         const enrichedItems = cartItems.map((item) => {
-          if (typeof item.producto === 'number' && productMap.has(item.producto)) {
-            return { ...item, producto: productMap.get(item.producto) };
+          if (typeof item.productId === 'number' && productMap.has(item.productId)) {
+            return { ...item, producto: productMap.get(item.productId) };
           }
           return item;
         });
@@ -221,16 +221,17 @@ export default function Checkout() {
                 try {
                   const payload = {
                     shippingAddress: entrega === 'envio' ? direccion.trim() : '',
-                    notas: notas?.trim() || '',
+                    notes: notas?.trim() || '',
+                    deliveryMethod: entrega === 'retiro' ? 'pickup' : 'delivery',
                   };
                   const res = await appService.orders.checkout(payload);
 
                   window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count: 0 } }));
                   window.dispatchEvent(new Event('order:placed'));
 
-                  const pid = res?.pedido?.orderId || res?.pedido?.id;
+                  const pid = res?.id;
 
-                  navigate(pid ? `/pedidos/${pid}` : '/pedidos');
+                  navigate(pid ? locPath(`/pedidos/${pid}`) : locPath('/pedidos'));
                 } catch (e) {
                   const msg =
                     e?.response?.data?.error || e?.message || t('checkout.error');
