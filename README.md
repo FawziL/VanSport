@@ -101,3 +101,22 @@ Variables requeridas: conexión a PostgreSQL (`DATABASE_URL`), secretos de Bette
 | `pnpm run start:prod` | Iniciar en producción |
 | `pnpm run test` | Tests (Vitest) |
 | `pnpm run lint` | ESLint |
+
+### Base de Datos
+
+| Comando | Descripción |
+|---------|-------------|
+| `pnpm db:generate` | Genera archivos de migración desde los schemas (`db/schema/`) |
+| `pnpm db:migrate` | Aplica las migraciones pendientes a la BD |
+| `pnpm db:push` | Sincroniza el schema directo (sin archivos de migración, ideal en desarrollo) |
+| `pnpm db:pull` | Importa el schema desde la BD existente |
+| `pnpm db:seed` | Ejecuta el seed (`db/seed.ts`) con datos iniciales |
+| `pnpm db:studio` | Abre Drizzle Studio (UI para explorar la BD) |
+
+**Flujo de trabajo típico:**
+
+1. Editar los schemas en `backend-NestJs/db/schema/`
+2. `pnpm db:generate` — genera los archivos SQL en `db/migrations/`
+3. `pnpm db:migrate` — aplica los cambios a PostgreSQL
+
+> `db:push` es útil en desarrollo para iterar rápido, pero en producción siempre usar `db:generate` + `db:migrate`.

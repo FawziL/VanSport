@@ -42,7 +42,7 @@ export default function EditOrder() {
       await adminService.orders.partialUpdate(id, form);
       navigate(locPath('/admin/pedidos'));
     } catch (err) {
-      setError(err?.detail || t('editOrder.errorGuardar'));
+      setError(err?.response?.data?.detail || err?.message || t('editOrder.errorGuardar'));
     }
   };
 
@@ -199,11 +199,11 @@ export default function EditOrder() {
               }}
             >
               <option value="">{t('editOrder.seleccionarEstado')}</option>
-              <option value="pendiente">{t('status.pendiente')}</option>
-              <option value="pagado">{t('status.pagado')}</option>
-              <option value="en_transito">{t('status.enTransito')}</option>
-              <option value="entregado">{t('status.entregado')}</option>
-              <option value="cancelado">{t('status.cancelado')}</option>
+              <option value="pending">{t('status.pendiente')}</option>
+              <option value="paid">{t('status.pagado')}</option>
+              <option value="in_transit">{t('status.enTransito')}</option>
+              <option value="delivered">{t('status.entregado')}</option>
+              <option value="canceled">{t('status.cancelado')}</option>
             </select>
           </div>
 

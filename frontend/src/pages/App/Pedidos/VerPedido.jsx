@@ -100,8 +100,8 @@ export default function VerPedido() {
   }, [id, isAuthenticated]);
 
   const enRevision =
-    !!pedido?.ultima_transaccion && pedido?.ultima_transaccion?.status === 'pendiente';
-  const mostrarFormulario = !!pedido && pedido.status === 'pendiente' && !enRevision;
+    !!pedido?.ultima_transaccion && pedido?.ultima_transaccion?.status === 'pending';
+  const mostrarFormulario = !!pedido && pedido.status === 'pending' && !enRevision;
 
   // NUEVO: referencia requerida solo si el método lo pide (por convención en config o por tipo)
   const requiereReferencia = !!(
@@ -373,9 +373,9 @@ export default function VerPedido() {
                   await appService.transactions.pay({
                     orderId: id,
                     paymentMethod: metodoSel?.name || metodoPago,
-                    referencia: requiereReferencia ? referencia : '',
+                    reference: requiereReferencia ? referencia : '',
                     transactionCode: requiereReferencia ? referencia : '',
-                    monto: pedido.total,
+                    amount: pedido.total,
                   });
                   const p = await appService.orders.retrieve(id);
                   setPedido(p);
@@ -398,9 +398,9 @@ export default function VerPedido() {
             >
               {paying
                 ? t('verPedido.pagarProcesando')
-                : pedido.status === 'completado'
+                : pedido.status === 'completed'
                   ? t('verPedido.completado')
-                  : pedido.status === 'pagado'
+                  : pedido.status === 'paid'
                     ? t('verPedido.pagado')
                     : enRevision
                       ? t('verPedido.enRevision')

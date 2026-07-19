@@ -23,6 +23,14 @@ export class TransactionsController {
     return this.transactionsService.findByUser(userId);
   }
 
+  @Get('admin')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Get all transactions (admin)' })
+  findAll() {
+    return this.transactionsService.findAll();
+  }
+
   @Post()
   @ApiOperation({ summary: 'Create a transaction' })
   @ApiConsumes('multipart/form-data')
@@ -35,14 +43,9 @@ export class TransactionsController {
   }
 
   @Post('pay')
-  @ApiOperation({ summary: 'Pay a transaction' })
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('comprobante'))
-  async pay(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() dto: PayTransactionDto,
-  ) {
-    return this.transactionsService.pay(0, dto, file);
+  @ApiOperation({ summary: 'Create a payment transaction for an order' })
+  async pay(@Body() dto: PayTransactionDto) {
+    return this.transactionsService.pay(dto);
   }
 
   @Get('export')

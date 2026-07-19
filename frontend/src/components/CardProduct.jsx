@@ -21,7 +21,7 @@ export default function CardProduct({ producto }) {
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
-        minHeight: 380,
+        minHeight: 320,
       }}
     >
       {discount > 0 && (
@@ -42,7 +42,7 @@ export default function CardProduct({ producto }) {
           {t('card.descuento', { pct: discount })}
         </span>
       )}
-      <Link to={`/productos/${producto.id}`}>
+      <Link to={locPath(`/productos/${producto.id}`)}>
         <img
           src={resolveImageUrl(producto.imageUrl)}
           alt={producto.name}
@@ -54,10 +54,10 @@ export default function CardProduct({ producto }) {
           }}
         />
         <div style={{ padding: '0.5rem' }}>
-          <h3 style={{ fontWeight: 700, fontSize: 18, marginBottom: 6, marginTop: 6 }}>
+          <h3 style={{ fontWeight: 700, fontSize: 18, marginBottom: 2, marginTop: 2 }}>
             {producto.name}
           </h3>
-          <div style={{ marginBottom: 8 }}>
+          <div style={{ marginBottom: 2 }}>
             {salePrice > 0 ? (
               <>
                 <span
@@ -80,18 +80,11 @@ export default function CardProduct({ producto }) {
               </span>
             )}
           </div>
-          <div style={{ fontSize: 14, color: '#666', marginBottom: 8 }}>
-            {producto.categoryId || ''}
-          </div>
-          <div style={{ fontSize: 13, color: producto.stock > 0 ? '#43a047' : '#e53935' }}>
-            {producto.stock > 0 ? t('card.disponible') : t('card.agotado')}
-          </div>
         </div>
       </Link>
-      <div style={{ flexGrow: 1 }} />
       <div style={{ padding: '0 1rem 1rem' }}>
         <Link
-          to={`/productos/${producto.id}`}
+          to={locPath(`/productos/${producto.id}`)}
           style={{
             display: 'block',
             width: '100%',

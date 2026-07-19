@@ -113,9 +113,9 @@ export default function MisPedidos() {
 
           <TableBody loading={false} empty={false} colSpan={5}>
             {items.map((p) => (
-              <TableRow key={p.orderId}>
-                <TableCell className="font-semibold">#{p.orderId}</TableCell>
-                <TableCell>{formatDate(p.fecha_pedido)}</TableCell>
+              <TableRow key={p.id}>
+                <TableCell className="font-semibold">#{p.id}</TableCell>
+                <TableCell>{formatDate(p.orderedAt)}</TableCell>
                 <TableCell>
                   <StatusBadge estado={p.status} variant="order" />
                 </TableCell>
@@ -123,7 +123,7 @@ export default function MisPedidos() {
                   {formatPrice(p.total)}
                 </TableCell>
                 <TableCell align="center">
-                  <ActionButton variant="edit" onClick={() => navigate(locPath(`/pedidos/${p.orderId}`))}>
+                  <ActionButton variant="edit" onClick={() => navigate(locPath(`/pedidos/${p.id}`))}>
                     {t('misPedidos.verDetalles')}
                   </ActionButton>
                 </TableCell>

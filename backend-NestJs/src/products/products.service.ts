@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { schema } from '../../db';
-import { products } from '../../db/schema';
+import { products, categories } from '../../db/schema';
 import { eq, and } from 'drizzle-orm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -16,7 +16,12 @@ export class ProductsService {
   ) {}
 
   async findAll() {
-    return this.db.select().from(products).where(eq(products.isActive, true));
+    const result = await this.db
+      .select()
+      .from(products)
+      .where(eq(products.isActive, true))
+      .leftJoin(categories, eq(products.categoryId, categories.id));
+    return result.map((r) => ({ ...r.products, category: r.categories }));
   }
 
   async exportExcel(): Promise<Buffer> {
@@ -55,7 +60,11 @@ export class ProductsService {
   }
 
   async findAllAdmin() {
-    return this.db.select().from(products);
+    const result = await this.db
+      .select()
+      .from(products)
+      .leftJoin(categories, eq(products.categoryId, categories.id));
+    return result.map((r) => ({ ...r.products, category: r.categories }));
   }
 
   async findOne(id: number) {

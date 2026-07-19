@@ -33,7 +33,7 @@ export default function ListSales() {
     setLoading(true);
     setError('');
     adminService.transactions
-      .list()
+      .listAdmin()
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.results || [];
         setItems(arr);
@@ -174,22 +174,22 @@ export default function ListSales() {
           loadingText={t('listSales.cargando')}
           emptyText={t('listSales.vacio')}
         >
-          {pageItems.map((t) => (
-            <TableRow key={t.id}>
-              <TableCell className="whitespace-nowrap">{t.id}</TableCell>
-              <TableCell className="whitespace-nowrap">{t.orderId ?? '-'}</TableCell>
-              <TableCell className="break-words">{getUserLabel(t)}</TableCell>
-              <TableCell className="whitespace-nowrap font-medium">{fmt.money(t.amount)}</TableCell>
-              <TableCell className="break-words">{t.paymentMethod}</TableCell>
-              <TableCell className="break-words">{t.reference}</TableCell>
+          {pageItems.map((tr) => (
+            <TableRow key={tr.id}>
+              <TableCell className="whitespace-nowrap">{tr.id}</TableCell>
+              <TableCell className="whitespace-nowrap">{tr.orderId ?? '-'}</TableCell>
+              <TableCell className="break-words">{getUserLabel(tr)}</TableCell>
+              <TableCell className="whitespace-nowrap font-medium">{fmt.money(tr.amount)}</TableCell>
+              <TableCell className="break-words">{tr.paymentMethod}</TableCell>
+              <TableCell className="break-words">{tr.reference}</TableCell>
               <TableCell className="break-words">
-                <StatusBadge estado={t.status} variant="order" />
+                <StatusBadge estado={tr.status} variant="order" />
               </TableCell>
-              <TableCell className="whitespace-nowrap">{fmt.date(t.createdAt)}</TableCell>
+              <TableCell className="whitespace-nowrap">{fmt.date(tr.createdAt)}</TableCell>
               <TableCell align="center">
                 <ActionButton
                   variant="edit"
-                    onClick={() => navigate(locPath(`/admin/ventas/editar/${t.id}`))}
+                    onClick={() => navigate(locPath(`/admin/ventas/editar/${tr.id}`))}
                 >
                   {t('listSales.editar')}
                 </ActionButton>

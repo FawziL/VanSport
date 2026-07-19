@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { schema } from '../../db';
-import { shipments } from '../../db/schema';
+import { shipments, orders } from '../../db/schema';
 import { eq } from 'drizzle-orm';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { UpdateShipmentDto } from './dto/update-shipment.dto';
@@ -19,8 +19,12 @@ export class ShipmentsService {
       .where(eq(schema.orders.userId, userId));
   }
 
-  async findAll() {
-    return this.db.select().from(shipments);
+  async findAllAdmin() {
+    const result = await this.db
+      .select()
+      .from(shipments)
+      .innerJoin(orders, eq(shipments.orderId, orders.id));
+    return result.map((r) => ({ ...r.shipments, userId: r.orders.userId }));
   }
 
   async exportExcel(): Promise<Buffer> {

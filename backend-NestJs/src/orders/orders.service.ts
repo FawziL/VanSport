@@ -1,8 +1,8 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { schema } from '../../db';
-import { orders, orderItems, cartItems, products } from '../../db/schema';
-import { eq } from 'drizzle-orm';
+import { orders, orderItems, cartItems, products, shipments, transactions as txTable } from '../../db/schema';
+import { eq, desc } from 'drizzle-orm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CheckoutDto } from './dto/checkout.dto';
@@ -51,8 +51,30 @@ export class OrdersService {
   }
 
   async findOne(id: number) {
-    const result = await this.db.select().from(orders).where(eq(orders.id, id));
-    return result[0] || null;
+    const [order] = await this.db.select().from(orders).where(eq(orders.id, id));
+    if (!order) return null;
+
+    const items = await this.db
+      .select({
+        id: orderItems.id,
+        productId: orderItems.productId,
+        productName: products.name,
+        unitPrice: orderItems.unitPrice,
+        quantity: orderItems.quantity,
+        subtotal: orderItems.subtotal,
+      })
+      .from(orderItems)
+      .leftJoin(products, eq(orderItems.productId, products.id))
+      .where(eq(orderItems.orderId, id));
+
+    const [lastTx] = await this.db
+      .select()
+      .from(txTable)
+      .where(eq(txTable.orderId, id))
+      .orderBy(desc(txTable.createdAt))
+      .limit(1);
+
+    return { ...order, detalles: items, ultima_transaccion: lastTx || null };
   }
 
   async create(dto: CreateOrderDto, userId: string) {
@@ -129,12 +151,27 @@ export class OrdersService {
 
       await tx.delete(cartItems).where(eq(cartItems.userId, userId));
 
+      const shippingMethod = dto.deliveryMethod === 'pickup' ? 'pickup' : 'delivery';
+      const address = dto.deliveryMethod === 'pickup' ? null : (dto.shippingAddress || null);
+      await tx.insert(shipments).values({
+        orderId: order.id,
+        shippingMethod,
+        address,
+        status: 'pending',
+        cost: '0',
+      });
+
       return order;
     });
   }
 
   async update(id: number, dto: UpdateOrderDto) {
-    const result = await this.db.update(orders).set(dto).where(eq(orders.id, id)).returning();
+    const values: any = {};
+    if (dto.status !== undefined) values.status = dto.status;
+    if (dto.shippingAddress !== undefined) values.shippingAddress = dto.shippingAddress;
+    if (dto.notes !== undefined) values.notes = dto.notes;
+
+    const result = await this.db.update(orders).set(values).where(eq(orders.id, id)).returning();
     return result[0] || null;
   }
 
