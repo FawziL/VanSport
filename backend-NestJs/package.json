@@ -16,6 +16,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:pull": "drizzle-kit pull",
+    "db:seed": "ts-node -r dotenv/config db/seed.ts",
     "test": "vitest",
     "test:e2e": "vitest --config vitest.e2e.config.ts"
   },
